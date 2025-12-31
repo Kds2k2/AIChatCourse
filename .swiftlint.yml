@@ -4,3 +4,6 @@ type_body_length:
   warning: 500
 file_length:
   warning: 750
+
+disabled_rules:
+  - trailing_whitespace
