@@ -44,4 +44,5 @@ struct ProfileView: View {
 
 #Preview {
     ProfileView()
+        .environment(AppState())
 }
