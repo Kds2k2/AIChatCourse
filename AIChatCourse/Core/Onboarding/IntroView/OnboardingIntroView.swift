@@ -38,11 +38,13 @@ struct OnboardingIntroView: View {
         }
         .font(.title3)
         .padding(24)
-    } 
+        .toolbarVisibility(.hidden, for: .navigationBar)
+    }
 }
 
 #Preview {
     NavigationStack {
         OnboardingIntroView()
     }
+    .environment(AppState())
 }
