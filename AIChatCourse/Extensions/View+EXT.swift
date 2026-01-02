@@ -21,4 +21,27 @@ extension View {
     func tappableBackground() -> some View {
         background(Color.black.opacity(0.001))
     }
+    
+    func outlineBackground(lineWidth: CGFloat) -> some View {
+        overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(.primary.opacity(0.35), lineWidth: lineWidth)
+        )
+    }
+    
+    func gradientBackground() -> some View {
+        background(
+            LinearGradient(colors: [
+                Color.black.opacity(0.0),
+                Color.black.opacity(0.3),
+                Color.black.opacity(0.4)
+            ], startPoint: .top, endPoint: .bottom)
+        )
+    }
+    
+    func removeListRowFormatting() -> some View {
+        self
+            .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+            .listRowBackground(Color.clear)
+    }
 }

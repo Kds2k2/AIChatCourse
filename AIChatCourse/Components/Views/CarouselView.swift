@@ -26,7 +26,7 @@ struct CarouselView<Content: View, T: Hashable>: View {
                 ForEach(items, id: \.self) { item in
                     content(item)
                         .scrollTransition(.interactive.threshold(.visible(0.95)), transition: { content, phase in
-                            content.scaleEffect(phase.isIdentity ? 1 : 0.9)
+                            content.scaleEffect(phase.isIdentity ? 1 : 0.85)
                         })
                         .containerRelativeFrame(.horizontal, alignment: .center)
                         .id(item)
@@ -35,6 +35,7 @@ struct CarouselView<Content: View, T: Hashable>: View {
             .scrollTargetLayout()
         }
         .frame(height: 200)
+        .scrollClipDisabled(true)
         .scrollIndicators(.hidden)
         .scrollTargetBehavior(.paging)
         .scrollPosition(id: $selection)
@@ -73,4 +74,5 @@ struct CarouselView<Content: View, T: Hashable>: View {
             lineWidth: 1.0
         )
     })
+    .padding(16)
 }

@@ -24,10 +24,7 @@ struct HeroCellView: View {
                     .fill(.accent)
             }
         }
-        .overlay(
-            RoundedRectangle(cornerRadius: 16)
-                .stroke(.primary.opacity(0.35), lineWidth: lineWidth)
-        )
+        .outlineBackground(lineWidth: lineWidth)
         .overlay(alignment: .bottomLeading, content: {
             VStack(alignment: .leading, spacing: 4) {
                 if let title {
@@ -43,13 +40,7 @@ struct HeroCellView: View {
             .foregroundStyle(.white)
             .padding(16)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(
-                LinearGradient(colors: [
-                    Color.black.opacity(0.0),
-                    Color.black.opacity(0.3),
-                    Color.black.opacity(0.4)
-                ], startPoint: .top, endPoint: .bottom)
-            )
+            .gradientBackground()
         })
         .cornerRadius(16)
     }
