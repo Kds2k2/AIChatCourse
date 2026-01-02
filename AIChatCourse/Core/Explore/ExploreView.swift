@@ -12,12 +12,14 @@ struct ExploreView: View {
     let avatar = AvatarModel.mock
     @State private var featuredAvatars: [AvatarModel] = AvatarModel.mocks
     @State private var categories: [CharacterOption] = CharacterOption.allCases
+    @State private var popularAvatars: [AvatarModel] = AvatarModel.mocks
     
     var body: some View {
         NavigationStack {
             List {
                 featuredSection
                 categorySection
+                popularSection
             }
             .navigationTitle("Explore")
         }
@@ -33,6 +35,9 @@ struct ExploreView: View {
                         imageName: avatar.profileImageName,
                         lineWidth: 1.0
                     )
+                    .anyButton {
+                        // action
+                    }
                 }
             }
             .removeListRowFormatting()
@@ -53,6 +58,10 @@ struct ExploreView: View {
                                 imageName: Constants.randomImage,
                                 lineWidth: 1.0
                             )
+                            .anyButton {
+                                // action
+                            }
+                            .removeListRowFormatting()
                         }
                     }
                     .scrollTargetLayout()
@@ -65,6 +74,25 @@ struct ExploreView: View {
             .removeListRowFormatting()
         } header: {
             Text("Categories")
+        }
+        .padding(3)
+    }
+    
+    private var popularSection: some View {
+        Section {
+            ForEach(popularAvatars, id: \.self) { avatar in
+                CustomListCellView(
+                    imageName: avatar.profileImageName,
+                    title: avatar.name,
+                    subtitle: avatar.characterDescription
+                )
+                .anyButton(.highlight) {
+                    // action
+                }
+                .removeListRowFormatting()
+            }
+        } header: {
+            Text("Popular")
         }
         .padding(3)
     }
