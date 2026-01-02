@@ -13,6 +13,8 @@ struct HeroCellView: View {
     var subtitle: String? = "This is some subtitle"
     var imageName: String? = Constants.randomImage
     
+    var lineWidth: CGFloat = 0.0
+    
     var body: some View {
         ZStack {
             if let imageName {
@@ -22,6 +24,10 @@ struct HeroCellView: View {
                     .fill(.accent)
             }
         }
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(.primary.opacity(0.35), lineWidth: lineWidth)
+        )
         .overlay(alignment: .bottomLeading, content: {
             VStack(alignment: .leading, spacing: 4) {
                 if let title {
