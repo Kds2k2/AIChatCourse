@@ -42,9 +42,9 @@ struct AvatarModel: Hashable {
         AvatarDescriptionBuilder(avatar: self).characterDescription
     }
     
-    static var mock: AvatarModel { mocks[0] }
+    static var mock: Self { mocks[0] }
     
-    static var mocks: [AvatarModel] {
+    static var mocks: [Self] {
         [
             AvatarModel(avatarId: UUID().uuidString, name: "Alpha", characterOption: .alien, characterAction: .walking, characterLocation: .space, profileImageName: Constants.randomImage, authorId: UUID().uuidString, createdAt: .now),
             
