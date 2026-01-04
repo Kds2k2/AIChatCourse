@@ -9,7 +9,8 @@ import SwiftUI
 
 struct WelcomeView: View {
     @State private var imageName: String = Constants.randomImage
-
+    @State private var showCreateAccountView: Bool = false
+    
     var body: some View {
         NavigationStack {
             VStack(spacing: 8) {
@@ -24,6 +25,13 @@ struct WelcomeView: View {
                 
                 policyLinks
             }
+        }
+        .sheet(isPresented: $showCreateAccountView) {
+            CreateAccountView(
+                title: "Sign in",
+                subtitle: "Connect to an existing account."
+            )
+            .presentationDetents([.medium])
         }
     }
 
@@ -53,9 +61,13 @@ struct WelcomeView: View {
                 .font(.body)
                 .padding(8)
                 .onTapGesture {
-                    print("Clicked!")
+                    onSignInPressed()
                 }
         }
+    }
+    
+    private func onSignInPressed() {
+        showCreateAccountView = true
     }
     
     private var policyLinks: some View {
