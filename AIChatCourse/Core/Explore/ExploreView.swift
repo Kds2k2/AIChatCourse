@@ -44,7 +44,6 @@ struct ExploreView: View {
         } header: {
             Text("Featured Avatars")
         }
-        .padding(3)
     }
     
     private var categorySection: some View {
@@ -61,7 +60,6 @@ struct ExploreView: View {
                             .anyButton {
                                 // action
                             }
-                            .removeListRowFormatting()
                         }
                     }
                     .scrollTargetLayout()
@@ -75,7 +73,6 @@ struct ExploreView: View {
         } header: {
             Text("Categories")
         }
-        .padding(3)
     }
     
     private var popularSection: some View {
@@ -94,7 +91,6 @@ struct ExploreView: View {
         } header: {
             Text("Popular")
         }
-        .padding(3)
     }
 }
 
