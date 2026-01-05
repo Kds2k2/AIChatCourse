@@ -41,7 +41,7 @@ struct UserModel {
         let now = Date()
         return [
             UserModel(
-                userId: UUID().uuidString,
+                userId: "user1",
                 didCompleteOnboarding: false,
                 profileColorHex: "#9F2B68",
                 createdAt: now.addingTimeInterval(days: -5)

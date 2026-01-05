@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct ChatMessageModel {
+struct ChatMessageModel: Identifiable, Hashable {
     let id: String
     let chatId: String
     let authorId: String?
@@ -63,15 +63,15 @@ struct ChatMessageModel {
             ChatMessageModel(
                 id: UUID().uuidString,
                 chatId: "3",
-                authorId: "user3",
+                authorId: "user1",
                 content: "Doing great! Working on the app.",
-                seenByIds: ["user1", "user2", "user4"],
+                seenByIds: ["user2", "user4"],
                 createdAt: now.addingTimeInterval(days: -1, minutes: -3)
             ),
             ChatMessageModel(
                 id: UUID().uuidString,
                 chatId: "1",
-                authorId: "user1",
+                authorId: "user3",
                 content: "Nice 🚀 Can’t wait to see it.",
                 seenByIds: nil,
                 createdAt: now.addingTimeInterval(minutes: -1)
