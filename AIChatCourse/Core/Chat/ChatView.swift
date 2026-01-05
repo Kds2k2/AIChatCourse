@@ -12,29 +12,116 @@ struct ChatView: View {
     @State private var chatMessages: [ChatMessageModel] = ChatMessageModel.mocks
     @State private var avatar: AvatarModel? = .mock
     @State private var currentUser: UserModel? = .mock
-
+    @State private var textFieldText: String = ""
+    
+    @State private var showChatSettings: Bool = false
+    @State private var scrollPosition: String?
+    
     var body: some View {
-        VStack(spacing: 0) {
-            ScrollView {
-                LazyVStack(spacing: 24) {
-                    ForEach(chatMessages, id: \.self) { message in
-                        let isCurrentUser = message.authorId == currentUser?.userId
-                        ChatBubbleViewBuilder(
-                            message: message,
-                            isCurrentUser: isCurrentUser,
-                            imageName: isCurrentUser ? nil : avatar?.profileImageName
-                        )
-                    }
-                }
-                .frame(maxWidth: .infinity)
-                .padding(.horizontal, 8)
-            }
-            
-            Rectangle()
-                .frame(height: 50)
+        VStack(spacing: 10) {
+            messagesSection
+            textFieldSection
         }
         .navigationTitle(avatar?.name ?? "Chat")
         .toolbarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                settingsButton
+            }
+        }
+    }
+
+    private var messagesSection: some View {
+        ScrollView {
+            LazyVStack(spacing: 24) {
+                ForEach(chatMessages, id: \.self) { message in
+                    let isCurrentUser = message.authorId == currentUser?.userId
+                    ChatBubbleViewBuilder(
+                        message: message,
+                        isCurrentUser: isCurrentUser,
+                        imageName: isCurrentUser ? nil : avatar?.profileImageName
+                    )
+                    .id(message.id)
+                }
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.horizontal, 8)
+            .rotationEffect(.degrees(180))
+        }
+        .rotationEffect(.degrees(180))
+        .scrollPosition(id: $scrollPosition, anchor: .center)
+        .animation(.default, value: chatMessages.count)
+        .animation(.default, value: scrollPosition)
+    }
+    
+    private var textFieldSection: some View {
+        TextField("Say something...", text: $textFieldText)
+            .keyboardType(.alphabet)
+            .autocorrectionDisabled()
+            .padding(12)
+            .padding(.trailing, 40)
+            .overlay(alignment: .trailing, content: {
+                Image(systemName: "arrow.up.circle.fill")
+                    .font(.system(size: 32))
+                    .padding(.trailing, 4)
+                    .foregroundStyle(.accent)
+                    .anyButton {
+                        onSendMessagePressed()
+                    }
+            })
+            .background {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 100)
+                        .fill(Color(uiColor: .systemBackground))
+                    
+                    RoundedRectangle(cornerRadius: 100)
+                        .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                }
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 6)
+            .background(Color(uiColor: .secondarySystemBackground))
+    }
+    
+    private var settingsButton: some View {
+        Image(systemName: "ellipsis")
+            .foregroundStyle(.accent)
+            .padding(8)
+            .anyButton {
+                onChatSettingPressed()
+            }
+            .confirmationDialog("", isPresented: $showChatSettings) {
+                Button("Report User / Chat", role: .destructive) {
+                    // action
+                }
+                Button("Delete Chat", role: .destructive) {
+                    // action
+                }
+            } message: {
+                Text("What would you like to do?")
+            }
+    }
+    
+    private func onSendMessagePressed() {
+        guard let currentUser else { return }
+        let content = textFieldText
+        
+        let message = ChatMessageModel(
+            id: UUID().uuidString,
+            chatId: UUID().uuidString,
+            authorId: currentUser.userId,
+            content: content,
+            seenByIds: nil,
+            createdAt: .now
+        )
+        chatMessages.append(message)
+        
+        scrollPosition = message.id
+        textFieldText = ""
+    }
+    
+    private func onChatSettingPressed() {
+        showChatSettings = true
     }
 }
 
