@@ -42,7 +42,7 @@ struct OnboardingCompletedView: View {
         isCompletingProfileSetup = true
 
         Task {
-            try await Task.sleep(for: .seconds(3))
+            try? await Task.sleep(for: .seconds(3))
             // try await saveUserProfile(color: selectedColor)
             isCompletingProfileSetup = false
 

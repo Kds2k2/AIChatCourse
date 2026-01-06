@@ -10,6 +10,7 @@ import SDWebImageSwiftUI
 
 struct CategoryListView: View {
     
+    @Binding var path: [NavigationPathOption]
     var category: CharacterOption = .alien
     var imageName: String = Constants.randomImage
     @State private var avatars: [AvatarModel] = AvatarModel.mocks + AvatarModel.mocks + AvatarModel.mocks
@@ -25,6 +26,7 @@ struct CategoryListView: View {
                 contentMode: .fill
             )
             .removeListRowFormatting()
+            .listRowSeparator(.hidden, edges: .top)
             .stretchy()
             
             ForEach(avatars, id: \.self) { avatar in
@@ -33,6 +35,9 @@ struct CategoryListView: View {
                     title: avatar.name,
                     subtitle: avatar.characterDescription
                 )
+                .anyButton(.highlight) {
+                    onAvatarPressed(avatar: avatar)
+                }
                 .removeListRowFormatting()
             }
         }
@@ -41,8 +46,12 @@ struct CategoryListView: View {
         .scrollIndicators(.hidden)
         .ignoresSafeArea()
     }
+    
+    private func onAvatarPressed(avatar: AvatarModel) {
+        path.append(.chat(avatarId: avatar.avatarId))
+    }
 }
 
 #Preview {
-    CategoryListView()
+    CategoryListView(path: .constant([]))
 }

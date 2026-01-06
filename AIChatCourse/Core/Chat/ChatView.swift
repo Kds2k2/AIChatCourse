@@ -21,6 +21,8 @@ struct ChatView: View {
 
     @State private var showProfileModel: Bool = false
     
+    var avatarId: String = AvatarModel.mock.avatarId
+    
     var body: some View {
         VStack(spacing: 10) {
             messagesSection

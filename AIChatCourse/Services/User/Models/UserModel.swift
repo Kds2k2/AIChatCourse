@@ -7,7 +7,7 @@
 import Foundation
 import SwiftUI
 
-struct UserModel {
+struct UserModel: Hashable {
     let userId: String
     let didCompleteOnboarding: Bool?
     let profileColorHex: String?
