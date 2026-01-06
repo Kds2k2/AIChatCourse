@@ -14,6 +14,7 @@ struct HeroCellView: View {
     var imageName: String? = Constants.randomImage
     
     var lineWidth: CGFloat = 0.0
+    var cornerRadius: CGFloat = 16.0
     
     var body: some View {
         ZStack {
@@ -42,7 +43,7 @@ struct HeroCellView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .gradientBackground()
         })
-        .cornerRadius(16)
+        .cornerRadius(cornerRadius)
     }
 }
 
