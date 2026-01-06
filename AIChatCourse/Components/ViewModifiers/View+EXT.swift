@@ -55,4 +55,15 @@ extension View {
             .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
             .listRowBackground(Color.clear)
     }
+    
+    // condition must NOT change while render on the screen,
+    // it would cause to re-render entire view.
+    @ViewBuilder
+    func ifSatisfiedCondition(_ condition: Bool, transform: @escaping (Self) -> some View) -> some View {
+        if condition {
+            transform(self)
+        } else {
+            self
+        }
+    }
 }
