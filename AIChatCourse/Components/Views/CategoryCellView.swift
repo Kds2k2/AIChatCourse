@@ -15,10 +15,11 @@ struct CategoryCellView: View {
     var font: Font = .title2
     var cornerRadius: CGFloat = 16
     var lineWidth: CGFloat = 0.0
+    var contentMode: ContentMode = .fit
     
     var body: some View {
         ImageLoaderView(urlString: imageName)
-            .aspectRatio(1, contentMode: .fit)
+            .aspectRatio(1, contentMode: contentMode)
             .overlay(alignment: .bottomLeading) {
                 Text(title)
                     .font(font)
@@ -41,5 +42,7 @@ struct CategoryCellView: View {
             .frame(width: 150)
         CategoryCellView(lineWidth: 1.0)
             .frame(width: 300)
+        
+        CategoryCellView(lineWidth: 1.0, contentMode: .fill)
     }
 }

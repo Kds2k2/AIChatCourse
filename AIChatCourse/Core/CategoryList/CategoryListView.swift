@@ -6,12 +6,13 @@
 //
 
 import SwiftUI
+import SDWebImageSwiftUI
 
 struct CategoryListView: View {
     
     var category: CharacterOption = .alien
     var imageName: String = Constants.randomImage
-    @State private var avatars: [AvatarModel] = AvatarModel.mocks
+    @State private var avatars: [AvatarModel] = AvatarModel.mocks + AvatarModel.mocks + AvatarModel.mocks
     
     var body: some View {
         List {
@@ -20,9 +21,11 @@ struct CategoryListView: View {
                 imageName: imageName,
                 font: .title,
                 cornerRadius: 0.0,
-                lineWidth: 0.0
+                lineWidth: 0.0,
+                contentMode: .fill
             )
             .removeListRowFormatting()
+            .stretchy()
             
             ForEach(avatars, id: \.self) { avatar in
                 CustomListCellView(
@@ -34,6 +37,7 @@ struct CategoryListView: View {
             }
         }
         .listStyle(.plain)
+        .coordinateSpace(name: "scroll")
         .scrollIndicators(.hidden)
         .ignoresSafeArea()
     }
