@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>API_KEY</key>
+	<string>AIzaSyBdRSZKMkOPz9wR8-jQTZD1QMZqod83pso</string>
+	<key>GCM_SENDER_ID</key>
+	<string>608769669352</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.DimaKryzhanovsky.AIChatCourse</string>
+	<key>PROJECT_ID</key>
+	<string>personal-aichatcourse</string>
+	<key>STORAGE_BUCKET</key>
+	<string>personal-aichatcourse.firebasestorage.app</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:608769669352:ios:0ed2157a785d2543e1f15d</string>
+</dict>
+</plist>

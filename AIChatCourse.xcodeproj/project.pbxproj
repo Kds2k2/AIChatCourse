@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		260C87972F0705DC0078F742 /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 260C87962F0705DC0078F742 /* SDWebImageSwiftUI */; };
+		26C599762F0FAF2200D7A1DE /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 26C599752F0FAF2200D7A1DE /* FirebaseAuth */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -57,6 +58,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				260C87972F0705DC0078F742 /* SDWebImageSwiftUI in Frameworks */,
+				26C599762F0FAF2200D7A1DE /* FirebaseAuth in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -119,6 +121,7 @@
 			name = AIChatCourse;
 			packageProductDependencies = (
 				260C87962F0705DC0078F742 /* SDWebImageSwiftUI */,
+				26C599752F0FAF2200D7A1DE /* FirebaseAuth */,
 			);
 			productName = AIChatCourse;
 			productReference = 26CA90F22F032E9500E21190 /* AIChatCourse.app */;
@@ -204,6 +207,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				260C87952F0705DC0078F742 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */,
+				26C599742F0FAF2200D7A1DE /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 26CA90F32F032E9500E21190 /* Products */;
@@ -668,6 +672,14 @@
 				minimumVersion = 3.1.4;
 			};
 		};
+		26C599742F0FAF2200D7A1DE /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.7.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -675,6 +687,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 260C87952F0705DC0078F742 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */;
 			productName = SDWebImageSwiftUI;
+		};
+		26C599752F0FAF2200D7A1DE /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 26C599742F0FAF2200D7A1DE /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
