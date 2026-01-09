@@ -12,36 +12,6 @@ extension EnvironmentValues {
     @Entry var authService: FirebaseAuthService = FirebaseAuthService()
 }
 
-struct UserAuthInfo {
-    let uid: String
-    let email: String?
-    let isAnonymous: Bool
-    let createdAt: Date?
-    let lastSignInAt: Date?
-    
-    init(
-        uid: String,
-        email: String? = nil,
-        isAnonymous: Bool = false,
-        createdAt: Date? = nil,
-        lastSignInAt: Date? = nil
-    ) {
-        self.uid = uid
-        self.email = email
-        self.isAnonymous = isAnonymous
-        self.createdAt = createdAt
-        self.lastSignInAt = lastSignInAt
-    }
-    
-    init(user: User) {
-        self.uid = user.uid
-        self.email = user.email
-        self.isAnonymous = user.isAnonymous
-        self.createdAt = user.metadata.creationDate
-        self.lastSignInAt = user.metadata.lastSignInDate
-    }
-}
-
 struct FirebaseAuthService {
     
     func getAuthenticatedUser() -> UserAuthInfo? {
@@ -57,6 +27,58 @@ struct FirebaseAuthService {
         let user = UserAuthInfo(user: result.user)
         let isNewUser = result.additionalUserInfo?.isNewUser ?? true
         
+        return (user, isNewUser)
+    }
+    
+    func signInWithEmailAndPassword(email: String, password: String) async throws -> (user: UserAuthInfo, isNewUser: Bool) {
+        if let user = Auth.auth().currentUser, user.isAnonymous {
+            try await user.delete()
+        }
+        
+        let result = try await Auth.auth().signIn(withEmail: email, password: password)
+        return result.asAuthInfo
+    }
+    
+    func signUpWithEmailAndPassword(email: String, password: String) async throws -> (user: UserAuthInfo, isNewUser: Bool) {
+        
+        if let user = Auth.auth().currentUser, user.isAnonymous {
+            let credential = EmailAuthProvider.credential(withEmail: email, password: password)
+            let result = try await user.link(with: credential)
+            return result.asAuthInfo
+        }
+        
+        let result = try await Auth.auth().createUser(withEmail: email, password: password)
+        return result.asAuthInfo
+    }
+    
+    func signOut() throws {
+        try Auth.auth().signOut()
+    }
+    
+    func deleteAccount() async throws {
+        guard let user = Auth.auth().currentUser else {
+            throw AuthError.userNotFount
+        }
+        
+        try await user.delete()
+    }
+    
+    enum AuthError: LocalizedError {
+        case userNotFount
+        
+        var errorDescription: String? {
+            switch self {
+            case .userNotFount:
+                return "Current Authenticated user not found."
+            }
+        }
+    }
+}
+
+extension AuthDataResult {
+    var asAuthInfo: (user: UserAuthInfo, isNewUser: Bool) {
+        let user = UserAuthInfo(user: user)
+        let isNewUser = additionalUserInfo?.isNewUser ?? true
         return (user, isNewUser)
     }
 }

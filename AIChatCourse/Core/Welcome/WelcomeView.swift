@@ -27,11 +27,7 @@ struct WelcomeView: View {
             }
         }
         .sheet(isPresented: $showCreateAccountView) {
-            CreateAccountView(
-                title: "Sign in",
-                subtitle: "Connect to an existing account."
-            )
-            .presentationDetents([.medium])
+            SignInWithEmailAndPasswordView()
         }
     }
 

@@ -5,9 +5,10 @@
 //  Created by Dmitro Kryzhanovsky on 04.01.2026.
 //
 import SwiftUI
+import FirebaseAuth
 import AuthenticationServices
 
-struct CreateAccountView: View {
+struct CreateAccountWithAppleView: View {
     @State private var authorizationResult: ASAuthorization?
     @State private var error: Error?
     
@@ -50,5 +51,5 @@ struct CreateAccountView: View {
 }
 
 #Preview {
-    CreateAccountView()
+    CreateAccountWithAppleView()
 }

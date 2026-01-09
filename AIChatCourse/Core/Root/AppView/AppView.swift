@@ -25,6 +25,13 @@ struct AppView: View {
         .task {
             await checkUserStatus()
         }
+        .onChange(of: appState.showTabBar) { _, showTabBar in
+            if !showTabBar {
+                Task {
+                    await checkUserStatus()
+                }
+            }
+        }
     }
     
     private func checkUserStatus() async {
@@ -35,7 +42,7 @@ struct AppView: View {
             // User is not authenticated
             do {
                 let result = try await authService.singInAnonymously()
-                // log in t app
+                // log in the app
                 print("Sign in anonymous succes: \(result.user.uid), new: \(result.isNewUser)")
             } catch {
                 print(error)
