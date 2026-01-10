@@ -20,6 +20,8 @@ struct SignInWithEmailAndPasswordView: View {
     @State var email: String = "test@gmail.com"
     @State var password: String = "Password12345!"
 
+    var onDidSignIn: (_ isNewUser: Bool) -> Void
+    
     var body: some View {
         NavigationStack {
             VStack {
@@ -89,15 +91,19 @@ struct SignInWithEmailAndPasswordView: View {
 
     private func onLoginPressed() {
         Task {
-            _ = try? await authService.signInWithEmailAndPassword(email: email, password: password)
+            if let result = try? await authService.signInWithEmailAndPassword(email: email, password: password) {
+                dismiss()
+                onDidSignIn(result.isNewUser)
+            }
+            
             dismiss()
-            try? await Task.sleep(for: .seconds(1))
-            root.updateViewState(showTabBarView: true)
         }
     }
 }
 
 #Preview {
-    SignInWithEmailAndPasswordView()
-        .environment(AppState())
+    SignInWithEmailAndPasswordView { isNewUser in
+        print("\(isNewUser)")
+    }
+    .environment(AppState())
 }

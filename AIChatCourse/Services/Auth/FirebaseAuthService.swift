@@ -8,11 +8,7 @@
 import SwiftUI
 import FirebaseAuth
 
-extension EnvironmentValues {
-    @Entry var authService: FirebaseAuthService = FirebaseAuthService()
-}
-
-struct FirebaseAuthService {
+struct FirebaseAuthService: AuthService {
     
     func getAuthenticatedUser() -> UserAuthInfo? {
         if let user = Auth.auth().currentUser {
@@ -32,17 +28,24 @@ struct FirebaseAuthService {
     
     func signInWithEmailAndPassword(email: String, password: String) async throws -> (user: UserAuthInfo, isNewUser: Bool) {
         if let user = Auth.auth().currentUser, user.isAnonymous {
+            let result = try await Auth.auth().signIn(withEmail: email, password: password)
+            
             try await user.delete()
+            return result.asAuthInfo
         }
-        
+
         let result = try await Auth.auth().signIn(withEmail: email, password: password)
         return result.asAuthInfo
     }
     
     func signUpWithEmailAndPassword(email: String, password: String) async throws -> (user: UserAuthInfo, isNewUser: Bool) {
         
+        let credential = EmailAuthProvider.credential(
+            withEmail: email,
+            password: password
+        )
+        
         if let user = Auth.auth().currentUser, user.isAnonymous {
-            let credential = EmailAuthProvider.credential(withEmail: email, password: password)
             let result = try await user.link(with: credential)
             return result.asAuthInfo
         }

@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct OnboardingIntroView: View {
+    @Environment(\.authService) private var authService
+    
     var body: some View {
         VStack {
             Group {

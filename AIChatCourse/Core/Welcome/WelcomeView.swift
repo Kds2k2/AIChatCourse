@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct WelcomeView: View {
+    @Environment(AppState.self) private var root
+    
     @State private var imageName: String = Constants.randomImage
     @State private var showCreateAccountView: Bool = false
     
@@ -27,7 +29,9 @@ struct WelcomeView: View {
             }
         }
         .sheet(isPresented: $showCreateAccountView) {
-            SignInWithEmailAndPasswordView()
+            SignInWithEmailAndPasswordView { isNewUser in
+                handleDidSignIn(isNewUser: isNewUser)
+            }
         }
     }
 
@@ -62,10 +66,6 @@ struct WelcomeView: View {
         }
     }
     
-    private func onSignInPressed() {
-        showCreateAccountView = true
-    }
-    
     private var policyLinks: some View {
         HStack(spacing: 8) {
             Link(destination: URL(string: Constants.termosOfServiceURL)!) {
@@ -78,6 +78,21 @@ struct WelcomeView: View {
             
             Link(destination: URL(string: Constants.privacyPolicyURL)!) {
                 Text("Privacy Policy")
+            }
+        }
+    }
+    
+    private func onSignInPressed() {
+        showCreateAccountView = true
+    }
+    
+    private func handleDidSignIn(isNewUser: Bool) {
+        if isNewUser {
+            // Do nothing
+        } else {
+            Task {
+                try? await Task.sleep(for: .seconds(0.5))
+                root.updateViewState(showTabBarView: true)
             }
         }
     }

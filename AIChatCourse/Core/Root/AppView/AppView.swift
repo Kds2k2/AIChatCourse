@@ -36,7 +36,6 @@ struct AppView: View {
     
     private func checkUserStatus() async {
         if let user = authService.getAuthenticatedUser() {
-            // User is authenticated
             print("User already authenticated: \(user.uid)")
         } else {
             // User is not authenticated

@@ -176,7 +176,6 @@ struct SettingsView: View {
     
     private func dismissScreen() async {
         dismiss()
-        try? await Task.sleep(for: .seconds(1))
         appState.updateViewState(showTabBarView: false)
     }
 }
@@ -191,7 +190,20 @@ fileprivate extension View {
     }
 }
 
-#Preview {
+#Preview("No auth") {
     SettingsView()
+        .environment(\.authService, MockAuthService(user: nil))
+        .environment(AppState())
+}
+
+#Preview("Anon") {
+    SettingsView()
+        .environment(\.authService, MockAuthService(user: UserAuthInfo.mock(isAnonymous: true)))
+        .environment(AppState())
+}
+
+#Preview("Not anon") {
+    SettingsView()
+        .environment(\.authService, MockAuthService(user: UserAuthInfo.mock(isAnonymous: false)))
         .environment(AppState())
 }
