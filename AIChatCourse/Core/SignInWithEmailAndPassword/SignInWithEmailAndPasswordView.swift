@@ -14,7 +14,7 @@ struct SignInWithEmailAndPasswordView: View {
     }
     
     @Environment(AppState.self) private var root
-    @Environment(\.authService) private var authService
+    @Environment(AuthManager.self) private var authManager
     @Environment(\.dismiss) private var dismiss
     
     @State var email: String = "test@gmail.com"
@@ -91,7 +91,7 @@ struct SignInWithEmailAndPasswordView: View {
 
     private func onLoginPressed() {
         Task {
-            if let result = try? await authService.signInWithEmailAndPassword(email: email, password: password) {
+            if let result = try? await authManager.signInWithEmailAndPassword(email: email, password: password) {
                 dismiss()
                 onDidSignIn(result.isNewUser)
             }

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct OnboardingIntroView: View {
-    @Environment(\.authService) private var authService
+    @Environment(AuthManager.self) private var authManager
     
     var body: some View {
         VStack {
