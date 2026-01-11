@@ -12,7 +12,8 @@ class AuthManager {
     
     private let service: AuthService
     private(set) var auth: UserAuthInfo?
-    private var listener: (any NSObjectProtocol)?
+    private var stateListener: (any NSObjectProtocol)?
+    private var idListener: (any NSObjectProtocol)?
     
     init(service: AuthService) {
         self.service = service
@@ -22,11 +23,12 @@ class AuthManager {
     
     private func addAuthListener() {
         Task {
-            for await value in service.addAuthenticatedUserListener(onListenerAttached: { listener in
-                self.listener = listener
+            for await value in service.addAuthenticatedListener(onListenerAttached: { listener in
+                self.stateListener = listener
             }) {
                 self.auth = value
                 print("Auth listener succes: \(value?.uid ?? "no uid")")
+                print("Auth status: \(self.auth?.isAnonymous ?? true)")
             }
         }
     }
@@ -40,21 +42,15 @@ class AuthManager {
     }
     
     func singInAnonymously() async throws -> (user: UserAuthInfo, isNewUser: Bool) {
-        let result = try await service.singInAnonymously()
-        self.auth = result.user
-        return result
+        try await service.singInAnonymously()
     }
     
     func signInWithEmailAndPassword(email: String, password: String) async throws -> (user: UserAuthInfo, isNewUser: Bool) {
-        let result = try await service.signInWithEmailAndPassword(email: email, password: password)
-        self.auth = result.user
-        return result
+        try await service.signInWithEmailAndPassword(email: email, password: password)
     }
     
     func signUpWithEmailAndPassword(email: String, password: String) async throws -> (user: UserAuthInfo, isNewUser: Bool) {
-        let result = try await service.signUpWithEmailAndPassword(email: email, password: password)
-        self.auth = result.user
-        return result
+        try await service.signUpWithEmailAndPassword(email: email, password: password)
     }
     
     func signOut() throws {

@@ -10,9 +10,9 @@ import FirebaseAuth
 
 struct FirebaseAuthService: AuthService {
     
-    func addAuthenticatedUserListener(onListenerAttached: (any NSObjectProtocol) -> Void) -> AsyncStream<UserAuthInfo?> {
+    func addAuthenticatedListener(onListenerAttached: (any NSObjectProtocol) -> Void) -> AsyncStream<UserAuthInfo?> {
         AsyncStream { continuation in
-            let listener = Auth.auth().addStateDidChangeListener { _, currentUser in
+            let listener = Auth.auth().addIDTokenDidChangeListener { _, currentUser in
                 if let currentUser {
                     let user = UserAuthInfo(user: currentUser)
                     continuation.yield(user)
@@ -61,8 +61,13 @@ struct FirebaseAuthService: AuthService {
         )
         
         if let user = Auth.auth().currentUser, user.isAnonymous {
-            let result = try await user.link(with: credential)
-            return result.asAuthInfo
+            do {
+                let linkResult = try await user.link(with: credential) // listener don't work with linking :\
+                let reauthenticateResult = try await linkResult.user.reauthenticate(with: credential)
+                return reauthenticateResult.asAuthInfo
+            } catch {
+                print("\(error)")
+            }
         }
         
         let result = try await Auth.auth().createUser(withEmail: email, password: password)
