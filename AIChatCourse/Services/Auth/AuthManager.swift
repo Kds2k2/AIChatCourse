@@ -40,15 +40,21 @@ class AuthManager {
     }
     
     func singInAnonymously() async throws -> (user: UserAuthInfo, isNewUser: Bool) {
-        try await service.singInAnonymously()
+        let result = try await service.singInAnonymously()
+        self.auth = result.user
+        return result
     }
     
     func signInWithEmailAndPassword(email: String, password: String) async throws -> (user: UserAuthInfo, isNewUser: Bool) {
-        try await service.signInWithEmailAndPassword(email: email, password: password)
+        let result = try await service.signInWithEmailAndPassword(email: email, password: password)
+        self.auth = result.user
+        return result
     }
     
     func signUpWithEmailAndPassword(email: String, password: String) async throws -> (user: UserAuthInfo, isNewUser: Bool) {
-        try await service.signUpWithEmailAndPassword(email: email, password: password)
+        let result = try await service.signUpWithEmailAndPassword(email: email, password: password)
+        self.auth = result.user
+        return result
     }
     
     func signOut() throws {

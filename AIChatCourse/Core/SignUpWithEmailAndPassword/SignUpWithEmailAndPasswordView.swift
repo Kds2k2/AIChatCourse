@@ -15,6 +15,7 @@ struct SignUpWithEmailAndPasswordView: View {
     
     @Environment(AppState.self) private var root
     @Environment(AuthManager.self) private var authManager
+    @Environment(UserManager.self) private var userManager
     @Environment(\.dismiss) private var dismiss
     
     @State var email: String = "test@gmail.com"
@@ -76,7 +77,15 @@ struct SignUpWithEmailAndPasswordView: View {
 
     private func onRegisterPressed() {
         Task {
-            _ = try? await authManager.signUpWithEmailAndPassword(email: email, password: password)
+            do {
+                let result = try await authManager.signUpWithEmailAndPassword(email: email, password: password)
+                print("Register, sign up success")
+                try await userManager.logIn(auth: result.user, isNewUser: result.isNewUser)
+                print("Register, log in success")
+            } catch {
+                print("onRegisterPressed: \(error)")
+            }
+            
             dismiss()
         }
     }
