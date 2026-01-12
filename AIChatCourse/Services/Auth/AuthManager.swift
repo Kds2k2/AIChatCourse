@@ -12,8 +12,7 @@ class AuthManager {
     
     private let service: AuthService
     private(set) var auth: UserAuthInfo?
-    private var stateListener: (any NSObjectProtocol)?
-    private var idListener: (any NSObjectProtocol)?
+    private var listener: (any NSObjectProtocol)?
     
     init(service: AuthService) {
         self.service = service
@@ -24,7 +23,7 @@ class AuthManager {
     private func addAuthListener() {
         Task {
             for await value in service.addAuthenticatedListener(onListenerAttached: { listener in
-                self.stateListener = listener
+                self.listener = listener
             }) {
                 self.auth = value
                 print("Auth listener succes: \(value?.uid ?? "no uid")")
