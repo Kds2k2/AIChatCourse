@@ -64,9 +64,13 @@ struct AppView: View {
 // I think, useful for empty/not empty state.
 #Preview("AppView - tabBar") {
     AppView(appState: AppState(showTabBar: true))
+        .environment(UserManager(service: MockUserService(user: .mock)))
+        .environment(AuthManager(service: MockAuthService(user: .mock())))
 }
 #Preview("AppView - onboarding") {
     AppView(appState: AppState(showTabBar: false))
+        .environment(UserManager(service: MockUserService(user: nil)))
+        .environment(AuthManager(service: MockAuthService(user: nil)))
 }
 
 // VARIANT 2

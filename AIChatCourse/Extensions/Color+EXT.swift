@@ -48,32 +48,32 @@ extension Color {
         )
     }
     
-    func toHex(includeAlpha: Bool = false) -> String? {
+    func toHex(alpha: Bool = false) -> String {
         let uiColor = UIColor(self)
 
         var red: CGFloat = 0
         var green: CGFloat = 0
         var blue: CGFloat = 0
-        var alpha: CGFloat = 0
+        var alphaValue: CGFloat = 0
 
-        guard uiColor.getRed(&red, green: &green, blue: &blue, alpha: &alpha) else {
-            return nil
+        guard uiColor.getRed(&red, green: &green, blue: &blue, alpha: &alphaValue) else {
+            return alpha ? "#00000000" : "#000000"
         }
 
-        if includeAlpha {
+        if alpha {
             return String(
-                format: "#%02X%02X%02X%02X",
-                Int(red * 255),
-                Int(green * 255),
-                Int(blue * 255),
-                Int(alpha * 255)
+                format: "#%02lX%02lX%02lX%02lX",
+                lroundf(Float(alphaValue) * 255),
+                lroundf(Float(red) * 255),
+                lroundf(Float(green) * 255),
+                lroundf(Float(blue) * 255)
             )
         } else {
             return String(
-                format: "#%02X%02X%02X",
-                Int(red * 255),
-                Int(green * 255),
-                Int(blue * 255)
+                format: "#%02lX%02lX%02lX",
+                lroundf(Float(red) * 255),
+                lroundf(Float(green) * 255),
+                lroundf(Float(blue) * 255)
             )
         }
     }

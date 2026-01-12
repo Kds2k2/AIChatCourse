@@ -4,10 +4,13 @@
 //
 //  Created by Dmitro Kryzhanovsky on 04.01.2026.
 //
-import Foundation
 import SwiftUI
+import Foundation
+import IdentifiableByString
 
-struct UserModel: Codable, Hashable {
+struct UserModel: Codable, Hashable, StringIdentifiable {
+
+    var id: String { userId }
     
     let userId: String
     let email: String?
