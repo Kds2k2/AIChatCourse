@@ -9,7 +9,9 @@ import SwiftUI
 
 struct ProfileView: View {
 
+    @Environment(AuthManager.self) private var authManager
     @Environment(UserManager.self) private var userManager
+    @Environment(AvatarManager.self) private var avatarManager
     
     @State private var currentUser: UserModel?
     @State private var myAvatars: [AvatarModel] = []
@@ -48,9 +50,14 @@ struct ProfileView: View {
     private func loadData() async {
         self.currentUser = userManager.currentUser
         
-        try? await Task.sleep(for: .seconds(3))
+        do {
+            let uid = try authManager.getAuthId()
+            myAvatars = try await avatarManager.getAvatarsForUser(userId: uid)
+        } catch {
+            print("Error while fetching user avatars\(error)")
+        }
+
         isLoading = false
-        myAvatars = AvatarModel.mocks
     }
 
     private var myInfoSection: some View {
@@ -140,6 +147,8 @@ struct ProfileView: View {
 
 #Preview {
     ProfileView()
-        .environment(AppState())
+        .environment(AuthManager(service: MockAuthService(user: .mock())))
         .environment(UserManager(services: MockUserServices(user: .mock)))
+        .environment(AvatarManager(service: MockAvatarService()))
+        .environment(AppState())
 }

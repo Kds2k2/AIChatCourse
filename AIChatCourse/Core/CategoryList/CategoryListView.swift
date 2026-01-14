@@ -10,10 +10,14 @@ import SDWebImageSwiftUI
 
 struct CategoryListView: View {
     
+    @Environment(AvatarManager.self) private var avatarManager
+        
     @Binding var path: [NavigationPathOption]
     var category: CharacterOption = .alien
     var imageName: String = Constants.randomImage
-    @State private var avatars: [AvatarModel] = AvatarModel.mocks + AvatarModel.mocks + AvatarModel.mocks
+    @State private var avatars: [AvatarModel] = []
+    
+    @State private var showAlert: AnyAppAlert?
     
     var body: some View {
         List {
@@ -29,22 +33,41 @@ struct CategoryListView: View {
             .listRowSeparator(.hidden, edges: .top)
             .stretchy()
             
-            ForEach(avatars, id: \.self) { avatar in
-                CustomListCellView(
-                    imageName: avatar.profileImageName,
-                    title: avatar.name,
-                    subtitle: avatar.characterDescription
-                )
-                .anyButton(.highlight) {
-                    onAvatarPressed(avatar: avatar)
+            if avatars.isEmpty {
+                ProgressView()
+                    .padding(40)
+                    .frame(maxWidth: .infinity)
+                    .removeListRowFormatting()
+            } else {
+                ForEach(avatars, id: \.self) { avatar in
+                    CustomListCellView(
+                        imageName: avatar.profileImageName,
+                        title: avatar.name,
+                        subtitle: avatar.characterDescription
+                    )
+                    .anyButton(.highlight) {
+                        onAvatarPressed(avatar: avatar)
+                    }
+                    .removeListRowFormatting()
                 }
-                .removeListRowFormatting()
             }
         }
         .listStyle(.plain)
         .coordinateSpace(name: "scroll")
         .scrollIndicators(.hidden)
         .ignoresSafeArea()
+        .task {
+            await loadAvatarsForCategory()
+        }
+        .showCustomAlert(alert: $showAlert)
+    }
+    
+    private func loadAvatarsForCategory() async {
+        do {
+            avatars = try await avatarManager.getAvatarsForCategory(category: category)
+        } catch {
+            showAlert = AnyAppAlert(error: error)
+        }
     }
     
     private func onAvatarPressed(avatar: AvatarModel) {
@@ -54,4 +77,5 @@ struct CategoryListView: View {
 
 #Preview {
     CategoryListView(path: .constant([]))
+        .environment(AvatarManager(service: MockAvatarService()))
 }
