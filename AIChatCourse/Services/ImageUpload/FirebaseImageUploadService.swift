@@ -20,7 +20,7 @@ struct FirebaseImageUploadService: ImageUploadService {
             throw URLError(.dataNotAllowed)
         }
         
-        let _ = try await saveImage(data: data, path: path)
+        _ = try await saveImage(data: data, path: path)
         
         return try await imageReference(path: path).downloadURL()
     }

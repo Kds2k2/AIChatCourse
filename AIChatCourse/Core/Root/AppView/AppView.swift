@@ -33,6 +33,9 @@ struct AppView: View {
                 }
             }
         }
+        .onAppear {
+            KeyboardWarmup.warmupInBackground()
+        }
     }
     
     private func checkUserStatus() async {

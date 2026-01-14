@@ -7,34 +7,31 @@
 
 import SwiftUI
 
-class KeyboardWarmup {
+@MainActor
+final class KeyboardWarmup {
     static func warmupInBackground() {
-        DispatchQueue.global(qos: .background).async {
-            // Preload keyboard resources
-            let _ = UITextInputMode.activeInputModes
-            // Preload text input system
-            let _ = UITextChecker()
+        // Preload keyboard resources
+        _ = UITextInputMode.activeInputModes
+        // Preload text input system
+        _ = UITextChecker()
 
-            DispatchQueue.main.async {
-                // Create offscreen textfield
-                let textField = UITextField()
-                textField.frame = CGRect(x: -10000, y: -10000, width: 1, height: 1)
-                textField.isHidden = true
-                textField.alpha = 0.0
+        // Create offscreen textfield
+        let textField = UITextField()
+        textField.frame = CGRect(x: -10000, y: -10000, width: 1, height: 1)
+        textField.isHidden = true
+        textField.alpha = 0.0
 
-                if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-                   let window = windowScene.windows.first {
-                    window.addSubview(textField)
+        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+           let window = windowScene.windows.first {
+            window.addSubview(textField)
 
-                    // Brief activation
-                    textField.becomeFirstResponder()
+            // Brief activation
+            textField.becomeFirstResponder()
 
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
-                        textField.resignFirstResponder()
-                        textField.removeFromSuperview()
-                        print("✅ Keyboard warmed up")
-                    }
-                }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
+                textField.resignFirstResponder()
+                textField.removeFromSuperview()
+                print("✅ Keyboard warmed up")
             }
         }
     }
