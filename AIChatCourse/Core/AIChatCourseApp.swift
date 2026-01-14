@@ -15,9 +15,10 @@ struct AIChatCourseApp: App {
     var body: some Scene {
         WindowGroup {
             AppView()
+                .environment(delegate.dependencies.aiManager)
                 .environment(delegate.dependencies.authManager)
                 .environment(delegate.dependencies.userManager)
-                .environment(delegate.dependencies.aiManager)
+                .environment(delegate.dependencies.avatarManager)
         }
     }
 }
@@ -38,13 +39,15 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 @MainActor
 struct AppDependencies {
     
+    let aiManager: AIManager
     let authManager: AuthManager
     let userManager: UserManager
-    let aiManager: AIManager
+    let avatarManager: AvatarManager
     
     init() {
+        aiManager = AIManager(service: OpenAIService())
         authManager = AuthManager(service: FirebaseAuthService())
         userManager = UserManager(services: ProductionUserServices())
-        aiManager = AIManager(service: OpenAIService())
+        avatarManager = AvatarManager(service: FirebaseAvatarService())
     }
 }

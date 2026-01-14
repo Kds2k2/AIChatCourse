@@ -39,6 +39,11 @@ struct ProfileView: View {
         }
         .fullScreenCover(isPresented: $showCreateAvatarView) {
             CreateAvatarView()
+                .onAppear {
+                    DispatchQueue.main.async {
+                        KeyboardWarmup.warmupInBackground()
+                    }
+                }
         }
         .task {
             await loadData()

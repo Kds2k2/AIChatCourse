@@ -8,9 +8,7 @@
 import SwiftUI
 
 struct TextValidationHelper {
-    static func checkIfTextIsValid(text: String) throws {
-        let minimumCharacterCount = 1
-        
+    static func checkIfTextIsValid(text: String, minimumCharacterCount: Int = 3) throws {
         guard text.count >= minimumCharacterCount else {
             throw TextValidationError.notEnoughCharacters(min: minimumCharacterCount)
         }
