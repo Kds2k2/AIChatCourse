@@ -93,7 +93,7 @@ struct ExploreView: View {
                 ScrollView(.horizontal) {
                     HStack(spacing: 12) {
                         ForEach(categories, id: \.self) { category in
-                            if let imageName = popularAvatars.first(where: { $0.characterOption == category })?.profileImageName {
+                            if let imageName = popularAvatars.last(where: { $0.characterOption == category })?.profileImageName {
                                 CategoryCellView(
                                     title: category.rawValue.capitalized,
                                     imageName: imageName,
