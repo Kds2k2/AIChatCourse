@@ -54,7 +54,7 @@ struct FirebaseAvatarService: RemoteAvatarService {
     func getAvatarsForUser(userId: String) async throws -> [AvatarModel] {
         try await collection
             .whereField(AvatarModel.CodingKeys.authorId.rawValue, isEqualTo: userId)
-            //.order(by: AvatarModel.CodingKeys.createdAt.rawValue, descending: true)
+            // .order(by: AvatarModel.CodingKeys.createdAt.rawValue, descending: true)
             .getAllDocuments()
             .sorted(by: { ($0.createdAt ?? .distantPast) > ($1.createdAt ?? .distantPast) })
     }

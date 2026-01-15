@@ -8,32 +8,57 @@
 import SwiftUI
 
 struct MockAvatarService: RemoteAvatarService {
+    let avatars: [AvatarModel]
+    let delay: Double
+    let showError: Bool
+    
+    init(avatars: [AvatarModel] = AvatarModel.mocks, delay: Double = 0, showError: Bool = false) {
+        self.avatars = avatars
+        self.delay = delay
+        self.showError = showError
+    }
+    
+    private func tryShowError() throws {
+        if showError {
+            throw URLError(.unknown)
+        }
+    }
+    
     func getAvatarsForUser(userId: String) async throws -> [AvatarModel] {
-        try await Task.sleep(for: .seconds(2))
-        return AvatarModel.mocks.shuffled()
+        try await Task.sleep(for: .seconds(delay))
+        try tryShowError()
+        return avatars.shuffled()
     }
     
     func getAvatar(id: String) async throws -> AvatarModel {
-        try await Task.sleep(for: .seconds(1))
-        return AvatarModel.mock
+        guard let avatar = avatars.first(where: { $0.id == id }) else {
+            throw URLError(.noPermissionsToReadFile)
+        }
+        
+        try await Task.sleep(for: .seconds(delay))
+        try tryShowError()
+        return avatar
     }
     
     func getFeaturedAvatars() async throws -> [AvatarModel] {
-        try await Task.sleep(for: .seconds(1))
-        return AvatarModel.mocks.shuffled()
+        try await Task.sleep(for: .seconds(delay))
+        try tryShowError()
+        return avatars.shuffled()
     }
     
     func getPopularAvatars() async throws -> [AvatarModel] {
-        try await Task.sleep(for: .seconds(3))
-        return AvatarModel.mocks.shuffled()
+        try await Task.sleep(for: .seconds(delay))
+        try tryShowError()
+        return avatars.shuffled()
     }
     
     func createAvatart(avatar: AvatarModel, image: UIImage) async throws {
     }
     
     func getAvatarsForCategory(category: CharacterOption) async throws -> [AvatarModel] {
-        try await Task.sleep(for: .seconds(2))
-        return AvatarModel.mocks.filter({ $0.characterOption == category })
+        try await Task.sleep(for: .seconds(delay))
+        try tryShowError()
+        return avatars.shuffled()
     }
     
     func incrementAvatarClickCount(avatarId: String) async throws {
