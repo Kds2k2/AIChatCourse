@@ -7,10 +7,15 @@
 
 import SwiftUI
 
-struct MockAvatarService: AvatarService {
+struct MockAvatarService: RemoteAvatarService {
     func getAvatarsForUser(userId: String) async throws -> [AvatarModel] {
         try await Task.sleep(for: .seconds(2))
         return AvatarModel.mocks.shuffled()
+    }
+    
+    func getAvatar(id: String) async throws -> AvatarModel {
+        try await Task.sleep(for: .seconds(1))
+        return AvatarModel.mock
     }
     
     func getFeaturedAvatars() async throws -> [AvatarModel] {

@@ -1,0 +1,48 @@
+//
+//  AvatarEntity.swift
+//  AIChatCourse
+//
+//  Created by Dmitro Kryzhanovsky on 15.01.2026.
+//
+
+import SwiftUI
+import SwiftData
+
+@Model
+class AvatarEntity {
+    
+    @Attribute(.unique) var avatarId: String
+    var name: String?
+    var characterOption: CharacterOption?
+    var characterAction: CharacterAction?
+    var characterLocation: CharacterLocation?
+    var profileImageName: String?
+    var authorId: String?
+    var createdAt: Date?
+    var addedAt: Date
+    
+    init(from model: AvatarModel) {
+        self.avatarId = model.avatarId
+        self.name = model.name
+        self.characterOption = model.characterOption
+        self.characterAction = model.characterAction
+        self.characterLocation = model.characterLocation
+        self.profileImageName = model.profileImageName
+        self.authorId = model.authorId
+        self.createdAt = model.createdAt
+        self.addedAt = .now
+    }
+    
+    @MainActor func toModel() -> AvatarModel {
+        AvatarModel(
+            avatarId: avatarId,
+            name: name,
+            characterOption: characterOption,
+            characterAction: characterAction,
+            characterLocation: characterLocation,
+            profileImageName: profileImageName,
+            authorId: authorId,
+            createdAt: createdAt
+        )
+    }
+}
