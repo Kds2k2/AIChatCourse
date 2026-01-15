@@ -11,7 +11,7 @@ struct ChatMessageModel: Identifiable, Hashable {
     let id: String
     let chatId: String
     let authorId: String?
-    let content: String?
+    let content: AIChatModel?
     let seenByIds: [String]?
     let createdAt: Date?
     
@@ -19,7 +19,7 @@ struct ChatMessageModel: Identifiable, Hashable {
         id: String,
         chatId: String,
         authorId: String? = nil,
-        content: String? = nil,
+        content: AIChatModel? = nil,
         seenByIds: [String]? = nil,
         createdAt: Date? = nil
     ) {
@@ -48,7 +48,7 @@ struct ChatMessageModel: Identifiable, Hashable {
                 id: UUID().uuidString,
                 chatId: "1",
                 authorId: "user1",
-                content: "Hey! How are you?",
+                content: AIChatModel(role: .user, message: "Hey! How are you?"),
                 seenByIds: ["user2", "user3"],
                 createdAt: now.addingTimeInterval(days: -1, minutes: -10)
             ),
@@ -56,7 +56,7 @@ struct ChatMessageModel: Identifiable, Hashable {
                 id: UUID().uuidString,
                 chatId: "2",
                 authorId: "user2",
-                content: "I'm good 🙂 How about you?",
+                content: AIChatModel(role: .assistant, message: "I'm good 🙂 How about you?"),
                 seenByIds: ["user1"],
                 createdAt: now.addingTimeInterval(days: -1, minutes: -7)
             ),
@@ -64,7 +64,7 @@ struct ChatMessageModel: Identifiable, Hashable {
                 id: UUID().uuidString,
                 chatId: "3",
                 authorId: "user1",
-                content: "Doing great! Working on the app.",
+                content: AIChatModel(role: .user, message: "Doing great! Working on the app."),
                 seenByIds: ["user2", "user4"],
                 createdAt: now.addingTimeInterval(days: -1, minutes: -3)
             ),
@@ -72,7 +72,7 @@ struct ChatMessageModel: Identifiable, Hashable {
                 id: UUID().uuidString,
                 chatId: "1",
                 authorId: "user3",
-                content: "Nice 🚀 Can’t wait to see it.",
+                content: AIChatModel(role: .assistant, message: "Nice 🚀 Can’t wait to see it."),
                 seenByIds: nil,
                 createdAt: now.addingTimeInterval(minutes: -1)
             )
