@@ -11,7 +11,7 @@ struct ChatBubbleViewBuilder: View {
     
     var message: ChatMessageModel = .mock
     var isCurrentUser: Bool = false
-    
+    var currentUserProfileColor: Color = .accent
     var imageName: String?
     var onImagePressed: (() -> Void)?
     
@@ -19,7 +19,7 @@ struct ChatBubbleViewBuilder: View {
         ChatBubbleView(
             text: message.content?.message ?? "",
             textColor: isCurrentUser ? .white : .primary,
-            backgroundColor: isCurrentUser ? .accent : Color(uiColor: .systemGray6),
+            backgroundColor: isCurrentUser ? currentUserProfileColor : Color(uiColor: .systemGray6),
             imageName: imageName,
             showImage: !isCurrentUser,
             onImagePressed: onImagePressed
@@ -34,8 +34,9 @@ struct ChatBubbleViewBuilder: View {
     ScrollView {
         VStack(spacing: 24) {
             ChatBubbleViewBuilder()
-            ChatBubbleViewBuilder(isCurrentUser: true)
+            ChatBubbleViewBuilder(isCurrentUser: true, currentUserProfileColor: .blue)
             ChatBubbleViewBuilder()
+            ChatBubbleViewBuilder(isCurrentUser: true)
         }
         .padding(8)
     }

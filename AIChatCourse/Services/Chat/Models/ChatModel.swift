@@ -5,14 +5,25 @@
 //  Created by Dmitro Kryzhanovsky on 02.01.2026.
 //
 import Foundation
+import IdentifiableByString
 
-struct ChatModel: Identifiable, Hashable {
+struct ChatModel: Hashable, Codable, StringIdentifiable {
     
     let id: String
     let userId: String
     let avatarId: String
     let createdAt: Date
     let updatedAt: Date
+    
+    static func createNewChat(userId: String, avatarId: String) -> Self {
+        ChatModel(
+            id: "\(userId).\(avatarId)",
+            userId: userId,
+            avatarId: avatarId,
+            createdAt: .now,
+            updatedAt: .now
+        )
+    }
     
     static var mock: Self {
         mocks[0]

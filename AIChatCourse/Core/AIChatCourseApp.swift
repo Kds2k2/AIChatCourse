@@ -15,10 +15,11 @@ struct AIChatCourseApp: App {
     var body: some Scene {
         WindowGroup {
             AppView()
-                .environment(delegate.dependencies.aiManager)
                 .environment(delegate.dependencies.authManager)
                 .environment(delegate.dependencies.userManager)
+                .environment(delegate.dependencies.aiManager)
                 .environment(delegate.dependencies.avatarManager)
+                .environment(delegate.dependencies.chatManager)
         }
     }
 }
@@ -39,26 +40,30 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 @MainActor
 struct AppDependencies {
     
-    let aiManager: AIManager
     let authManager: AuthManager
     let userManager: UserManager
+    let aiManager: AIManager
     let avatarManager: AvatarManager
+    let chatManager: ChatManager
     
     init() {
-        aiManager = AIManager(service: OpenAIService())
         authManager = AuthManager(service: FirebaseAuthService())
         userManager = UserManager(services: ProductionUserServices())
-        avatarManager = AvatarManager(remote: FirebaseAvatarService(), local: SwiftDataLocalPersistence())
+        aiManager = AIManager(service: OpenAIService())
+        avatarManager = AvatarManager(remote: FirebaseAvatarService(),
+                                      local: SwiftDataLocalPersistence())
+        chatManager = ChatManager(service: FirebaseChatService())
     }
 }
 
 extension View {
     func previewEnvironment(isSignedIn: Bool = true) -> some View {
         self
-            .environment(AIManager(service: MockAIService()))
             .environment(AuthManager(service: MockAuthService(user: isSignedIn ? .mock() : nil)))
             .environment(UserManager(services: MockUserServices(user: isSignedIn ? .mock : nil)))
+            .environment(AIManager(service: MockAIService()))
             .environment(AvatarManager(remote: MockAvatarService()))
+            .environment(ChatManager(service: MockChatService()))
             .environment(AppState())
     }
 }
