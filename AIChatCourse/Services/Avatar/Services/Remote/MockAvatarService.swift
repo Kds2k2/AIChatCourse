@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct MockAvatarService: RemoteAvatarService {
+struct MockAvatarService: RemoteAvatarService, MockService {
     let avatars: [AvatarModel]
     let delay: Double
     let showError: Bool
@@ -18,15 +18,8 @@ struct MockAvatarService: RemoteAvatarService {
         self.showError = showError
     }
     
-    private func tryShowError() throws {
-        if showError {
-            throw URLError(.unknown)
-        }
-    }
-    
     func getAvatarsForUser(userId: String) async throws -> [AvatarModel] {
-        try await Task.sleep(for: .seconds(delay))
-        try tryShowError()
+        try await executionBehavior()
         return avatars.shuffled()
     }
     
@@ -35,20 +28,17 @@ struct MockAvatarService: RemoteAvatarService {
             throw URLError(.noPermissionsToReadFile)
         }
         
-        try await Task.sleep(for: .seconds(delay))
-        try tryShowError()
+        try await executionBehavior()
         return avatar
     }
     
     func getFeaturedAvatars() async throws -> [AvatarModel] {
-        try await Task.sleep(for: .seconds(delay))
-        try tryShowError()
+        try await executionBehavior()
         return avatars.shuffled()
     }
     
     func getPopularAvatars() async throws -> [AvatarModel] {
-        try await Task.sleep(for: .seconds(delay))
-        try tryShowError()
+        try await executionBehavior()
         return avatars.shuffled()
     }
     
@@ -56,8 +46,7 @@ struct MockAvatarService: RemoteAvatarService {
     }
     
     func getAvatarsForCategory(category: CharacterOption) async throws -> [AvatarModel] {
-        try await Task.sleep(for: .seconds(delay))
-        try tryShowError()
+        try await executionBehavior()
         return avatars.shuffled()
     }
     

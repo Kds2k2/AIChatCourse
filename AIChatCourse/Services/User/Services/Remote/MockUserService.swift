@@ -7,12 +7,16 @@
 
 import SwiftUI
 
-struct MockUserService: RemoteUserService {
+struct MockUserService: RemoteUserService, MockService {
     
     let currentUser: UserModel?
+    let delay: Double
+    let showError: Bool
     
-    init(user: UserModel? = nil) {
+    init(user: UserModel? = nil, delay: Double = 0, showError: Bool = false) {
         self.currentUser = user
+        self.delay = delay
+        self.showError = showError
     }
     
     func saveUser(user: UserModel) async throws {

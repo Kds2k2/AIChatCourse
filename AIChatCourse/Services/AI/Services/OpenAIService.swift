@@ -57,7 +57,7 @@ struct OpenAIService: AIService {
     }
 }
 
-struct AIChatModel: Hashable {
+struct AIChatModel: Hashable, Codable {
     let role: AIChatRole
     let message: String
     
@@ -84,7 +84,7 @@ struct AIChatModel: Hashable {
     }
 }
 
-enum AIChatRole: Hashable {
+enum AIChatRole: Hashable, Codable {
     case system, user, assistant, tool, developer
     
     init(role: ChatQuery.ChatCompletionMessageParam.Role) {

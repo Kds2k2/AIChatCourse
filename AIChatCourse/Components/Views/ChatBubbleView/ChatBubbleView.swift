@@ -38,13 +38,17 @@ struct ChatBubbleView: View {
                 .offset(y: imageOffset)
             }
             
-            Text(text)
-                .font(.body)
-                .foregroundStyle(textColor)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 10)
-                .background(backgroundColor)
-                .cornerRadius(6)
+            if text.isEmpty {
+                ChatBubbleIndicatorView()
+            } else {
+                Text(text)
+                    .font(.body)
+                    .foregroundStyle(textColor)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 10)
+                    .background(backgroundColor)
+                    .cornerRadius(6)
+            }
         }
         .padding(.bottom, showImage ? imageOffset : 0)
     }

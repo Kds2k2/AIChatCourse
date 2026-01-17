@@ -25,6 +25,14 @@ struct ChatModel: Hashable, Codable, StringIdentifiable {
         )
     }
     
+    enum CodingKeys: String, CodingKey {
+        case id
+        case userId = "user_id"
+        case avatarId = "avatar_id"
+        case createdAt = "created_at"
+        case updatedAt = "updated_at"
+    }
+    
     static var mock: Self {
         mocks[0]
     }

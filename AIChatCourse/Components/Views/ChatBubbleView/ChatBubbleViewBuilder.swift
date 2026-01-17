@@ -37,6 +37,7 @@ struct ChatBubbleViewBuilder: View {
             ChatBubbleViewBuilder(isCurrentUser: true, currentUserProfileColor: .blue)
             ChatBubbleViewBuilder()
             ChatBubbleViewBuilder(isCurrentUser: true)
+            ChatBubbleViewBuilder(message: ChatMessageModel.emptyMock)
         }
         .padding(8)
     }

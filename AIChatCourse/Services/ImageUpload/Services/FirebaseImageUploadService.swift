@@ -9,10 +9,6 @@ import SwiftUI
 import Foundation
 import FirebaseStorage
 
-protocol ImageUploadService: Sendable {
-    func uploadImage(image: UIImage, path: String) async throws -> URL
-}
-
 struct FirebaseImageUploadService: ImageUploadService {
     
     func uploadImage(image: UIImage, path: String) async throws -> URL {
