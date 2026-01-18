@@ -15,9 +15,13 @@ struct ChatModel: Hashable, Codable, StringIdentifiable {
     let createdAt: Date
     let updatedAt: Date
     
-    static func createNewChat(userId: String, avatarId: String) -> Self {
+    static func chatId(userId: String, avatarId: String) -> String {
+        return "\(userId).\(avatarId)"
+    }
+    
+    static func new(userId: String, avatarId: String) -> Self {
         ChatModel(
-            id: "\(userId).\(avatarId)",
+            id: chatId(userId: userId, avatarId: avatarId),
             userId: userId,
             avatarId: avatarId,
             createdAt: .now,

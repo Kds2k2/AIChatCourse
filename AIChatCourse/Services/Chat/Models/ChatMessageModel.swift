@@ -32,6 +32,10 @@ struct ChatMessageModel: StringIdentifiable, Hashable, Codable {
         self.createdAt = createdAt
     }
     
+    var createdAtCalculated: Date {
+        createdAt ?? .distantPast
+    }
+    
     func hasBeenSeenBy(userId: String) -> Bool {
         guard let seenByIds else { return true }
         return seenByIds.contains(userId)

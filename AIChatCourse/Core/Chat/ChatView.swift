@@ -15,7 +15,7 @@ struct ChatView: View {
     @Environment(AvatarManager.self) private var avatarManager
     @Environment(ChatManager.self) private var chatManager
     
-    @State private var chatMessages: [ChatMessageModel] = ChatMessageModel.mocks
+    @State private var chatMessages: [ChatMessageModel] = []
     @State private var avatar: AvatarModel?
     @State private var currentUser: UserModel?
     @State private var chat: ChatModel?
@@ -28,6 +28,7 @@ struct ChatView: View {
     @State private var showProfileModel: Bool = false
     
     @State private var isGeneratingResponse: Bool = false
+    @State private var chatMessagesTask: Task<Void, Never>?
     
     var avatarId: String
     
@@ -50,11 +51,16 @@ struct ChatView: View {
             }
         }
         .onAppear { loadCurrentUser() }
+        .onDisappear {
+            chatMessagesTask?.cancel()
+            chatMessagesTask = nil
+        }
         .task {
             await loadAvatar()
         }
         .task {
             await loadChat()
+            await listenChatMessages()
         }
     }
     
@@ -73,9 +79,44 @@ struct ChatView: View {
     }
     
     private func loadChat() async {
-        // load chat
+        do {
+            let uid = try authManager.getAuthId()
+            chat = try await chatManager.getChat(userId: uid, avatarId: avatarId)
+            print("Success loading chat.")
+        } catch {
+            print("Error loading chat: \(error)")
+        }
     }
 
+    private func getChatId() throws -> String {
+        guard let chat else {
+            throw ChatViewError.noChat
+        }
+        
+        return chat.id
+    }
+    
+    private func listenChatMessages() async {
+        chatMessagesTask?.cancel()
+        
+        chatMessagesTask = Task {
+            do {
+                let chatId = try getChatId()
+                for try await value in chatManager.streamChatMessages(chatId: chatId) {
+                    self.chatMessages = value.sorted(by: { $0.createdAtCalculated < $1.createdAtCalculated })
+                    withAnimation(.easeOut(duration: 0.25)) {
+                        scrollPosition = chatMessages.last?.id
+                    }
+
+                }
+            } catch is CancellationError {
+                // expected
+            } catch {
+                print("Failed to attach chat messages to chat.")
+            }
+        }
+    }
+    
     private var messagesSection: some View {
         ScrollView {
             LazyVStack(spacing: 24) {
@@ -106,15 +147,14 @@ struct ChatView: View {
             .rotationEffect(.degrees(180))
         }
         .rotationEffect(.degrees(180))
-        .scrollPosition(id: $scrollPosition, anchor: .center)
-        .animation(.smooth, value: chatMessages.count)
+        .scrollPosition(id: $scrollPosition, anchor: .top)
+        .animation(.default, value: chatMessages.count)
         .animation(.smooth, value: isGeneratingResponse)
         .animation(.default, value: scrollPosition)
     }
     
     private var textFieldSection: some View {
         TextField("Say something...", text: $textFieldText)
-            .keyboardType(.alphabet)
             .autocorrectionDisabled()
             .padding(12)
             .padding(.trailing, 40)
@@ -163,6 +203,7 @@ struct ChatView: View {
                 // If still nil, throw error
                 if chat == nil {
                     chat = try await createNewChat(userId: userId)
+                    await listenChatMessages()
                 }
                 
                 guard let chat else {
@@ -175,21 +216,22 @@ struct ChatView: View {
                 
                 // Upload User Message
                 try await chatManager.addChatMessage(message: message)
-                chatMessages.append(message)
-                
-                // Clearing
-                scrollPosition = message.id
                 textFieldText = ""
                 
                 // Generate AI Response
                 isGeneratingResponse = true
-                let aiChats = chatMessages.compactMap({ $0.content })
+                var aiChats = chatMessages.compactMap({ $0.content })
+                if let avatarDescription = avatar?.characterDescription, let avatarName = avatar?.name {
+                    let messageContent = "Your name is \(avatarName). You are \(avatarDescription.lowercased())"
+                    let systemMessage = AIChatModel(role: .system, message: messageContent)
+                    aiChats.insert(systemMessage, at: 0)
+                }
+                
                 let response = try await aiManager.generateText(chats: aiChats)
                 
                 // Upload AI Response
                 let newAIMessage = ChatMessageModel.newAIMessage(chatId: chat.id, avatarId: avatarId, message: response)
                 try await chatManager.addChatMessage(message: newAIMessage)
-                chatMessages.append(newAIMessage)
             } catch {
                 showAlert = AnyAppAlert(error: error)
             }
@@ -203,7 +245,7 @@ struct ChatView: View {
     }
     
     private func createNewChat(userId: String) async throws -> ChatModel {
-        let newChat = ChatModel.createNewChat(userId: userId, avatarId: avatarId)
+        let newChat = ChatModel.new(userId: userId, avatarId: avatarId)
         try await chatManager.createNewChat(chat: newChat)
         return newChat
     }

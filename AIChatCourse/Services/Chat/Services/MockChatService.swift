@@ -19,6 +19,17 @@ struct MockChatService: ChatService, MockService {
     func createNewChat(chat: ChatModel) async throws {
     }
     
+    func getChat(userId: String, avatarId: String) async throws -> ChatModel? {
+        try await executionBehavior()
+        return ChatModel.mock
+    }
+    
     func addChatMessage(message: ChatMessageModel) async throws {
+    }
+    
+    func streamChatMessages(chatId: String) -> AsyncThrowingStream<[ChatMessageModel], Error> {
+        AsyncThrowingStream { continuation in
+            continuation.yield(ChatMessageModel.mocks)
+        }
     }
 }
