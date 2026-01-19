@@ -83,13 +83,53 @@ struct AvatarModel: Hashable, Codable, StringIdentifiable {
     
     static var mocks: [Self] {
         [
-            AvatarModel(avatarId: UUID().uuidString, name: "Alpha", characterOption: .alien, characterAction: .walking, characterLocation: .space, profileImageName: Constants.randomImage, authorId: UUID().uuidString, createdAt: .now, clickCount: 10),
+            AvatarModel(
+                avatarId: "avatar1",
+                name: "Alpha",
+                characterOption: .alien,
+                characterAction: .walking,
+                characterLocation: .space,
+                profileImageName: Constants.randomImage,
+                authorId: "user1",
+                createdAt: .now,
+                clickCount: 10
+            ),
             
-            AvatarModel(avatarId: UUID().uuidString, name: "Beta", characterOption: .dog, characterAction: .eating, characterLocation: .park, profileImageName: Constants.randomImage, authorId: UUID().uuidString, createdAt: .now, clickCount: 5),
+            AvatarModel(
+                avatarId: "avatar2",
+                name: "Beta",
+                characterOption: .dog,
+                characterAction: .eating,
+                characterLocation: .park,
+                profileImageName: Constants.randomImage,
+                authorId: "user2",
+                createdAt: .now,
+                clickCount: 5
+            ),
             
-            AvatarModel(avatarId: UUID().uuidString, name: "Gamma", characterOption: .cat, characterAction: .relaxing, characterLocation: .mall, profileImageName: Constants.randomImage, authorId: UUID().uuidString, createdAt: .now, clickCount: 100),
+            AvatarModel(
+                avatarId: "avatar3",
+                name: "Gamma",
+                characterOption: .cat,
+                characterAction: .relaxing,
+                characterLocation: .mall,
+                profileImageName: Constants.randomImage,
+                authorId: "user2",
+                createdAt: .now,
+                clickCount: 100
+            ),
             
-            AvatarModel(avatarId: UUID().uuidString, name: "Delta", characterOption: .man, characterAction: .working, characterLocation: .city, profileImageName: Constants.randomImage, authorId: UUID().uuidString, createdAt: .now, clickCount: 20)
+            AvatarModel(
+                avatarId: "avatar4",
+                name: "Delta",
+                characterOption: .man,
+                characterAction: .working,
+                characterLocation: .city,
+                profileImageName: Constants.randomImage,
+                authorId: "user3",
+                createdAt: .now,
+                clickCount: 20
+            )
         ]
     }
 }

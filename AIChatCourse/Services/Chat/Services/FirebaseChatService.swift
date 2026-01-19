@@ -33,11 +33,26 @@ struct FirebaseChatService: ChatService {
         try await collection.getDocument(id: ChatModel.chatId(userId: userId, avatarId: avatarId))
     }
     
+    func getAllChats(userId: String) async throws -> [ChatModel] {
+        return try await collection
+            .whereField(ChatModel.CodingKeys.userId.rawValue, isEqualTo: userId)
+            .getAllDocuments()
+    }
+    
     func addChatMessage(message: ChatMessageModel) async throws {
         try await messagesCollection(chatId: message.chatId).setDocument(document: message)
         try await collection.updateDocument(id: message.chatId, dict: [
             ChatModel.CodingKeys.updatedAt.rawValue: Date.now
         ])
+    }
+    
+    func getLastChatMessage(chatId: String) async throws -> ChatMessageModel? {
+        let messages: [ChatMessageModel] = try await messagesCollection(chatId: chatId)
+            .order(by: ChatMessageModel.CodingKeys.createdAt.rawValue, descending: true)
+            .limit(to: 1)
+            .getAllDocuments()
+        
+        return messages.first
     }
     
     func streamChatMessages(chatId: String) -> AsyncThrowingStream<[ChatMessageModel], Error> {

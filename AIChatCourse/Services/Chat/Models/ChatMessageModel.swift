@@ -103,15 +103,15 @@ struct ChatMessageModel: StringIdentifiable, Hashable, Codable {
         return [
             ChatMessageModel(
                 id: UUID().uuidString,
-                chatId: "1",
+                chatId: "chat1",
                 authorId: UserAuthInfo.mock().uid,
                 content: AIChatModel(role: .user, message: "Hey! How are you?"),
-                seenByIds: ["user2", "user3"],
+                seenByIds: [UserAuthInfo.mock().uid, "user2", "user3"],
                 createdAt: now.addingTimeInterval(days: -1, minutes: -10)
             ),
             ChatMessageModel(
                 id: UUID().uuidString,
-                chatId: "2",
+                chatId: "chat2",
                 authorId: AvatarModel.mock.avatarId,
                 content: AIChatModel(role: .assistant, message: "I'm good 🙂 How about you?"),
                 seenByIds: [UserAuthInfo.mock().uid],
@@ -119,15 +119,15 @@ struct ChatMessageModel: StringIdentifiable, Hashable, Codable {
             ),
             ChatMessageModel(
                 id: UUID().uuidString,
-                chatId: "3",
+                chatId: "chat3",
                 authorId: UserAuthInfo.mock().uid,
                 content: AIChatModel(role: .user, message: "Doing great! Working on the app."),
-                seenByIds: ["user2", "user3"],
+                seenByIds: [UserAuthInfo.mock().uid, "user2", "user3"],
                 createdAt: now.addingTimeInterval(days: -1, minutes: -3)
             ),
             ChatMessageModel(
                 id: UUID().uuidString,
-                chatId: "1",
+                chatId: "chat1",
                 authorId: AvatarModel.mock.avatarId,
                 content: AIChatModel(role: .assistant, message: "Nice 🚀 Can’t wait to see it."),
                 seenByIds: nil,

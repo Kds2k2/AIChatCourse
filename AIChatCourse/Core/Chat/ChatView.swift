@@ -18,7 +18,7 @@ struct ChatView: View {
     @State private var chatMessages: [ChatMessageModel] = []
     @State private var avatar: AvatarModel?
     @State private var currentUser: UserModel?
-    @State private var chat: ChatModel?
+    @State var chat: ChatModel?
     
     @State private var textFieldText: String = ""
     @State private var scrollPosition: String?
@@ -87,14 +87,6 @@ struct ChatView: View {
             print("Error loading chat: \(error)")
         }
     }
-
-    private func getChatId() throws -> String {
-        guard let chat else {
-            throw ChatViewError.noChat
-        }
-        
-        return chat.id
-    }
     
     private func listenChatMessages() async {
         chatMessagesTask?.cancel()
@@ -103,11 +95,10 @@ struct ChatView: View {
             do {
                 let chatId = try getChatId()
                 for try await value in chatManager.streamChatMessages(chatId: chatId) {
-                    self.chatMessages = value.sorted(by: { $0.createdAtCalculated < $1.createdAtCalculated })
+                    self.chatMessages = value.sortedByKeyPath(keyPath: \.createdAtCalculated, order: .ascending)
                     withAnimation(.easeOut(duration: 0.25)) {
                         scrollPosition = chatMessages.last?.id
                     }
-
                 }
             } catch is CancellationError {
                 // expected
@@ -115,6 +106,14 @@ struct ChatView: View {
                 print("Failed to attach chat messages to chat.")
             }
         }
+    }
+    
+    private func getChatId() throws -> String {
+        guard let chat else {
+            throw ChatViewError.noChat
+        }
+        
+        return chat.id
     }
     
     private var messagesSection: some View {
@@ -191,6 +190,20 @@ struct ChatView: View {
             .showCustomAlert(type: .confirmationDialog, alert: $showChatSettings)
     }
     
+    private func profileModal(avatar: AvatarModel) -> some View {
+        ProfileModalView(
+            imageName: avatar.profileImageName,
+            title: avatar.name,
+            subtitle: avatar.characterOption?.rawValue.capitalized,
+            headline: avatar.characterDescription,
+            onXmarkPressed: {
+                showProfileModel = false
+            }
+        )
+        .padding(40)
+        .transition(.slide)
+    }
+    
     private func onSendMessagePressed() {
         let content = textFieldText
         
@@ -240,10 +253,6 @@ struct ChatView: View {
         }
     }
     
-    enum ChatViewError: LocalizedError {
-        case noChat
-    }
-    
     private func createNewChat(userId: String) async throws -> ChatModel {
         let newChat = ChatModel.new(userId: userId, avatarId: avatarId)
         try await chatManager.createNewChat(chat: newChat)
@@ -273,18 +282,8 @@ struct ChatView: View {
         showProfileModel = true
     }
     
-    private func profileModal(avatar: AvatarModel) -> some View {
-        ProfileModalView(
-            imageName: avatar.profileImageName,
-            title: avatar.name,
-            subtitle: avatar.characterOption?.rawValue.capitalized,
-            headline: avatar.characterDescription,
-            onXmarkPressed: {
-                showProfileModel = false
-            }
-        )
-        .padding(40)
-        .transition(.slide)
+    enum ChatViewError: LocalizedError {
+        case noChat
     }
 }
 

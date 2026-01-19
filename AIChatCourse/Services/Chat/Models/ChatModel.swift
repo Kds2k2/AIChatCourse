@@ -45,23 +45,23 @@ struct ChatModel: Hashable, Codable, StringIdentifiable {
         let now = Date()
         return [
             ChatModel(
-                id: UUID().uuidString,
-                userId: UUID().uuidString,
-                avatarId: UUID().uuidString,
+                id: "chat1",
+                userId: UserAuthInfo.mock().uid,
+                avatarId: AvatarModel.mocks.randomElement()!.avatarId,
                 createdAt: now,
                 updatedAt: now
             ),
             ChatModel(
-                id: UUID().uuidString,
-                userId: UUID().uuidString,
-                avatarId: UUID().uuidString,
+                id: "chat2",
+                userId: UserAuthInfo.mock().uid,
+                avatarId: AvatarModel.mocks.randomElement()!.avatarId,
                 createdAt: now.addingTimeInterval(days: -3),
                 updatedAt: now.addingTimeInterval(days: -2, hours: -1)
             ),
             ChatModel(
-                id: UUID().uuidString,
-                userId: UUID().uuidString,
-                avatarId: UUID().uuidString,
+                id: "chat3",
+                userId: UserAuthInfo.mock().uid,
+                avatarId: AvatarModel.mocks.randomElement()!.avatarId,
                 createdAt: now.addingTimeInterval(days: -1),
                 updatedAt: now.addingTimeInterval(hours: -5)
             )
