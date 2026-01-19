@@ -14,6 +14,10 @@ struct FirebaseChatService: ChatService {
         Firestore.firestore().collection("chats")
     }
     
+    private var chatReportsCollection: CollectionReference {
+        Firestore.firestore().collection("chat_reports")
+    }
+    
     private func messagesCollection(chatId: String) -> CollectionReference {
         collection.document(chatId).collection("messages")
     }
@@ -57,5 +61,27 @@ struct FirebaseChatService: ChatService {
     
     func streamChatMessages(chatId: String) -> AsyncThrowingStream<[ChatMessageModel], Error> {
         messagesCollection(chatId: chatId).streamAllDocuments()
+    }
+    
+    func deleteChat(chatId: String) async throws {
+        async let deleteChat: () = collection.deleteDocument(id: chatId)
+        async let deleteChatMessages: () = messagesCollection(chatId: chatId).deleteAllDocuments()
+        _ = try await (deleteChat, deleteChatMessages)
+    }
+    
+    func deleteAllChatsForUser(userId: String) async throws {
+        let chats = try await getAllChats(userId: userId)
+        
+        try await withThrowingTaskGroup(of: Void.self) { taskGroup in
+            for chat in chats {
+                taskGroup.addTask { try await collection.deleteDocument(id: chat.id) }
+                taskGroup.addTask { try await messagesCollection(chatId: chat.id).deleteAllDocuments()  }
+            }
+            try await taskGroup.waitForAll()
+        }
+    }
+    
+    func reportChat(report: ChatReportModel) async throws {
+        try await chatReportsCollection.setDocument(document: report)
     }
 }

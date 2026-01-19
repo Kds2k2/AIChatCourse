@@ -86,13 +86,13 @@ struct UserModel: Codable, Hashable, StringIdentifiable {
                 profileColorHex: "#9F2B68"
             ),
             UserModel(
-                userId: UUID().uuidString,
+                userId: "user2",
                 createdAt: now.addingTimeInterval(days: -2),
                 didCompleteOnboarding: true,
                 profileColorHex: "#FF5733"
             ),
             UserModel(
-                userId: UUID().uuidString,
+                userId: "user3",
                 createdAt: now.addingTimeInterval(days: -1),
                 didCompleteOnboarding: false,
                 profileColorHex: "#FF5733"

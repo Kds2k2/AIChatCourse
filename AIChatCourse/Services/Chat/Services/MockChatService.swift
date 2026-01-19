@@ -46,7 +46,19 @@ struct MockChatService: ChatService, MockService {
     
     func streamChatMessages(chatId: String) -> AsyncThrowingStream<[ChatMessageModel], Error> {
         AsyncThrowingStream { continuation in
-            continuation.yield(ChatMessageModel.mocks)
+            continuation.yield(ChatMessageModel.mocks.filter({ $0.chatId == chatId }))
         }
+    }
+    
+    func deleteChat(chatId: String) async throws {
+        try await executionBehavior()
+    }
+    
+    func deleteAllChatsForUser(userId: String) async throws {
+        try await executionBehavior()
+    }
+    
+    func reportChat(report: ChatReportModel) async throws {
+        try await executionBehavior()
     }
 }

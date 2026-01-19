@@ -62,7 +62,7 @@ extension View {
             .environment(AuthManager(service: MockAuthService(user: isSignedIn ? .mock() : nil)))
             .environment(UserManager(services: MockUserServices(user: isSignedIn ? .mock : nil)))
             .environment(AIManager(service: MockAIService()))
-            .environment(AvatarManager(remote: MockAvatarService()))
+            .environment(AvatarManager(remote: MockAvatarService(), local: MockLocalAvatarPersistence()))
             .environment(ChatManager(service: MockChatService()))
             .environment(AppState())
     }

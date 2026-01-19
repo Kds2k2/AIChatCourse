@@ -47,7 +47,7 @@ struct ChatModel: Hashable, Codable, StringIdentifiable {
             ChatModel(
                 id: "chat1",
                 userId: UserAuthInfo.mock().uid,
-                avatarId: AvatarModel.mocks.randomElement()!.avatarId,
+                avatarId: AvatarModel.mock.avatarId,
                 createdAt: now,
                 updatedAt: now
             ),
@@ -55,11 +55,18 @@ struct ChatModel: Hashable, Codable, StringIdentifiable {
                 id: "chat2",
                 userId: UserAuthInfo.mock().uid,
                 avatarId: AvatarModel.mocks.randomElement()!.avatarId,
+                createdAt: now,
+                updatedAt: now
+            ),
+            ChatModel(
+                id: "chat3",
+                userId: UserAuthInfo.mock().uid,
+                avatarId: AvatarModel.mocks.randomElement()!.avatarId,
                 createdAt: now.addingTimeInterval(days: -3),
                 updatedAt: now.addingTimeInterval(days: -2, hours: -1)
             ),
             ChatModel(
-                id: "chat3",
+                id: "chat4",
                 userId: UserAuthInfo.mock().uid,
                 avatarId: AvatarModel.mocks.randomElement()!.avatarId,
                 createdAt: now.addingTimeInterval(days: -1),
