@@ -29,27 +29,45 @@ class AppDelegate: NSObject, UIApplicationDelegate {
     var dependencies: AppDependencies!
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
-        FirebaseApp.configure()
         
         // MOCK - mock dependencies
         // DEVELOPMENT - production dependencies + some extra dev tool
         // PRODUCTION - production dependencies
         // Also could: Staging, Beta, Alpha, ...
         
+        let config: BuildConfiguration
+        
         #if MOCK
-        dependencies = AppDependencies(.mock(isSignedIn: true))
+        config = .mock(isSignedIn: true)
         #elseif DEV
-        dependencies = AppDependencies(.dev)
+        config = .dev
         #else
-        dependencies = AppDependencies(.prod)
+        config = .prod
         #endif
         
+        config.configure()
+        dependencies = AppDependencies(config)
         return true
     }
 }
 
 enum BuildConfiguration {
     case mock(isSignedIn: Bool), dev, prod
+    
+    func configure() {
+        switch self {
+        case .mock(let isSignedIn):
+            break
+        case .dev:
+            let plist = Bundle.main.path(forResource: "GoogleService-Info-Dev", ofType: "plist")!
+            let options = FirebaseOptions(contentsOfFile: plist)!
+            FirebaseApp.configure(options: options)
+        case .prod:
+            let plist = Bundle.main.path(forResource: "GoogleService-Info-Prod", ofType: "plist")!
+            let options = FirebaseOptions(contentsOfFile: plist)!
+            FirebaseApp.configure(options: options)
+        }
+    }
 }
 
 @MainActor
