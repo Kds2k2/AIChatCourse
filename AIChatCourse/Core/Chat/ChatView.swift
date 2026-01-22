@@ -121,6 +121,10 @@ struct ChatView: View {
         ScrollView {
             LazyVStack(spacing: 24) {
                 ForEach(chatMessages, id: \.self) { message in
+                    if messageIsDelayed(message: message) {
+                        timeStampView(date: message.createdAtCalculated)
+                    }
+                    
                     let isCurrentUser = message.authorId == authManager.auth?.uid
                     ChatBubbleViewBuilder(
                         message: message,
@@ -129,6 +133,9 @@ struct ChatView: View {
                         imageName: isCurrentUser ? nil : avatar?.profileImageName,
                         onImagePressed: onProfileImagePressed
                     )
+                    .onAppear {
+                        onMessageDidAppear(message: message)
+                    }
                     .id(message.id)
                 }
                 
@@ -151,6 +158,52 @@ struct ChatView: View {
         .animation(.default, value: chatMessages.count)
         .animation(.smooth, value: isGeneratingResponse)
         .animation(.default, value: scrollPosition)
+    }
+    
+    private func onMessageDidAppear(message: ChatMessageModel) {
+        Task {
+            do {
+                let uid = try authManager.getAuthId()
+                let chatId = try getChatId()
+                
+                guard !message.hasBeenSeenBy(userId: uid) else {
+                    return
+                }
+                
+                try await chatManager.markChatMessageAsSeen(chatId: chatId, messageId: message.id, userId: uid)
+            } catch {
+                print("Error marking message as seen: \(error)")
+            }
+        }
+    }
+    
+    private func timeStampView(date: Date) -> some View {
+        Group {
+            Text(date.formatted(date: .abbreviated, time: .omitted))
+            +
+            Text(" - ")
+            +
+            Text(date.formatted(date: .omitted, time: .shortened))
+        }
+        .foregroundStyle(.secondary)
+        .font(.callout)
+    }
+    
+    private func messageIsDelayed(message: ChatMessageModel) -> Bool {
+        let currentDate = message.createdAtCalculated
+        
+        guard let index = chatMessages.firstIndex(where: { $0.id == message.id }),
+              chatMessages.indices.contains(index - 1)
+        else {
+            return false
+        }
+        
+        let previousDate = chatMessages[index - 1].createdAtCalculated
+        let timeDiff = currentDate.timeIntervalSince(previousDate)
+        
+        // 45 minutes, also could check for date components for same day or etc.
+        let threshold: TimeInterval = 60 * 45
+        return timeDiff > threshold
     }
     
     private var textFieldSection: some View {

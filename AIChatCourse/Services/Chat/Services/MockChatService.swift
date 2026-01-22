@@ -49,6 +49,10 @@ class MockChatService: ChatService, MockService {
         messages.append(message)
     }
     
+    func markChatMessageAsSeen(chatId: String, messageId: String, userId: String) async throws {
+        try await executionBehavior()
+    }
+    
     func getLastChatMessage(chatId: String) async throws -> ChatMessageModel? {
         try await executionBehavior()
         return ChatMessageModel.mocks.randomElement()

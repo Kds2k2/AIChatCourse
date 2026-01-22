@@ -47,12 +47,21 @@ struct AppDependencies {
     let chatManager: ChatManager
     
     init() {
-        authManager = AuthManager(service: FirebaseAuthService())
-        userManager = UserManager(services: ProductionUserServices())
-        aiManager = AIManager(service: OpenAIService())
-        avatarManager = AvatarManager(remote: FirebaseAvatarService(),
-                                      local: SwiftDataLocalPersistence())
-        chatManager = ChatManager(service: FirebaseChatService())
+        #if DEBUG
+            authManager = AuthManager(service: MockAuthService())
+            userManager = UserManager(services: MockUserServices())
+            aiManager = AIManager(service: MockAIService())
+            avatarManager = AvatarManager(remote: MockAvatarService(),
+                                          local: MockLocalAvatarPersistence())
+            chatManager = ChatManager(service: MockChatService())
+        #else
+            authManager = AuthManager(service: FirebaseAuthService())
+            userManager = UserManager(services: ProductionUserServices())
+            aiManager = AIManager(service: OpenAIService())
+            avatarManager = AvatarManager(remote: FirebaseAvatarService(),
+                                          local: SwiftDataLocalPersistence())
+            chatManager = ChatManager(service: FirebaseChatService())
+        #endif
     }
 }
 

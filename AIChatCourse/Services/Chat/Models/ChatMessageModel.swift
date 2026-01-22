@@ -107,7 +107,7 @@ struct ChatMessageModel: StringIdentifiable, Hashable, Codable {
                 authorId: UserAuthInfo.mock().uid,
                 content: AIChatModel(role: .user, message: "Hey! How are you?"),
                 seenByIds: [UserAuthInfo.mock().uid],
-                createdAt: now.addingTimeInterval(days: -1, minutes: -10)
+                createdAt: now.addingTimeInterval(days: -2, minutes: -10)
             ),
             ChatMessageModel(
                 id: UUID().uuidString,
@@ -122,20 +122,12 @@ struct ChatMessageModel: StringIdentifiable, Hashable, Codable {
                 chatId: "chat3",
                 authorId: UserAuthInfo.mock().uid,
                 content: AIChatModel(role: .user, message: "Doing great! Working on the app."),
-                seenByIds: [UserAuthInfo.mock().uid],
+                seenByIds: nil,
                 createdAt: now.addingTimeInterval(days: -1, minutes: -3)
             ),
             ChatMessageModel(
                 id: UUID().uuidString,
                 chatId: "chat1",
-                authorId: AvatarModel.mock.avatarId,
-                content: AIChatModel(role: .assistant, message: "Nice 🚀 Can’t wait to see it."),
-                seenByIds: nil,
-                createdAt: now.addingTimeInterval(minutes: -1)
-            ),
-            ChatMessageModel(
-                id: UUID().uuidString,
-                chatId: "chat4",
                 authorId: AvatarModel.mock.avatarId,
                 content: AIChatModel(role: .assistant, message: "Nice 🚀 Can’t wait to see it."),
                 seenByIds: nil,
