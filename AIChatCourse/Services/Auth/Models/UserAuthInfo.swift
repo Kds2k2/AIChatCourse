@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct UserAuthInfo {
+struct UserAuthInfo: Codable {
     let uid: String
     let email: String?
     let isAnonymous: Bool
@@ -26,6 +26,14 @@ struct UserAuthInfo {
         self.isAnonymous = isAnonymous
         self.createdAt = createdAt
         self.lastSignInAt = lastSignInAt
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case uid
+        case email
+        case isAnonymous = "is_anonymous"
+        case createdAt = "created_at"
+        case lastSignInAt = "last_sign_in_at"
     }
     
     static func mock(isAnonymous: Bool = false) -> Self {
@@ -62,5 +70,16 @@ struct UserAuthInfo {
             )
         ]
     }
-
+    
+    var eventParameters: [String: Any] {
+        let dict: [String: Any?] = [
+            "uauth_\(CodingKeys.uid.rawValue)": uid,
+            "uauth_\(CodingKeys.email.rawValue)": email,
+            "uauth_\(CodingKeys.isAnonymous.rawValue)": isAnonymous,
+            "uauth_\(CodingKeys.createdAt.rawValue)": createdAt,
+            "uauth_\(CodingKeys.lastSignInAt.rawValue)": lastSignInAt
+        ]
+        
+        return dict.compactMapValues({ $0 })
+    }
 }

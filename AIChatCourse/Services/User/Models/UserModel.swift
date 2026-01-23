@@ -64,6 +64,21 @@ struct UserModel: Codable, Hashable, StringIdentifiable {
         case profileColorHex = "profile_color_hex"
     }
     
+    var eventParameters: [String: Any] {
+        let dict: [String: Any?] = [
+            "user_\(CodingKeys.userId.rawValue)": userId,
+            "user_\(CodingKeys.email.rawValue)": email,
+            "user_\(CodingKeys.isAnonymous.rawValue)": isAnonymous,
+            "user_\(CodingKeys.createdAt.rawValue)": createdAt,
+            "user_\(CodingKeys.lastSignInAt.rawValue)": lastSignInAt,
+            "user_\(CodingKeys.creationVersion.rawValue)": creationVersion,
+            "user_\(CodingKeys.didCompleteOnboarding.rawValue)": didCompleteOnboarding,
+            "user_\(CodingKeys.profileColorHex.rawValue)": profileColorHex
+        ]
+        
+        return dict.compactMapValues({ $0 })
+    }
+    
     var profileColorCalculated: Color {
         guard let profileColorHex else {
             return .accent

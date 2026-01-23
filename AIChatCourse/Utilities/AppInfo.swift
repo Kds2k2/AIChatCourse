@@ -309,58 +309,58 @@ public struct AppInfo {
         case appStore = "appstore"
     }
     
-    /// A Boolean value indicating whether the app is running in TestFlight.
-    public static func isTestFlight() async -> Bool {
-        if #available(iOS 18.0, *) {
-            do {
-                let result = try await AppTransaction.shared
-
-                switch result {
-                case .verified(let transaction):
-                    return transaction.environment == .sandbox
-                case .unverified:
-                    return false
-                }
-
-            } catch {
-                return false
-            }
-        } else {
-            guard let component = Bundle.main.appStoreReceiptURL?.lastPathComponent else {
-                return false
-            }
-            return component == "sandboxReceipt"
-        }
-    }
-    
+//    /// A Boolean value indicating whether the app is running in TestFlight.
+//    public static func isTestFlight() async -> Bool {
+//        if #available(iOS 18.0, *) {
+//            do {
+//                let result = try await AppTransaction.shared
+//
+//                switch result {
+//                case .verified(let transaction):
+//                    return transaction.environment == .sandbox
+//                case .unverified:
+//                    return false
+//                }
+//
+//            } catch {
+//                return false
+//            }
+//        } else {
+//            guard let component = Bundle.main.appStoreReceiptURL?.lastPathComponent else {
+//                return false
+//            }
+//            return component == "sandboxReceipt"
+//        }
+//    }
+//    
     /// A Boolean value indicating whether the app is running in a debug build.
     public static var isDebug: Bool {
-#if DEBUG
+    #if DEBUG
         return true
-#else
+    #else
         return false
-#endif
+    #endif
     }
-    
-    /// A Boolean value indicating whether the user is a development user.
-    public static func isDevUser() async -> Bool {
-        await userType() != .appStore
-    }
-
-    public static func isProdUser() async -> Bool {
-        await userType() == .appStore
-    }
-    
-    /// The type of user based on the app's build and environment.
-    public static func userType() async -> UserType {
-        if isDebug {
-            return .debug
-        }
-
-        if await isTestFlight() {
-            return .testFlight
-        }
-
-        return .appStore
-    }
+//    
+//    /// A Boolean value indicating whether the user is a development user.
+//    public static func isDevUser() async -> Bool {
+//        await userType() != .appStore
+//    }
+//
+//    public static func isProdUser() async -> Bool {
+//        await userType() == .appStore
+//    }
+//    
+//    /// The type of user based on the app's build and environment.
+//    public static func userType() async -> UserType {
+//        if isDebug {
+//            return .debug
+//        }
+//
+//        if await isTestFlight() {
+//            return .testFlight
+//        }
+//
+//        return .appStore
+//    }
 }
