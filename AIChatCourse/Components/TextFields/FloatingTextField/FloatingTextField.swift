@@ -28,8 +28,8 @@ struct FloatingTextField: View {
     var type: FloatingTextFieldType = .default
     
     @Binding var text: String
-    @State private var isSecure: Bool = true
     @FocusState private var isFocused: Bool
+    @State private var isSecure: Bool = true
     
     private var isFloated: Bool {
         isFocused || !text.isEmpty
@@ -95,6 +95,7 @@ struct FloatingTextField: View {
         .background(backgroundColor)
     }
     
+    // MARK: - Some View
     private var fieldContainer: some View {
         HStack {
             leftIconView
@@ -193,7 +194,7 @@ struct FloatingTextField: View {
         .textFieldForegroundColor(
             foregroundColor: .teal,
             backgroundColor: .black,
-            border: .teal,
-            icon: .teal
+            borderColor: .teal,
+            iconColor: .teal
         )
 }

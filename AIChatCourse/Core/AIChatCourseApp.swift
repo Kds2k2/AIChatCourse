@@ -56,7 +56,7 @@ enum BuildConfiguration {
     
     func configure() {
         switch self {
-        case .mock(let _):
+        case .mock:
             break
         case .dev:
             let plist = Bundle.main.path(forResource: "GoogleService-Info-Dev", ofType: "plist")!

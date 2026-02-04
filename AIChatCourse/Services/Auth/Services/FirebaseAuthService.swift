@@ -7,9 +7,9 @@
 
 import SwiftUI
 import FirebaseAuth
+import SignInAppleAsync
 
 struct FirebaseAuthService: AuthService {
-    
     func addAuthenticatedListener(onListenerAttached: (any NSObjectProtocol) -> Void) -> AsyncStream<UserAuthInfo?> {
         AsyncStream { continuation in
             let listener = Auth.auth().addIDTokenDidChangeListener { _, currentUser in
@@ -39,6 +39,38 @@ struct FirebaseAuthService: AuthService {
         let isNewUser = result.additionalUserInfo?.isNewUser ?? true
         
         return (user, isNewUser)
+    }
+    
+    func signInWithApple() async throws -> (user: UserAuthInfo, isNewUser: Bool) {
+        let helper = SignInWithAppleHelper()
+        let response = try await helper.signIn()
+        
+        let credential = OAuthProvider.credential(
+            providerID: AuthProviderID.apple,
+            idToken: response.token,
+            rawNonce: response.nonce
+        )
+        
+        if let user = Auth.auth().currentUser, user.isAnonymous {
+            do {
+                let result = try await user.link(with: credential)
+                return result.asAuthInfo
+            } catch let error as NSError {
+                let authError = AuthErrorCode(rawValue: error.code)
+                switch authError {
+                case .providerAlreadyLinked, .credentialAlreadyInUse:
+                    if let secondaryCredential = error.userInfo["FIRAuthErrorUserInfoUpdatedCredentialKey"] as? AuthCredential {
+                        let result = try await Auth.auth().signIn(with: secondaryCredential)
+                        return result.asAuthInfo
+                    }
+                default:
+                    break
+                }
+            }
+        }
+        
+        let result = try await Auth.auth().signIn(with: credential)
+        return result.asAuthInfo
     }
     
     func signInWithEmailAndPassword(email: String, password: String) async throws -> (user: UserAuthInfo, isNewUser: Bool) {

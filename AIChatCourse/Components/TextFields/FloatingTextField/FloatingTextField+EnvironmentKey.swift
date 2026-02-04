@@ -63,25 +63,26 @@ struct FloatingTextFieldAppearance: ViewModifier {
     }
 }
 
-// MARK: - View extension
+// MARK: - View Extension
 extension View {
     func textFieldForegroundColor(
         foregroundColor: Color,
         backgroundColor: Color? = nil,
-        border: Color? = nil,
-        icon: Color? = nil
+        borderColor: Color? = nil,
+        iconColor: Color? = nil
     ) -> some View {
         modifier(
             FloatingTextFieldAppearance(
                 foreground: foregroundColor,
                 background: backgroundColor ?? Color(uiColor: .systemBackground),
-                border: border ?? foregroundColor.opacity(0.5),
-                icon: icon ?? foregroundColor.opacity(0.7)
+                border: borderColor ?? foregroundColor.opacity(0.5),
+                icon: iconColor ?? foregroundColor.opacity(0.7)
             )
         )
     }
 }
 
+// MARK: - Preview
 private struct PreviewView: View {
     @State var text: String = ""
     
@@ -94,22 +95,21 @@ private struct PreviewView: View {
         )
         .textFieldForegroundColor(
             foregroundColor: .white,
-            border: .accent,
-            icon: .accent
+            borderColor: .accent,
+            iconColor: .accent
         )
         
         FloatingTextField(secureText: $text)
         .textFieldForegroundColor(
             foregroundColor: .blue,
             backgroundColor: .red,
-            border: .green,
-            icon: .purple
+            borderColor: .green,
+            iconColor: .purple
         )
     }
 }
 
 #Preview {
     @Previewable @State var text: String = ""
-    
     PreviewView(text: text)
 }

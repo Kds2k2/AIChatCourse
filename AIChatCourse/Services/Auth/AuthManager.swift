@@ -5,6 +5,8 @@
 //  Created by Dmitro Kryzhanovsky on 10.01.2026.
 //
 import SwiftUI
+import CryptoKit
+import AuthenticationServices
 
 @MainActor
 @Observable
@@ -12,6 +14,7 @@ class AuthManager {
     
     private let service: AuthService
     private(set) var auth: UserAuthInfo?
+    private var nonse: String?
     private var listener: (any NSObjectProtocol)?
     
     init(service: AuthService) {
@@ -42,6 +45,10 @@ class AuthManager {
     
     func singInAnonymously() async throws -> (user: UserAuthInfo, isNewUser: Bool) {
         try await service.singInAnonymously()
+    }
+    
+    func signInWithApple() async throws -> (user: UserAuthInfo, isNewUser: Bool) {
+        try await service.signInWithApple()
     }
     
     func signInWithEmailAndPassword(email: String, password: String) async throws -> (user: UserAuthInfo, isNewUser: Bool) {

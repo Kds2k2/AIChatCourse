@@ -11,7 +11,9 @@ struct WelcomeView: View {
     @Environment(AppState.self) private var root
     
     @State private var imageName: String = Constants.randomImage
-    @State private var showCreateAccountView: Bool = false
+    @State private var showCreateAccountMenu: AnyAppAlert?
+    @State private var showAppleProvider: Bool = false
+    @State private var showEmailProvider: Bool = false
     
     var body: some View {
         NavigationStack {
@@ -28,7 +30,14 @@ struct WelcomeView: View {
                 policyLinks
             }
         }
-        .sheet(isPresented: $showCreateAccountView) {
+        .showCustomAlert(type: .confirmationDialog, alert: $showCreateAccountMenu)
+        .sheet(isPresented: $showAppleProvider) {
+            CreateAccountWithAppleView { isNewUser in
+                handleDidSignIn(isNewUser: isNewUser)
+            }
+            .presentationDetents([.medium])
+        }
+        .sheet(isPresented: $showEmailProvider) {
             SignInWithEmailAndPasswordView { isNewUser in
                 handleDidSignIn(isNewUser: isNewUser)
             }
@@ -83,9 +92,24 @@ struct WelcomeView: View {
     }
     
     private func onSignInPressed() {
-        showCreateAccountView = true
+        showCreateAccountMenu = AnyAppAlert(
+            title: "",
+            subtitle: "Select provider",
+            buttons: {
+                AnyView(
+                    Group {
+                        Button("Apple", role: .destructive) {
+                            showAppleProvider = true
+                        }
+                        Button("Email", role: .destructive) {
+                            showEmailProvider = true
+                        }
+                    }
+                )
+            }
+        )
     }
-    
+
     private func handleDidSignIn(isNewUser: Bool) {
         if isNewUser {
             // Do nothing
@@ -101,5 +125,6 @@ struct WelcomeView: View {
 #Preview {
     NavigationStack {
         WelcomeView()
+            .previewEnvironment()
     }
 }

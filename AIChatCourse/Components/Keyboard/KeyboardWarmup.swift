@@ -10,12 +10,9 @@ import SwiftUI
 @MainActor
 final class KeyboardWarmup {
     static func warmupInBackground() {
-        // Preload keyboard resources
         _ = UITextInputMode.activeInputModes
-        // Preload text input system
         _ = UITextChecker()
 
-        // Create offscreen textfield
         let textField = UITextField()
         textField.frame = CGRect(x: -10000, y: -10000, width: 1, height: 1)
         textField.isHidden = true
@@ -25,13 +22,11 @@ final class KeyboardWarmup {
            let window = windowScene.windows.first {
             window.addSubview(textField)
 
-            // Brief activation
             textField.becomeFirstResponder()
 
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
                 textField.resignFirstResponder()
                 textField.removeFromSuperview()
-                print("✅ Keyboard warmed up")
             }
         }
     }

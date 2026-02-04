@@ -22,7 +22,9 @@ struct SettingsView: View {
     }
     
     @State private var isAnonymousUser: Bool = true
-    @State private var showCreateAccountView: Bool = false
+    @State private var showCreateAccountMenu: AnyAppAlert?
+    @State private var showAppleProvider: Bool = false
+    @State private var showEmailProvider: Bool = false
     
     @State private var showAlert: AnyAppAlert?
     
@@ -35,7 +37,14 @@ struct SettingsView: View {
             }
             .environment(\.defaultMinListRowHeight, 0)
             .navigationTitle("Settings")
-            .sheet(isPresented: $showCreateAccountView, onDismiss: {
+            .showCustomAlert(type: .confirmationDialog, alert: $showCreateAccountMenu)
+            .sheet(isPresented: $showAppleProvider, onDismiss: {
+                setAnonymousAccountStatus()
+            }, content: {
+                CreateAccountWithAppleView()
+                    .presentationDetents([.medium])
+            })
+            .sheet(isPresented: $showEmailProvider, onDismiss: {
                 setAnonymousAccountStatus()
             }, content: {
                 SignUpWithEmailAndPasswordView()
@@ -138,7 +147,22 @@ struct SettingsView: View {
     }
     
     private func onCreateAccountPressed() {
-        showCreateAccountView = true
+        showCreateAccountMenu = AnyAppAlert(
+            title: "",
+            subtitle: "Select provider",
+            buttons: {
+                AnyView(
+                    Group {
+                        Button("Apple", role: .destructive) {
+                            showAppleProvider = true
+                        }
+                        Button("Email", role: .destructive) {
+                            showEmailProvider = true
+                        }
+                    }
+                )
+            }
+        )
     }
     
     private func onSignOutPressed() {

@@ -6,11 +6,17 @@
 //
 import SwiftUI
 import FirebaseAuth
+import SignInAppleAsync
 import AuthenticationServices
+import CryptoKit
 
 struct CreateAccountWithAppleView: View {
-    @State private var authorizationResult: ASAuthorization?
-    @State private var error: Error?
+    @Environment(AppState.self) private var root
+    @Environment(AuthManager.self) private var authManager
+    @Environment(UserManager.self) private var userManager
+    @Environment(\.dismiss) private var dismiss
+    
+    var onDidSignIn: ((_ isNewUser: Bool) -> Void)?
     
     var title: String = "Create Account?"
     var subtitle: String = "Don't lose your data! Connect to an SSO provider to save your account."
@@ -26,30 +32,41 @@ struct CreateAccountWithAppleView: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
 
-            SignInWithAppleButton(.signIn, onRequest: { request in
-                request.requestedScopes = [.fullName, .email]
-            }, onCompletion: { result in
-                switch result {
-                case .success(let authResult):
-                    self.error = nil
-                    self.authorizationResult = authResult
-                    print("+")
-                case .failure(let error):
-                    self.error = error
-                    self.authorizationResult = nil
-                    print("-")
-                }
-            })
-            .signInWithAppleButtonStyle(.black)
+            SignInWithAppleButtonView(
+                type: .signIn,
+                style: .black,
+                cornerRadius: 10
+            )
             .frame(height: 55)
+            .anyButton(.press) {
+                onSignInPressed()
+            }
             
             Spacer()
         }
         .padding(16)
         .padding(.top, 40)
     }
+    
+    private func onSignInPressed() {
+        Task {
+            do {
+                let result = try await authManager.signInWithApple()
+                print("Apple, sign in success")
+                try await userManager.logIn(auth: result.user, isNewUser: result.isNewUser)
+                print("Apple, log in success")
+                
+                dismiss()
+                onDidSignIn?(result.isNewUser)
+            } catch {
+                print("onLoginPressed: \(error)")
+            }
+        }
+    }
 }
 
 #Preview {
-    CreateAccountWithAppleView()
+    CreateAccountWithAppleView { newUser in
+        print("newUser:\(newUser)")
+    }
 }

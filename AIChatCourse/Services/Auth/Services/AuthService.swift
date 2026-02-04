@@ -6,11 +6,13 @@
 //
 
 import SwiftUI
+import AuthenticationServices
 
 protocol AuthService: Sendable {
     func addAuthenticatedListener(onListenerAttached: (any NSObjectProtocol) -> Void) -> AsyncStream<UserAuthInfo?>
     func getAuthenticatedUser() -> UserAuthInfo?
     func singInAnonymously() async throws -> (user: UserAuthInfo, isNewUser: Bool)
+    func signInWithApple() async throws -> (user: UserAuthInfo, isNewUser: Bool)
     func signInWithEmailAndPassword(email: String, password: String) async throws -> (user: UserAuthInfo, isNewUser: Bool)
     func signUpWithEmailAndPassword(email: String, password: String) async throws -> (user: UserAuthInfo, isNewUser: Bool)
     func signOut() throws

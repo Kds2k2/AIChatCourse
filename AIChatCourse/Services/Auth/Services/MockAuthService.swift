@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import AuthenticationServices
 
 struct MockAuthService: AuthService, MockService {
     let currentUser: UserAuthInfo?
@@ -32,6 +33,12 @@ struct MockAuthService: AuthService, MockService {
         try await executionBehavior()
         let user = UserAuthInfo.mock(isAnonymous: true)
         return (user, true)
+    }
+    
+    func signInWithApple() async throws -> (user: UserAuthInfo, isNewUser: Bool) {
+        try await executionBehavior()
+        let user = UserAuthInfo.mock(isAnonymous: false)
+        return (user, false)
     }
     
     func signInWithEmailAndPassword(email: String, password: String) async throws -> (user: UserAuthInfo, isNewUser: Bool) {

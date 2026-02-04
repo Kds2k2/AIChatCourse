@@ -154,7 +154,7 @@ struct ChatView: View {
             .rotationEffect(.degrees(180))
         }
         .rotationEffect(.degrees(180))
-        .scrollPosition(id: $scrollPosition, anchor: .top)
+        .scrollPosition(id: $scrollPosition, anchor: .center)
         .animation(.default, value: chatMessages.count)
         .animation(.smooth, value: isGeneratingResponse)
         .animation(.default, value: scrollPosition)
