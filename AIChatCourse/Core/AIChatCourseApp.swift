@@ -20,6 +20,7 @@ struct AIChatCourseApp: App {
                 .environment(delegate.dependencies.aiManager)
                 .environment(delegate.dependencies.avatarManager)
                 .environment(delegate.dependencies.chatManager)
+                .environment(delegate.dependencies.logManager)
         }
     }
 }
@@ -78,6 +79,7 @@ struct AppDependencies {
     let aiManager: AIManager
     let avatarManager: AvatarManager
     let chatManager: ChatManager
+    let logManager: LogManager
     
     init(_ config: BuildConfiguration) {
         switch config {
@@ -88,6 +90,7 @@ struct AppDependencies {
             avatarManager = AvatarManager(remote: MockAvatarService(),
                                           local: MockLocalAvatarPersistence())
             chatManager = ChatManager(service: MockChatService())
+            logManager = LogManager(services: [ConsoleService(printParameters: false)])
         case .dev:
             authManager = AuthManager(service: FirebaseAuthService())
             userManager = UserManager(services: ProductionUserServices())
@@ -95,6 +98,7 @@ struct AppDependencies {
             avatarManager = AvatarManager(remote: FirebaseAvatarService(),
                                           local: SwiftDataLocalPersistence())
             chatManager = ChatManager(service: FirebaseChatService())
+            logManager = LogManager(services: [ConsoleService()])
         case .prod:
             authManager = AuthManager(service: FirebaseAuthService())
             userManager = UserManager(services: ProductionUserServices())
@@ -102,6 +106,7 @@ struct AppDependencies {
             avatarManager = AvatarManager(remote: FirebaseAvatarService(),
                                           local: SwiftDataLocalPersistence())
             chatManager = ChatManager(service: FirebaseChatService())
+            logManager = LogManager(services: [])
         }
     }
 }
@@ -114,6 +119,7 @@ extension View {
             .environment(AIManager(service: MockAIService()))
             .environment(AvatarManager(remote: MockAvatarService(), local: MockLocalAvatarPersistence()))
             .environment(ChatManager(service: MockChatService()))
+            .environment(LogManager(services: []))
             .environment(AppState())
     }
 }

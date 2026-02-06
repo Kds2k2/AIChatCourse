@@ -10,6 +10,7 @@ import SwiftUI
 struct AppView: View {
     @Environment(AuthManager.self) private var authManager
     @Environment(UserManager.self) private var userManager
+    @Environment(LogManager.self) private var logManager
     @State var appState: AppState = AppState()
 
     var body: some View {
@@ -34,7 +35,55 @@ struct AppView: View {
             }
         }
         .onAppear {
+            logManager.identifyUser(userId: "123", name: "Dima", email: "dk@gm.com")
+            logManager.addUserProperties(dict: UserModel.mock.eventParameters)
+            
+            logManager.trackEvent(event: Event.alpha)
+            logManager.trackEvent(event: Event.beta)
+            logManager.trackEvent(event: Event.gamma)
+            logManager.trackEvent(event: Event.delta)
+        }
+        .onAppear {
             KeyboardWarmup.warmupInBackground()
+        }
+    }
+    
+    enum Event: LoggableEvent {
+        case alpha, beta, gamma, delta
+        
+        var eventName: String {
+            switch self {
+            case .alpha:
+                "Event_Alpha"
+            case .beta:
+                "Event_Beta"
+            case .gamma:
+                "Event_Gamma"
+            case .delta:
+                "Event_Delta"
+            }
+        }
+        
+        var parameners: [String : Any]? {
+            switch self {
+            case .alpha, .beta:
+                return ["aaa": true, "bbb": 123]
+            default:
+                return nil
+            }
+        }
+        
+        var type: LogType {
+            switch self {
+            case .alpha:
+                    .info
+            case .beta:
+                    .analytic
+            case .gamma:
+                    .waring
+            case .delta:
+                    .severe
+            }
         }
     }
     
