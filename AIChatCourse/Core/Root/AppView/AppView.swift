@@ -36,12 +36,21 @@ struct AppView: View {
         }
         .onAppear {
             logManager.identifyUser(userId: "123", name: "Dima", email: "dk@gm.com")
-            logManager.addUserProperties(dict: UserModel.mock.eventParameters)
+            logManager.addUserProperties(dict: UserModel.mock.eventParameters, isHighPriority: true)
             
             logManager.trackEvent(event: Event.alpha)
             logManager.trackEvent(event: Event.beta)
             logManager.trackEvent(event: Event.gamma)
             logManager.trackEvent(event: Event.delta)
+            
+            let event = AnyLoggableEvent(
+                eventName: "MyNewEvent",
+                parameters: UserModel.mock.eventParameters,
+                type: .analytic
+            )
+            logManager.trackEvent(event: event)
+            
+            logManager.trackEvent(eventName: "AnotherEvent")
         }
         .onAppear {
             KeyboardWarmup.warmupInBackground()
@@ -64,7 +73,7 @@ struct AppView: View {
             }
         }
         
-        var parameners: [String : Any]? {
+        var parameters: [String: Any]? {
             switch self {
             case .alpha, .beta:
                 return ["aaa": true, "bbb": 123]

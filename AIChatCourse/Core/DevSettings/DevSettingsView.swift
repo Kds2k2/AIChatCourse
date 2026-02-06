@@ -75,16 +75,10 @@ struct DevSettingsView: View {
         HStack {
             Text(item.key)
             Spacer(minLength: 4)
-            if let value = item.value as? String {
+            if let value = String.convertToStirng(item.value) {
                 Text(value)
-            } else if let value = item.value as? Bool {
-                Text(value.description)
-            } else if let value = item.value as? Int {
-                Text("\(value)")
-            } else if let value = item.value as? Double {
-                Text("\(value)")
-            } else if let value = item.value as? Date {
-                Text(value.formatted())
+            } else {
+                Text("Unknown")
             }
         }
         .font(.caption)

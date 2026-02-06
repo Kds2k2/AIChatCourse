@@ -76,7 +76,9 @@ struct ConsoleService: LogService {
         logger.log(level: level, message: string)
     }
     
-    func addUserProperties(dict: [String: Any]) {
+    func addUserProperties(dict: [String: Any], isHighPriority: Bool) {
+        guard isHighPriority else { return }
+        
         let level = LogType.analytic
         var string = """
         \(level.emoji) User properties:
@@ -109,10 +111,10 @@ struct ConsoleService: LogService {
         """
         
         if printParameters {
-            if let parameners = event.parameners, !parameners.isEmpty {
-                let sorted = parameners.keys.sorted()
+            if let parameters = event.parameters, !parameters.isEmpty {
+                let sorted = parameters.keys.sorted()
                 for key in sorted {
-                    if let value = parameners[key] {
+                    if let value = parameters[key] {
                         string += "\n(key: \(key), value: \(value)"
                     }
                 }
