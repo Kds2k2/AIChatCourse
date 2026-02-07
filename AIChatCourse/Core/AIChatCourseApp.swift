@@ -101,7 +101,9 @@ struct AppDependencies {
                                           local: SwiftDataLocalPersistence())
             chatManager = ChatManager(service: FirebaseChatService())
             logManager = LogManager(services: [
-                ConsoleService(), FirebaseAnalyticsService()
+                ConsoleService(),
+                FirebaseAnalyticsService(),
+                MixpanelService(token: AppKeys.mixpanel)
             ])
         case .prod:
             authManager = AuthManager(service: FirebaseAuthService())
@@ -111,7 +113,8 @@ struct AppDependencies {
                                           local: SwiftDataLocalPersistence())
             chatManager = ChatManager(service: FirebaseChatService())
             logManager = LogManager(services: [
-                FirebaseAnalyticsService()
+                FirebaseAnalyticsService(),
+                MixpanelService(token: AppKeys.mixpanel)
             ])
         }
     }

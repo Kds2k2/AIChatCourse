@@ -16,4 +16,13 @@ struct AppKeys {
         }
         return key
     }()
+    
+    static let mixpanel: String = {
+        guard let key = Bundle.main.object(
+            forInfoDictionaryKey: "MIXPANEL_PROJECT_TOKEN"
+        ) as? String else {
+            fatalError("MIXPANEL_PROJECT_TOKEN not set")
+        }
+        return key
+    }()
 }
