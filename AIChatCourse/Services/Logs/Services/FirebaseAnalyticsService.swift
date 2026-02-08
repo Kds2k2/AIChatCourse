@@ -59,7 +59,7 @@ struct FirebaseAnalyticsService: LogService {
             }
         }
         
-        for (key, value) in parameters where key.count > 40{    
+        for (key, value) in parameters where key.count > 40 {    
             parameters.removeValue(forKey: key)
             
             let newKey = key.clean(maxCharactes: 24)

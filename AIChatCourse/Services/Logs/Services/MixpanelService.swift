@@ -31,7 +31,7 @@ struct MixpanelService: LogService {
         }
     }
     
-    func addUserProperties(dict: [String : Any], isHighPriority: Bool) {
+    func addUserProperties(dict: [String: Any], isHighPriority: Bool) {
         var userProperties: [String: MixpanelType] = [:]
         
         for (key, value) in dict {

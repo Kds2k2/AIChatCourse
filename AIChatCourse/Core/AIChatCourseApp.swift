@@ -103,6 +103,7 @@ struct AppDependencies {
             logManager = LogManager(services: [
                 ConsoleService(),
                 FirebaseAnalyticsService(),
+                FirebaseCrashlyticsService(),
                 MixpanelService(token: AppKeys.mixpanel)
             ])
         case .prod:
@@ -114,6 +115,7 @@ struct AppDependencies {
             chatManager = ChatManager(service: FirebaseChatService())
             logManager = LogManager(services: [
                 FirebaseAnalyticsService(),
+                FirebaseCrashlyticsService(),
                 MixpanelService(token: AppKeys.mixpanel)
             ])
         }
