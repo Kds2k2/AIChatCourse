@@ -46,6 +46,8 @@ struct FirebaseAnalyticsService: LogService {
     }
     
     func trackEvent(event: any LoggableEvent) {
+        guard event.type != .info else { return }
+        
         var parameters = event.parameters ?? [:]
         for (key, value) in parameters {
             if let date = value as? Date, let string = String.convertToStirng(date) {

@@ -35,48 +35,29 @@ struct AppView: View {
             }
         }
         .onAppear {
-            logManager.identifyUser(userId: "123", name: "Dima", email: "dk@gm.com")
-            logManager.addUserProperties(dict: UserModel.mock.eventParameters, isHighPriority: true)
-            
-            logManager.trackEvent(event: Event.alpha)
-            logManager.trackEvent(event: Event.beta)
-            logManager.trackEvent(event: Event.gamma)
-            logManager.trackEvent(event: Event.delta)
-            
-            let event = AnyLoggableEvent(
-                eventName: "MyNewEvent",
-                parameters: UserModel.mock.eventParameters,
-                type: .analytic
-            )
-            logManager.trackEvent(event: event)
-            
-            logManager.trackEvent(eventName: "AnotherEvent")
-        }
-        .onAppear {
             KeyboardWarmup.warmupInBackground()
         }
+        .screenAppearAnalytics(name: "AppView")
     }
     
     enum Event: LoggableEvent {
-        case alpha, beta, gamma, delta
+        case existingAuthStart, existingAuthFail(error: Error)
+        case anonAuthStart, anonAuthSuccess, anonAuthFail(error: Error)
         
         var eventName: String {
             switch self {
-            case .alpha:
-                "Event_Alpha"
-            case .beta:
-                "Event_Beta"
-            case .gamma:
-                "Event_Gamma"
-            case .delta:
-                "Event_Delta"
+            case .existingAuthStart: "AppView_ExistingAuth_Start"
+            case .existingAuthFail: "AppView_ExistingAuth_Fail"
+            case .anonAuthStart: "AppView_AnonAuth_Start"
+            case .anonAuthSuccess: "AppView_AnonAuth_Success"
+            case .anonAuthFail: "AppView_AnonAuth_Fail"
             }
         }
         
         var parameters: [String: Any]? {
             switch self {
-            case .alpha, .beta:
-                return ["aaa": true, "bbb": 123]
+            case .existingAuthFail(error: let error), .anonAuthFail(error: let error):
+                return error.eventParameters
             default:
                 return nil
             }
@@ -84,37 +65,34 @@ struct AppView: View {
         
         var type: LogType {
             switch self {
-            case .alpha:
-                    .info
-            case .beta:
-                    .analytic
-            case .gamma:
-                    .waring
-            case .delta:
-                    .severe
+            case .existingAuthFail, .anonAuthFail:
+                .severe
+            default:
+                .analytic
             }
         }
     }
     
     private func checkUserStatus() async {
         if let user = authManager.auth {
-            print("User already authenticated: \(user.uid)")
+            logManager.trackEvent(event: Event.existingAuthStart)
             
             do {
                 try await userManager.logIn(auth: user, isNewUser: false)
             } catch {
-                print("Failed to log in to auth for existing user: \(error)")
+                logManager.trackEvent(event: Event.existingAuthFail(error: error))
                 try? await Task.sleep(for: .seconds(5))
                 await checkUserStatus()
             }
         } else {
+            logManager.trackEvent(event: Event.anonAuthStart)
             do {
                 let result = try await authManager.singInAnonymously()
-                print("Sign in anonymous succes: \(result.user.uid), new: \(result.isNewUser)")
+                logManager.trackEvent(event: Event.anonAuthSuccess)
                 
                 try await userManager.logIn(auth: result.user, isNewUser: result.isNewUser)
             } catch {
-                print("Failed to sign in anonymously and log in: \(error)")
+                logManager.trackEvent(event: Event.anonAuthFail(error: error))
                 try? await Task.sleep(for: .seconds(5))
                 await checkUserStatus()
             }
