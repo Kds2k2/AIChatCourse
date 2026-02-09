@@ -12,6 +12,7 @@ struct ChatsView: View {
     @Environment(AuthManager.self) private var authManager
     @Environment(AvatarManager.self) private var avatarManager
     @Environment(ChatManager.self) private var chatManager
+    @Environment(LogManager.self) private var logManager
     
     @State private var chats: [ChatModel] = []
     @State private var isLoadingChats: Bool = true
@@ -30,6 +31,7 @@ struct ChatsView: View {
             }
             .navigationTitle("Chats")
             .navigationDestinationForCoreModule(path: $path)
+            .screenAppearAnalytics(name: "ChatsView")
             .onAppear {
                 loadRecentAvatars()
             }
@@ -39,25 +41,31 @@ struct ChatsView: View {
         }
     }
     
+    // MARK: - Loading
     private func loadRecentAvatars() {
+        logManager.trackEvent(event: Event.loadAvatarsStart)
         do {
             recentAvatars = try avatarManager.getRecentAvatars()
+            logManager.trackEvent(event: Event.loadAvatarsSuccess)
         } catch {
-            print("Failed to load recent avatars: \(error)")
+            logManager.trackEvent(event: Event.loadAvatarsFail(error: error))
         }
     }
     
     private func loadChats() async {
+        logManager.trackEvent(event: Event.loadChatsStart)
         do {
             let uid = try authManager.getAuthId()
             chats = try await chatManager.getAllChats(userId: uid) // .sorted(by: { $0.updatedAt > $1.updatedAt })
                 .sortedByKeyPath(keyPath: \.updatedAt, order: .descending)
+            logManager.trackEvent(event: Event.loadChatsSuccess)
         } catch {
-            print("Failed to load chats: \(error)")
+            logManager.trackEvent(event: Event.loadChatsFail(error: error))
         }
         isLoadingChats = false
     }
     
+    // MARK: - Views
     private var chatsSection: some View {
         Section {
             if isLoadingChats {
@@ -129,15 +137,63 @@ struct ChatsView: View {
         }
     }
     
+    // MARK: - Actions
     private func onChatPressed(chat: ChatModel) {
         path.append(.chat(avatarId: chat.avatarId, chat: chat))
+        logManager.trackEvent(event: Event.chatPressed(chat: chat))
     }
     
     private func onAvatarPresser(avatar: AvatarModel) {
         path.append(.chat(avatarId: avatar.avatarId, chat: nil))
+        logManager.trackEvent(event: Event.avatarPressed(avatar: avatar))
+    }
+    
+    // MARK: - Logs
+    enum Event: LoggableEvent {
+        case loadAvatarsStart, loadAvatarsSuccess, loadAvatarsFail(error: Error)
+        case loadChatsStart, loadChatsSuccess, loadChatsFail(error: Error)
+        case chatPressed(chat: ChatModel), avatarPressed(avatar: AvatarModel)
+        
+        static var screenName: String = "ChatsView"
+        
+        var eventName: String {
+            switch self {
+            case .loadAvatarsStart:         return "\(Event.screenName)_LoadAvatars_Start"
+            case .loadAvatarsSuccess:       return "\(Event.screenName)_LoadAvatars_Success"
+            case .loadAvatarsFail:          return "\(Event.screenName)_LoadAvatars_Fail"
+            case .loadChatsStart:           return "\(Event.screenName)_LoadChats_Start"
+            case .loadChatsSuccess:         return "\(Event.screenName)_LoadChats_Success"
+            case .loadChatsFail:            return "\(Event.screenName)_LoadChats_Fail"
+            case .chatPressed:              return "\(Event.screenName)_Chat_Pressed"
+            case .avatarPressed:            return "\(Event.screenName)_Avatar_Pressed"
+            }
+        }
+        
+        var parameters: [String: Any]? {
+            switch self {
+            case .loadChatsFail(error: let error), .loadAvatarsFail(error: let error):
+                return error.eventParameters
+            case .chatPressed(chat: let chat):
+                return chat.eventParameters
+            case .avatarPressed(avatar: let avatar):
+                return avatar.eventParameters
+            default:
+                return nil
+            }
+        }
+        
+        var type: LogType {
+            switch self {
+            case .loadChatsFail, .loadAvatarsFail:
+                    .severe
+            default:
+                    .analytic
+            }
+        }
     }
 }
 
+// MARK: - Previews
 #Preview("Has data") {
     ChatsView()
         .environment(AuthManager(service: MockAuthService(user: .mock(isAnonymous: true))))

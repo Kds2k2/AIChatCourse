@@ -26,6 +26,7 @@ struct DevSettingsView: View {
                     backButtonView
                 }
             }
+            .screenAppearAnalytics(name: "DevSettings")
         }
     }
     

@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct AvatarDescriptionBuilder {
+struct AvatarDescriptionBuilder: Codable {
     let characterOption: CharacterOption
     let characterAction: CharacterAction
     let characterLocation: CharacterLocation
@@ -22,6 +22,23 @@ struct AvatarDescriptionBuilder {
         self.characterOption = avatar.characterOption ?? .default
         self.characterAction = avatar.characterAction ?? .default
         self.characterLocation = avatar.characterLocation ?? .default
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case characterOption = "option"
+        case characterAction = "action"
+        case characterLocation = "location"
+    }
+    
+    var eventParameters: [String: Any] {
+        var dict = [
+            "avatar_description_\(CodingKeys.characterOption)": characterOption.rawValue,
+            "avatar_description_\(CodingKeys.characterAction)": characterAction.rawValue,
+            "avatar_description_\(CodingKeys.characterLocation)": characterLocation.rawValue,
+            "avatar_description": characterDescription
+        ]
+        
+        return dict.compactMapValues({ $0 })
     }
     
     var characterDescription: String {

@@ -13,6 +13,7 @@ struct CreateAvatarView: View {
     @Environment(AIManager.self) private var aiManager
     @Environment(AuthManager.self) private var authManager
     @Environment(AvatarManager.self) private var avatarManager
+    @Environment(LogManager.self) private var logManager
     
     @State private var avatarName: String = ""
     @State private var characterOption: CharacterOption = .default
@@ -34,6 +35,7 @@ struct CreateAvatarView: View {
                 saveSection
             }
             .navigationTitle("Create Avatar")
+            .screenAppearAnalytics(name: "CreateAvatarView")
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     backButton
@@ -43,6 +45,7 @@ struct CreateAvatarView: View {
         }
     }
     
+    // MARK: - Views
     private var avatarNameSection: some View {
         Section {
             TextField("Player 1", text: $avatarName)
@@ -142,25 +145,29 @@ struct CreateAvatarView: View {
             }
     }
     
+    // MARK: - Actions
     private func onBackPressed() {
         dismiss()
+        logManager.trackEvent(event: Event.backButtonPressed)
     }
     
     private func onGenerateImagePressed() {
         isGeneratingImage = true
+        logManager.trackEvent(event: Event.generateImageStart)
         
         Task {
             do {
-                let promt = AvatarDescriptionBuilder(
+                let avatarDescriptionBuilder = AvatarDescriptionBuilder(
                     characterOption: characterOption,
                     characterAction: characterAction,
                     characterLocation: characterLocation
                 )
-                .characterDescription
+                let promt = avatarDescriptionBuilder.characterDescription
                 
                 generatedImage = try await aiManager.generateImage(input: promt)
+                logManager.trackEvent(event: Event.generateImageSuccess(description: avatarDescriptionBuilder))
             } catch {
-                print("Error while generating image: \(error)")
+                logManager.trackEvent(event: Event.generateImageFail(error: error))
             }
             
             isGeneratingImage = false
@@ -168,6 +175,7 @@ struct CreateAvatarView: View {
     }
     
     private func onSavePressed() {
+        logManager.trackEvent(event: Event.saveAvatarStart)
         guard let generatedImage = generatedImage else { return }
         isSaving = true
         
@@ -185,13 +193,60 @@ struct CreateAvatarView: View {
                 )
                 
                 try await avatarManager.createAvatar(avatar: avatar, image: generatedImage)
+                logManager.trackEvent(event: Event.saveAvatarSuccess(avatar: avatar))
                 
                 dismiss()
             } catch {
                 showAlert = AnyAppAlert(error: error)
+                logManager.trackEvent(event: Event.saveAvatarFail(error: error))
             }
             
             isSaving = false
+        }
+    }
+    
+    // MARK: - Logs
+    enum Event: LoggableEvent {
+        case backButtonPressed
+        case generateImageStart, generateImageSuccess(description: AvatarDescriptionBuilder), generateImageFail(error: Error)
+        case saveAvatarStart, saveAvatarSuccess(avatar: AvatarModel), saveAvatarFail(error: Error)
+        
+        static var screenName: String = "CreateAvatarView"
+        
+        var eventName: String {
+            switch self {
+            case .backButtonPressed:            return "\(Event.screenName)_BackButton_Pressed"
+            case .generateImageStart:           return "\(Event.screenName)_GenerateImage_Start"
+            case .generateImageSuccess:         return "\(Event.screenName)_GenerateImage_Success"
+            case .generateImageFail:            return "\(Event.screenName)_GenerateImage_Fail"
+            case .saveAvatarStart:              return "\(Event.screenName)_SaveAvatar_Start"
+            case .saveAvatarSuccess:            return "\(Event.screenName)_SaveAvatar_Success"
+            case .saveAvatarFail:               return "\(Event.screenName)_SaveAvatar_Fail"
+            }
+        }
+        
+        var parameters: [String: Any]? {
+            switch self {
+            case .saveAvatarFail(error: let error), .generateImageFail(error: let error):
+                return error.eventParameters
+            case .saveAvatarSuccess(avatar: let avatar):
+                return avatar.eventParameters
+            case .generateImageSuccess(description: let description):
+                return description.eventParameters
+            default:
+                return nil
+            }
+        }
+        
+        var type: LogType {
+            switch self {
+            case .generateImageFail:
+                    .severe
+            case .saveAvatarFail:
+                    .waring
+            default:
+                    .analytic
+            }
         }
     }
 }
