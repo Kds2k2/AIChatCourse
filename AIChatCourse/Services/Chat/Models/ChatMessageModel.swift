@@ -50,6 +50,19 @@ struct ChatMessageModel: StringIdentifiable, Hashable, Codable {
         case createdAt = "created_at"
     }
     
+    var eventParameters: [String: Any] {
+        var dict: [String: Any?] = [
+            "chatMessage_\(CodingKeys.id.rawValue)": id,
+            "chatMessage_\(CodingKeys.chatId.rawValue)": chatId,
+            "chatMessage_\(CodingKeys.authorId.rawValue)": authorId,
+            "chatMessage_\(CodingKeys.seenByIds.rawValue)": seenByIds?.sorted().joined(separator: ", "),
+            "chatMessage_\(CodingKeys.createdAt.rawValue)": createdAt,
+        ]
+        
+        dict.merge(content?.eventParameters)
+        return dict.compactMapValues({ $0 })
+    }
+    
     static func newUserMessage(chatId: String, userId: String, message: AIChatModel) -> Self {
         ChatMessageModel(
             id: UUID().uuidString,
