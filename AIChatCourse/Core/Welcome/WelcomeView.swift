@@ -9,6 +9,7 @@ import SwiftUI
 
 struct WelcomeView: View {
     @Environment(AppState.self) private var root
+    @Environment(LogManager.self) private var logManager
     
     @State private var imageName: String = Constants.randomImage
     @State private var showCreateAccountMenu: AnyAppAlert?
@@ -30,6 +31,7 @@ struct WelcomeView: View {
                 policyLinks
             }
         }
+        .screenAppearAnalytics(name: "WelcomeView")
         .showCustomAlert(type: .confirmationDialog, alert: $showCreateAccountMenu)
         .sheet(isPresented: $showAppleProvider) {
             CreateAccountWithAppleView { isNewUser in
@@ -44,6 +46,7 @@ struct WelcomeView: View {
         }
     }
 
+    // MARK: - Views
     private var titleSection: some View {
         VStack {
             Text("AI Chat")
@@ -91,6 +94,7 @@ struct WelcomeView: View {
         }
     }
     
+    // MARK: - Actions
     private func onSignInPressed() {
         showCreateAccountMenu = AnyAppAlert(
             title: "",
@@ -117,6 +121,38 @@ struct WelcomeView: View {
             Task {
                 try? await Task.sleep(for: .seconds(0.5))
                 root.updateViewState(showTabBarView: true)
+            }
+        }
+    }
+    
+    // MARK: - Logs
+    enum Event: LoggableEvent {
+        case signInWithApple, signInWithEmail
+        case didSignIn(isNewUser: Bool)
+        
+        static var screenName: String = "WelcomeView"
+        
+        var eventName: String {
+            switch self {
+            case .signInWithApple:          return "\(Event.screenName)_SignIn_Apple"
+            case .signInWithEmail:          return "\(Event.screenName)_SignIn_Email"
+            case .didSignIn:                return "\(Event.screenName)_DidSignIn"
+            }
+        }
+        
+        var parameters: [String: Any]? {
+            switch self {
+            case .didSignIn(isNewUser: let isNewUser):
+                return ["welcome_is_new_user": isNewUser]
+            default:
+                return nil
+            }
+        }
+        
+        var type: LogType {
+            switch self {
+            default:
+                    .analytic
             }
         }
     }

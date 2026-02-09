@@ -16,6 +16,7 @@ struct SignInWithEmailAndPasswordView: View {
     @Environment(AppState.self) private var root
     @Environment(AuthManager.self) private var authManager
     @Environment(UserManager.self) private var userManager
+    @Environment(LogManager.self) private var logManager
     @Environment(\.dismiss) private var dismiss
     
     @State var email: String = "test@gmail.com"
@@ -41,6 +42,7 @@ struct SignInWithEmailAndPasswordView: View {
                         }
                 }
             }
+            .screenAppearAnalytics(name: "SignInWithEmailAndPasswordView")
         }
     }
     
@@ -91,17 +93,59 @@ struct SignInWithEmailAndPasswordView: View {
     }
 
     private func onLoginPressed() {
+        logManager.trackEvent(event: Event.loginStart)
         Task {
             do {
                 let result = try await authManager.signInWithEmailAndPassword(email: email, password: password)
-                print("Login, sign in success")
+                logManager.trackEvent(event: Event.loginAuthSuccess(user: result.user, isNewUser: result.isNewUser))
+                
                 try await userManager.logIn(auth: result.user, isNewUser: result.isNewUser)
-                print("Login, log in success")
+                logManager.trackEvent(event: Event.loginUserSuccess(user: result.user, isNewUser: result.isNewUser))
                 
                 dismiss()
                 onDidSignIn(result.isNewUser)
             } catch {
-                print("onLoginPressed: \(error)")
+                logManager.trackEvent(event: Event.loginFail(error: error))
+            }
+        }
+    }
+    
+    enum Event: LoggableEvent {
+        case loginStart
+        case loginAuthSuccess(user: UserAuthInfo, isNewUser: Bool)
+        case loginUserSuccess(user: UserAuthInfo, isNewUser: Bool)
+        case loginFail(error: Error)
+        
+        static var screenName: String = "SignInWithEmailAndPasswordView"
+        
+        var eventName: String {
+            switch self {
+            case .loginStart:               return "\(Event.screenName)_Login_Start"
+            case .loginAuthSuccess:         return "\(Event.screenName)_LoginAuth_Success"
+            case .loginUserSuccess:         return "\(Event.screenName)_LoginUser_Success"
+            case .loginFail:                return "\(Event.screenName)_Login_Fail"
+            }
+        }
+        
+        var parameters: [String: Any]? {
+            switch self {
+            case .loginFail(error: let error):
+                return error.eventParameters
+            case .loginAuthSuccess(user: let user, isNewUser: let isNewUser), .loginUserSuccess(user: let user, isNewUser: let isNewUser):
+                var dict = user.eventParameters
+                dict["login_is_new_user"] = isNewUser
+                return dict
+            default:
+                return nil
+            }
+        }
+        
+        var type: LogType {
+            switch self {
+            case .loginFail:
+                    .severe
+            default:
+                    .analytic
             }
         }
     }

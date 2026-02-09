@@ -15,6 +15,7 @@ struct SettingsView: View {
     @Environment(AvatarManager.self) private var avatarManager
     @Environment(ChatManager.self) private var chatManager
     @Environment(AppState.self) private var appState
+    @Environment(LogManager.self) private var logManager
 
     @State private var isPremium: Bool = true
     var premiumTitle: String {
@@ -37,6 +38,7 @@ struct SettingsView: View {
             }
             .environment(\.defaultMinListRowHeight, 0)
             .navigationTitle("Settings")
+            .screenAppearAnalytics(name: "SettignsScreen")
             .showCustomAlert(type: .confirmationDialog, alert: $showCreateAccountMenu)
             .sheet(isPresented: $showAppleProvider, onDismiss: {
                 setAnonymousAccountStatus()
@@ -56,6 +58,7 @@ struct SettingsView: View {
         }
     }
     
+    // MARK: - Views
     private var accountSection: some View {
         Section {
             if isAnonymousUser {
@@ -142,6 +145,7 @@ struct SettingsView: View {
         }
     }
     
+    // MARK: - Actions
     private func setAnonymousAccountStatus() {
         isAnonymousUser = authManager.auth?.isAnonymous == true
     }
@@ -155,9 +159,11 @@ struct SettingsView: View {
                     Group {
                         Button("Apple", role: .destructive) {
                             showAppleProvider = true
+                            logManager.trackEvent(event: Event.createAccountWithApple)
                         }
                         Button("Email", role: .destructive) {
                             showEmailProvider = true
+                            logManager.trackEvent(event: Event.createAccountWithEmail)
                         }
                     }
                 )
@@ -166,19 +172,23 @@ struct SettingsView: View {
     }
     
     private func onSignOutPressed() {
+        logManager.trackEvent(event: Event.signOuntStart)
         Task {
             do {
                 try authManager.signOut()
                 userManager.signOut()
+                logManager.trackEvent(event: Event.signOutSuccess)
                 
                 await dismissScreen()
             } catch {
                 showAlert = AnyAppAlert(error: error)
+                logManager.trackEvent(event: Event.signOutFail(error: error))
             }
         }
     }
     
     private func onDeleteAccountPressed() {
+        logManager.trackEvent(event: Event.deleteAccountButtonPressed)
         showAlert = AnyAppAlert(
             title: "Delete Account?",
             subtitle: "This action is permenet and cannot be undone. Your data will be deleted form out server forever.",
@@ -193,6 +203,7 @@ struct SettingsView: View {
     }
     
     private func onDeleteAccountConfirmed() {
+        logManager.trackEvent(event: Event.deleteAccountStart)
         Task {
             do {
                 let uid = try authManager.getAuthId()
@@ -201,12 +212,15 @@ struct SettingsView: View {
                 async let deleteUser: () = userManager.deleleCurrentUser()
                 async let deleteAvatars: () = avatarManager.removeAuthorIdFromAllUserAvatars(userId: uid)
                 async let deleteChats: () = chatManager.deleteAllChatsForUser(userId: uid)
+                async let deleteAnalytics: () = logManager.deleteUserProfile()
                 
-                let (_, _, _, _) = try await (deleteAuth, deleteUser, deleteAvatars, deleteChats)
+                let (_, _, _, _, _) = try await (deleteAuth, deleteUser, deleteAvatars, deleteChats, deleteAnalytics)
+                logManager.trackEvent(event: Event.deleteAccountSuccess)
                 
                 await dismissScreen()
             } catch {
                 showAlert = AnyAppAlert(error: error)
+                logManager.trackEvent(event: Event.deleteAccountFail(error: error))
             }
         }
     }
@@ -214,6 +228,48 @@ struct SettingsView: View {
     private func dismissScreen() async {
         dismiss()
         appState.updateViewState(showTabBarView: false)
+    }
+    
+    // MARK: - Logs
+    enum Event: LoggableEvent {
+        case createAccountWithApple, createAccountWithEmail
+        case signOuntStart, signOutSuccess, signOutFail(error: Error)
+        case deleteAccountButtonPressed
+        case deleteAccountStart, deleteAccountSuccess, deleteAccountFail(error: Error)
+        
+        static var screenName: String = "SettingsView"
+        
+        var eventName: String {
+            switch self {
+            case .createAccountWithApple:               return "\(Event.screenName)_CreateAccount_Apple"
+            case .createAccountWithEmail:               return "\(Event.screenName)_CreateAccount_Email"
+            case .signOuntStart:                        return "\(Event.screenName)_SignOut_Start"
+            case .signOutSuccess:                       return "\(Event.screenName)_SignOut_Success"
+            case .signOutFail:                          return "\(Event.screenName)_SignOut_Fail"
+            case .deleteAccountButtonPressed:           return "\(Event.screenName)_DeleteAccountButton_Pressed"
+            case .deleteAccountStart:                   return "\(Event.screenName)_DeleteAccount_Start"
+            case .deleteAccountSuccess:                 return "\(Event.screenName)_DeleteAccount_Success"
+            case .deleteAccountFail:                    return "\(Event.screenName)_DeleteAccount_Fail"
+            }
+        }
+        
+        var parameters: [String: Any]? {
+            switch self {
+            case .signOutFail(error: let error), .deleteAccountFail(error: let error):
+                return error.eventParameters
+            default:
+                return nil
+            }
+        }
+        
+        var type: LogType {
+            switch self {
+            case .signOutFail, .deleteAccountFail:
+                    .severe
+            default:
+                    .analytic
+            }
+        }
     }
 }
 
@@ -227,6 +283,7 @@ fileprivate extension View {
     }
 }
 
+// MARK: - Previews
 #Preview("No auth") {
     SettingsView()
         .environment(AuthManager(service: MockAuthService(user: nil)))

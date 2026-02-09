@@ -29,6 +29,7 @@ struct OnboardingColorView: View {
         })
         .animation(.smooth, value: selectedColor)
         .toolbarVisibility(.hidden, for: .navigationBar)
+        .screenAppearAnalytics(name: "OnboardingColorView")
     }
     
     private var colorGrid: some View {

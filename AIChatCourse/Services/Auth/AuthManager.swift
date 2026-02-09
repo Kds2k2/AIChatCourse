@@ -14,23 +14,31 @@ class AuthManager {
     
     private let service: AuthService
     private(set) var auth: UserAuthInfo?
+    private var logManager: LogManager?
     private var nonse: String?
     private var listener: (any NSObjectProtocol)?
     
-    init(service: AuthService) {
+    init(service: AuthService, logManager: LogManager? = nil) {
         self.service = service
         self.auth = service.getAuthenticatedUser()
+        self.logManager = logManager
         self.addAuthListener()
     }
     
     private func addAuthListener() {
+        logManager?.trackEvent(event: Event.authListenerStart)
         Task {
             for await value in service.addAuthenticatedListener(onListenerAttached: { listener in
                 self.listener = listener
             }) {
                 self.auth = value
-                print("Auth listener succes: \(value?.uid ?? "no uid")")
-                print("Auth status: \(self.auth?.isAnonymous ?? true)")
+                logManager?.trackEvent(event: Event.authListenerSuccess(user: value))
+                
+                if let value {
+                    logManager?.identifyUser(userId: value.uid, name: nil, email: value.email)
+                    logManager?.addUserProperties(dict: value.eventParameters, isHighPriority: true)
+                    logManager?.addUserProperties(dict: AppInfo.eventParameters, isHighPriority: false)
+                }
             }
         }
     }
@@ -60,16 +68,55 @@ class AuthManager {
     }
     
     func signOut() throws {
+        logManager?.trackEvent(event: Event.signOutStart)
         try service.signOut()
         auth = nil
+        logManager?.trackEvent(event: Event.signOutSuccess)
     }
     
     func deleteAccount() async throws {
+        logManager?.trackEvent(event: Event.deleteAccountStart)
         try await service.deleteAccount()
         auth = nil
+        logManager?.trackEvent(event: Event.deleteAccountSuccess)
     }
     
+    // MARK: - Error
     enum AuthError: LocalizedError {
         case notSignedIn
+    }
+    
+    // MARK: - Logs
+    enum Event: LoggableEvent {
+        case authListenerStart, authListenerSuccess(user: UserAuthInfo?)
+        case signOutStart, signOutSuccess
+        case deleteAccountStart, deleteAccountSuccess
+        
+        var eventName: String {
+            switch self {
+            case .authListenerStart:            return "AuthManager_AuthListener_Start"
+            case .authListenerSuccess:          return "AuthManager_AuthListener_Success"
+            case .signOutStart:                 return "AuthManager_SignOut_Start"
+            case .signOutSuccess:               return "AuthManager_SignOut_Success"
+            case .deleteAccountStart:           return "AuthManager_DeleteAccount_Start"
+            case .deleteAccountSuccess:         return "AuthManager_DeleteAccount_Success"
+            }
+        }
+        
+        var parameters: [String: Any]? {
+            switch self {
+            case .authListenerSuccess(user: let user):
+                return user?.eventParameters
+            default:
+                return nil
+            }
+        }
+        
+        var type: LogType {
+            switch self {
+            default:
+                    .analytic
+            }
+        }
     }
 }

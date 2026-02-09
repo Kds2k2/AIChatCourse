@@ -37,7 +37,6 @@ struct AppView: View {
         .onAppear {
             KeyboardWarmup.warmupInBackground()
         }
-        .screenAppearAnalytics(name: "AppView")
     }
     
     enum Event: LoggableEvent {
