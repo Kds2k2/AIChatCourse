@@ -10,6 +10,7 @@ import AuthenticationServices
 
 protocol AuthService: Sendable {
     func addAuthenticatedListener(onListenerAttached: (any NSObjectProtocol) -> Void) -> AsyncStream<UserAuthInfo?>
+    func removeAuthenticatedListener(listener: any NSObjectProtocol)
     func getAuthenticatedUser() -> UserAuthInfo?
     func singInAnonymously() async throws -> (user: UserAuthInfo, isNewUser: Bool)
     func signInWithApple() async throws -> (user: UserAuthInfo, isNewUser: Bool)

@@ -25,6 +25,10 @@ struct FirebaseAuthService: AuthService {
         }
     }
     
+    func removeAuthenticatedListener(listener: any NSObjectProtocol) {
+        Auth.auth().removeStateDidChangeListener(listener)
+    }
+    
     func getAuthenticatedUser() -> UserAuthInfo? {
         if let user = Auth.auth().currentUser {
             return UserAuthInfo(user: user)

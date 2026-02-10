@@ -245,12 +245,12 @@ struct ExploreView: View {
         
         var eventName: String {
             switch self {
-            case .loadFeatureAvatarsStart:                   return "\(Event.screenName)_LoadFeatureAvatars_"
-            case .loadFeatureAvatarsSuccess:                 return "\(Event.screenName)_LoadFeatureAvatars_"
-            case .loadFeatureAvatarsFail:                    return "\(Event.screenName)_LoadFeatureAvatars_"
-            case .loadPopularAvatarsStart:                   return "\(Event.screenName)_LoadPopularAvatars_"
-            case .loadPopularAvatarsSuccess:                 return "\(Event.screenName)_LoadPopularAvatars_"
-            case .loadPopularAvatarsFail:                    return "\(Event.screenName)_LoadPopularAvatars_"
+            case .loadFeatureAvatarsStart:                   return "\(Event.screenName)_LoadFeatureAvatars_Start"
+            case .loadFeatureAvatarsSuccess:                 return "\(Event.screenName)_LoadFeatureAvatars_Success"
+            case .loadFeatureAvatarsFail:                    return "\(Event.screenName)_LoadFeatureAvatars_Fail"
+            case .loadPopularAvatarsStart:                   return "\(Event.screenName)_LoadPopularAvatars_Start"
+            case .loadPopularAvatarsSuccess:                 return "\(Event.screenName)_LoadPopularAvatars_Success"
+            case .loadPopularAvatarsFail:                    return "\(Event.screenName)_LoadPopularAvatars_Fail"
             case .avatarPressed:                             return "\(Event.screenName)_Avatar_Pressed"
             case .categoryPressed:                           return "\(Event.screenName)_Category_Pressed"
             case .tryAgainButtonPressed:                     return "\(Event.screenName)_TryAgainButton_Pressed"

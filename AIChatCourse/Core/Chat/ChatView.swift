@@ -301,7 +301,7 @@ struct ChatView: View {
                 isGeneratingResponse = true
                 var aiChats = chatMessages.compactMap({ $0.content })
                 if let avatarDescription = avatar?.characterDescription, let avatarName = avatar?.name {
-                    let messageContent = "Your name is \(avatarName). You are \(avatarDescription.lowercased())"
+                    let messageContent = "Your name is \(avatarName). You are \(avatarDescription.lowercased()). You have conversation with me in chat."
                     let systemMessage = AIChatModel(role: .system, message: messageContent)
                     aiChats.insert(systemMessage, at: 0)
                 }

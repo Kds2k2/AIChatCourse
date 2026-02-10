@@ -27,6 +27,10 @@ class AuthManager {
     
     private func addAuthListener() {
         logManager?.trackEvent(event: Event.authListenerStart)
+        if let listener {
+            service.removeAuthenticatedListener(listener: listener)
+        }
+        
         Task {
             for await value in service.addAuthenticatedListener(onListenerAttached: { listener in
                 self.listener = listener
@@ -56,15 +60,18 @@ class AuthManager {
     }
     
     func signInWithApple() async throws -> (user: UserAuthInfo, isNewUser: Bool) {
-        try await service.signInWithApple()
+        defer { self.addAuthListener() }
+        return try await service.signInWithApple()
     }
     
     func signInWithEmailAndPassword(email: String, password: String) async throws -> (user: UserAuthInfo, isNewUser: Bool) {
-        try await service.signInWithEmailAndPassword(email: email, password: password)
+        defer { self.addAuthListener() }
+        return try await service.signInWithEmailAndPassword(email: email, password: password)
     }
     
     func signUpWithEmailAndPassword(email: String, password: String) async throws -> (user: UserAuthInfo, isNewUser: Bool) {
-        try await service.signUpWithEmailAndPassword(email: email, password: password)
+        defer { self.addAuthListener() }
+        return try await service.signUpWithEmailAndPassword(email: email, password: password)
     }
     
     func signOut() throws {
