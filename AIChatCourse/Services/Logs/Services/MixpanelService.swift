@@ -17,6 +17,7 @@ struct MixpanelService: LogService {
     init(token: String, loggingEnabled: Bool = false) {
         Mixpanel.initialize(token: token, trackAutomaticEvents: true)
         instance.loggingEnabled = loggingEnabled
+        instance.serverURL = "https://api-eu.mixpanel.com"
     }
     
     func identifyUser(userId: String, name: String?, email: String?) {

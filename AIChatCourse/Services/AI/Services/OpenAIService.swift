@@ -84,7 +84,7 @@ struct AIChatModel: Hashable, Codable {
     var eventParameters: [String: Any] {
         let dict: [String: Any?] = [
             "aiChatMessage_\(CodingKeys.role.rawValue)": role.openAIRole.rawValue,
-            "aiChatMessage_\(CodingKeys.message.rawValue)": message,
+            "aiChatMessage_\(CodingKeys.message.rawValue)": message
         ]
         
         return dict.compactMapValues({ $0 })

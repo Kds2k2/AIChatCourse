@@ -98,7 +98,7 @@ struct AppDependencies {
                 ConsoleService(printParameters: false),
                 FirebaseAnalyticsService(),
                 FirebaseCrashlyticsService(),
-                MixpanelService(token: AppKeys.mixpanel)
+                MixpanelService(token: AppKeys.mixpanel, loggingEnabled: true)
             ])
             authManager = AuthManager(service: FirebaseAuthService(), logManager: logManager)
             userManager = UserManager(services: ProductionUserServices(), logManager: logManager)

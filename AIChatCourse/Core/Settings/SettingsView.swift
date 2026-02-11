@@ -17,7 +17,7 @@ struct SettingsView: View {
     @Environment(AppState.self) private var appState
     @Environment(LogManager.self) private var logManager
 
-    @State private var isPremium: Bool = true
+    @State private var isPremium: Bool = false
     var premiumTitle: String {
         return isPremium ? "PREMIUM" : "FREE"
     }
@@ -28,6 +28,7 @@ struct SettingsView: View {
     @State private var showEmailProvider: Bool = false
     
     @State private var showAlert: AnyAppAlert?
+    @State private var showRatingsModal: Bool = false
     
     var body: some View {
         NavigationStack {
@@ -55,6 +56,9 @@ struct SettingsView: View {
                 setAnonymousAccountStatus()
             }
             .showCustomAlert(alert: $showAlert)
+            .showModal($showRatingsModal) {
+                ratingsModal
+            }
         }
     }
     
@@ -112,6 +116,14 @@ struct SettingsView: View {
     
     private var applicationSection: some View {
         Section {
+            Text("Rate us on the App Store!")
+                .foregroundStyle(.blue)
+                .rowFormatting()
+                .anyButton(.highlight) {
+                    onRatingButtonPressed()
+                }
+                .removeListRowFormatting()
+            
             HStack {
                 Text("Version")
                 Spacer(minLength: 0)
@@ -134,20 +146,61 @@ struct SettingsView: View {
                 .foregroundStyle(.blue)
                 .rowFormatting()
                 .anyButton(.highlight) {
-                    // action
+                    onContactUsPressed()
                 }
                 .removeListRowFormatting()
         } header: {
             Text("Application")
         } footer: {
-            Text("Created by Dmitro Kryzhanovsky.\nLearn more at www.swiftful-thinking.com.")
+            Text("Created by Dmitro Kryzhanovsky.")
                 .baselineOffset(6)
         }
+    }
+    
+    private var ratingsModal: some View {
+        CustomModalView(
+            title: "Are you enjoying AIChat?",
+            subtitle: "We'd love to hear your feedback!",
+            primaryButtonTitle: "Yes",
+            primaryButtonAction: {
+                onEnjoyingAppPressed()
+            },
+            secondaryButtonTitle: "No",
+            secondaryButtonAction: {
+                onEnjoyingAppNoPressed()
+            }
+        )
     }
     
     // MARK: - Actions
     private func setAnonymousAccountStatus() {
         isAnonymousUser = authManager.auth?.isAnonymous == true
+    }
+    
+    private func onContactUsPressed() {
+        logManager.trackEvent(event: Event.contactUsPressed)
+        let email = "dimakruzha.dev@gmail.com"
+        let emailString = "mailto:\(email)"
+        
+        guard let url = URL(string: emailString), UIApplication.shared.canOpenURL(url) else { return }
+        
+        UIApplication.shared.open(url)
+    }
+    
+    private func onRatingButtonPressed() {
+        logManager.trackEvent(event: Event.ratingUsPressed)
+        showRatingsModal = true
+    }
+    
+    private func onEnjoyingAppPressed() {
+        logManager.trackEvent(event: Event.ratingYesPressed)
+        showRatingsModal = false
+        AppStoreRatingHelper().requestRatingsReview()
+    }
+    
+    private func onEnjoyingAppNoPressed() {
+        logManager.trackEvent(event: Event.ratingNoPressed)
+        showRatingsModal = false
     }
     
     private func onCreateAccountPressed() {
@@ -236,6 +289,8 @@ struct SettingsView: View {
         case signOuntStart, signOutSuccess, signOutFail(error: Error)
         case deleteAccountButtonPressed
         case deleteAccountStart, deleteAccountSuccess, deleteAccountFail(error: Error)
+        case contactUsPressed
+        case ratingUsPressed, ratingYesPressed, ratingNoPressed
         
         static var screenName: String = "SettingsView"
         
@@ -250,6 +305,10 @@ struct SettingsView: View {
             case .deleteAccountStart:                   return "\(Event.screenName)_DeleteAccount_Start"
             case .deleteAccountSuccess:                 return "\(Event.screenName)_DeleteAccount_Success"
             case .deleteAccountFail:                    return "\(Event.screenName)_DeleteAccount_Fail"
+            case .contactUsPressed:                     return "\(Event.screenName)_ContactUs_Pressed"
+            case .ratingUsPressed:                      return "\(Event.screenName)_RatingUs_Pressed"
+            case .ratingYesPressed:                     return "\(Event.screenName)_RatingYes_Pressed"
+            case .ratingNoPressed:                      return "\(Event.screenName)_RatingNo_Pressed"
             }
         }
         

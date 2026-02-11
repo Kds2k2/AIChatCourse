@@ -31,7 +31,7 @@ struct AvatarDescriptionBuilder: Codable {
     }
     
     var eventParameters: [String: Any] {
-        var dict = [
+        let dict = [
             "avatar_description_\(CodingKeys.characterOption)": characterOption.rawValue,
             "avatar_description_\(CodingKeys.characterAction)": characterAction.rawValue,
             "avatar_description_\(CodingKeys.characterLocation)": characterLocation.rawValue,

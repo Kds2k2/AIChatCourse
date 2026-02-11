@@ -27,6 +27,10 @@ struct AppView: View {
         .task {
             await checkUserStatus()
         }
+        .task {
+            try? await Task.sleep(for: .seconds(2))
+            await showATTPromptIfNeeded()
+        }
         .onChange(of: appState.showTabBar) { _, showTabBar in
             if !showTabBar {
                 Task {
@@ -39,39 +43,7 @@ struct AppView: View {
         }
     }
     
-    enum Event: LoggableEvent {
-        case existingAuthStart, existingAuthFail(error: Error)
-        case anonAuthStart, anonAuthSuccess, anonAuthFail(error: Error)
-        
-        var eventName: String {
-            switch self {
-            case .existingAuthStart: "AppView_ExistingAuth_Start"
-            case .existingAuthFail: "AppView_ExistingAuth_Fail"
-            case .anonAuthStart: "AppView_AnonAuth_Start"
-            case .anonAuthSuccess: "AppView_AnonAuth_Success"
-            case .anonAuthFail: "AppView_AnonAuth_Fail"
-            }
-        }
-        
-        var parameters: [String: Any]? {
-            switch self {
-            case .existingAuthFail(error: let error), .anonAuthFail(error: let error):
-                return error.eventParameters
-            default:
-                return nil
-            }
-        }
-        
-        var type: LogType {
-            switch self {
-            case .existingAuthFail, .anonAuthFail:
-                .severe
-            default:
-                .analytic
-            }
-        }
-    }
-    
+    // MARK: - Loading
     private func checkUserStatus() async {
         if let user = authManager.auth {
             logManager.trackEvent(event: Event.existingAuthStart)
@@ -94,6 +66,51 @@ struct AppView: View {
                 logManager.trackEvent(event: Event.anonAuthFail(error: error))
                 try? await Task.sleep(for: .seconds(5))
                 await checkUserStatus()
+            }
+        }
+    }
+    
+    private func showATTPromptIfNeeded() async {
+        #if !DEBUG
+        let status = await AppTrackingTransparencyHelper.requestTrackingAuthorization()
+        logManager.trackEvent(event: Event.attStatus(dict: status.eventParameters))
+        #endif
+    }
+    
+    // MARK: - Logs
+    enum Event: LoggableEvent {
+        case existingAuthStart, existingAuthFail(error: Error)
+        case anonAuthStart, anonAuthSuccess, anonAuthFail(error: Error)
+        case attStatus(dict: [String: Any])
+        
+        var eventName: String {
+            switch self {
+            case .existingAuthStart: "AppView_ExistingAuth_Start"
+            case .existingAuthFail: "AppView_ExistingAuth_Fail"
+            case .anonAuthStart: "AppView_AnonAuth_Start"
+            case .anonAuthSuccess: "AppView_AnonAuth_Success"
+            case .anonAuthFail: "AppView_AnonAuth_Fail"
+            case .attStatus: "AppView_ATTStatus"
+            }
+        }
+        
+        var parameters: [String: Any]? {
+            switch self {
+            case .existingAuthFail(error: let error), .anonAuthFail(error: let error):
+                return error.eventParameters
+            case .attStatus(dict: let dict):
+                return dict
+            default:
+                return nil
+            }
+        }
+        
+        var type: LogType {
+            switch self {
+            case .existingAuthFail, .anonAuthFail:
+                .severe
+            default:
+                .analytic
             }
         }
     }

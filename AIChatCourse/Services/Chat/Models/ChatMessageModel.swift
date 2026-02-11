@@ -56,7 +56,7 @@ struct ChatMessageModel: StringIdentifiable, Hashable, Codable {
             "chatMessage_\(CodingKeys.chatId.rawValue)": chatId,
             "chatMessage_\(CodingKeys.authorId.rawValue)": authorId,
             "chatMessage_\(CodingKeys.seenByIds.rawValue)": seenByIds?.sorted().joined(separator: ", "),
-            "chatMessage_\(CodingKeys.createdAt.rawValue)": createdAt,
+            "chatMessage_\(CodingKeys.createdAt.rawValue)": createdAt
         ]
         
         dict.merge(content?.eventParameters)
