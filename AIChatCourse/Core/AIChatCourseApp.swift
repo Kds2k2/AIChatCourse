@@ -21,6 +21,7 @@ struct AIChatCourseApp: App {
                 .environment(delegate.dependencies.avatarManager)
                 .environment(delegate.dependencies.chatManager)
                 .environment(delegate.dependencies.logManager)
+                .environment(delegate.dependencies.pushManager)
         }
     }
 }
@@ -80,6 +81,7 @@ struct AppDependencies {
     let avatarManager: AvatarManager
     let chatManager: ChatManager
     let logManager: LogManager
+    let pushManager: PushManager
     
     init(_ config: BuildConfiguration) {
         switch config {
@@ -119,6 +121,8 @@ struct AppDependencies {
                                           local: SwiftDataLocalPersistence())
             chatManager = ChatManager(service: FirebaseChatService())
         }
+        
+        pushManager = PushManager(logManager: logManager)
     }
 }
 
@@ -131,6 +135,7 @@ extension View {
             .environment(AvatarManager(remote: MockAvatarService(), local: MockLocalAvatarPersistence()))
             .environment(ChatManager(service: MockChatService()))
             .environment(LogManager(services: []))
+            .environment(PushManager())
             .environment(AppState())
     }
 }

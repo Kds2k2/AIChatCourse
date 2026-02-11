@@ -11,6 +11,7 @@ struct ExploreView: View {
     
     @Environment(AvatarManager.self) private var avatarManager
     @Environment(LogManager.self) private var logManager
+    @Environment(PushManager.self) private var pushManager
     
     @State private var categories: [CharacterOption] = CharacterOption.allCases
     
@@ -29,6 +30,9 @@ struct ExploreView: View {
             return false
         #endif
     }
+    
+    @State private var showPushNotificationButton: Bool = false
+    @State private var showPushNotificationModal: Bool = false
 
     var body: some View {
         NavigationStack(path: $path) {
@@ -54,27 +58,81 @@ struct ExploreView: View {
                 }
             }
             .navigationTitle("Explore")
+            .screenAppearAnalytics(name: "ExploreView")
+            .navigationDestinationForCoreModule(path: $path)
             .toolbar(content: {
                 ToolbarItem(placement: .topBarLeading) {
                     if showDevSettingsButton {
                         devSettingsButton
                     }
                 }
+                
+                ToolbarItem(placement: .topBarTrailing) {
+                    if showPushNotificationButton {
+                        pushNotificationButton
+                    }
+                }
             })
             .sheet(isPresented: $showDevSettings, content: {
                 DevSettingsView()
             })
-            .navigationDestinationForCoreModule(path: $path)
-            .screenAppearAnalytics(name: "ExploreView")
+            .showModal($showPushNotificationModal, content: {
+                pushNotificationModal
+            })
             .task {
                 await loadFeatureAvatars()
             }
             .task {
                 await loadPopularAvatars()
             }
+            .task {
+                await handleShowPushNotificationButton()
+            }
+            .onFirstAppear {
+                schedulePushNotifications()
+            }
         }
     }
+    
+    // MARK: - Loading
+    private func loadFeatureAvatars() async {
+        guard featuredAvatars.isEmpty else { return }
+        logManager.trackEvent(event: Event.loadFeatureAvatarsStart)
+        isLoadingFeatured = true
+        
+        do {
+            featuredAvatars = try await avatarManager.getFeaturedAvatars()
+            logManager.trackEvent(event: Event.loadFeatureAvatarsSuccess)
+        } catch {
+            logManager.trackEvent(event: Event.loadFeatureAvatarsFail(error: error))
+        }
+        
+        isLoadingFeatured = false
+    }
 
+    private func loadPopularAvatars() async {
+        guard popularAvatars.isEmpty else { return }
+        logManager.trackEvent(event: Event.loadPopularAvatarsStart)
+        isLoadingPopular = true
+        
+        do {
+            popularAvatars = try await avatarManager.getPopularAvatars()
+            logManager.trackEvent(event: Event.loadPopularAvatarsSuccess)
+        } catch {
+            logManager.trackEvent(event: Event.loadPopularAvatarsFail(error: error))
+        }
+        
+        isLoadingPopular = false
+    }
+    
+    private func handleShowPushNotificationButton() async {
+        showPushNotificationButton = await pushManager.canRequestAuthorization()
+    }
+    
+    private func schedulePushNotifications() {
+        pushManager.schedulePushNotificationForTheNextWeek()
+    }
+    
     // MARK: - Views
     private var devSettingsButton: some View {
         Text("DEV 👨‍💻")
@@ -178,37 +236,33 @@ struct ExploreView: View {
         }
     }
     
-    // MARK: - Actions
-    private func loadFeatureAvatars() async {
-        guard featuredAvatars.isEmpty else { return }
-        logManager.trackEvent(event: Event.loadFeatureAvatarsStart)
-        isLoadingFeatured = true
-        
-        do {
-            featuredAvatars = try await avatarManager.getFeaturedAvatars()
-            logManager.trackEvent(event: Event.loadFeatureAvatarsSuccess)
-        } catch {
-            logManager.trackEvent(event: Event.loadFeatureAvatarsFail(error: error))
-        }
-        
-        isLoadingFeatured = false
-    }
-
-    private func loadPopularAvatars() async {
-        guard popularAvatars.isEmpty else { return }
-        logManager.trackEvent(event: Event.loadPopularAvatarsStart)
-        isLoadingPopular = true
-        
-        do {
-            popularAvatars = try await avatarManager.getPopularAvatars()
-            logManager.trackEvent(event: Event.loadPopularAvatarsSuccess)
-        } catch {
-            logManager.trackEvent(event: Event.loadPopularAvatarsFail(error: error))
-        }
-        
-        isLoadingPopular = false
+    private var pushNotificationButton: some View {
+        Image(systemName: "bell.fill")
+            .font(.headline)
+            .padding(4)
+            .tappableBackground()
+            .foregroundStyle(.accent)
+            .anyButton {
+                onPushNotificationButtonPressed()
+            }
     }
     
+    private var pushNotificationModal: some View {
+        CustomModalView(
+            title: "Enable push notifications?",
+            subtitle: "We'll send you reminders and updates",
+            primaryButtonTitle: "Enable",
+            primaryButtonAction: {
+                onEnablePushNotificationModalPressed()
+            },
+            secondaryButtonTitle: "Cancel",
+            secondaryButtonAction: {
+                onCancelPushNotificationModalPressed()
+            }
+        )
+    }
+    
+    // MARK: - Actions
     private func onTryAgainPressed() {
         logManager.trackEvent(event: Event.tryAgainButtonPressed)
         Task {
@@ -234,12 +288,33 @@ struct ExploreView: View {
         logManager.trackEvent(event: Event.devSettingsButtonPressed)
     }
     
+    private func onPushNotificationButtonPressed() {
+        showPushNotificationModal = true
+        logManager.trackEvent(event: Event.pushNotificationStart)
+    }
+    
+    private func onEnablePushNotificationModalPressed() {
+        showPushNotificationModal = false
+        
+        Task {
+            let isAuthorized = try await LocalNotifications.requestAuthorization()
+            logManager.trackEvent(event: Event.pushNotificationEnable(isAuthorized: isAuthorized))
+            await handleShowPushNotificationButton()
+        }
+    }
+    
+    private func onCancelPushNotificationModalPressed() {
+        showPushNotificationModal = false
+        logManager.trackEvent(event: Event.pushNotificationCancel)
+    }
+    
     // MARK: - Logs
     enum Event: LoggableEvent {
         case loadFeatureAvatarsStart, loadFeatureAvatarsSuccess, loadFeatureAvatarsFail(error: Error)
         case loadPopularAvatarsStart, loadPopularAvatarsSuccess, loadPopularAvatarsFail(error: Error)
         case avatarPressed(avatar: AvatarModel), categoryPressed(categoty: CharacterOption)
         case tryAgainButtonPressed, devSettingsButtonPressed
+        case pushNotificationStart, pushNotificationEnable(isAuthorized: Bool), pushNotificationCancel
         
         static var screenName: String = "ExploreView"
         
@@ -255,6 +330,9 @@ struct ExploreView: View {
             case .categoryPressed:                           return "\(Event.screenName)_Category_Pressed"
             case .tryAgainButtonPressed:                     return "\(Event.screenName)_TryAgainButton_Pressed"
             case .devSettingsButtonPressed:                  return "\(Event.screenName)_DevSettingsButton_Pressed"
+            case .pushNotificationStart:                     return "\(Event.screenName)_PushNotification_Start"
+            case .pushNotificationEnable:                    return "\(Event.screenName)_PushNotification_Enable"
+            case .pushNotificationCancel:                    return "\(Event.screenName)_PushNotification_Cancel"
             }
         }
         
@@ -266,6 +344,8 @@ struct ExploreView: View {
                 return avatar.eventParameters
             case .categoryPressed(categoty: let category):
                 return ["category": category.rawValue]
+            case .pushNotificationEnable(isAuthorized: let isAuthorized):
+                return ["is_authorized": isAuthorized]
             default:
                 return nil
             }
@@ -285,14 +365,17 @@ struct ExploreView: View {
 #Preview("Has data") {
     ExploreView()
         .environment(AvatarManager(remote: MockAvatarService()))
+        .previewEnvironment()
 }
 
 #Preview("No data") {
     ExploreView()
         .environment(AvatarManager(remote: MockAvatarService(avatars: [], delay: 2.0)))
+        .previewEnvironment()
 }
 
 #Preview("Slow loading") {
     ExploreView()
         .environment(AvatarManager(remote: MockAvatarService(delay: 10)))
+        .previewEnvironment()
 }
