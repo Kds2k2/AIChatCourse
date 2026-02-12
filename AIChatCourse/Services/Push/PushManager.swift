@@ -75,8 +75,8 @@ class PushManager {
         
         var eventName: String {
             switch self {
-                case .weekScheduledSuccess:      return "PushManager_WeekScheduled_Success"
-                case .weekScheduledFail:         return "PushManager_WeekScheduled_Fail"
+            case .weekScheduledSuccess:      return "PushManager_WeekScheduled_Success"
+            case .weekScheduledFail:         return "PushManager_WeekScheduled_Fail"
             }
         }
         

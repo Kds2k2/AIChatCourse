@@ -91,6 +91,9 @@ struct ExploreView: View {
             .onFirstAppear {
                 schedulePushNotifications()
             }
+            .onOpenURL { url in
+                handleDeepLink(url: url)
+            }
         }
     }
     
@@ -123,6 +126,26 @@ struct ExploreView: View {
         }
         
         isLoadingPopular = false
+    }
+    
+    private func handleDeepLink(url: URL) {
+        logManager.trackEvent(event: Event.deepLinkStart(url: url))
+        guard let componets = URLComponents(url: url, resolvingAgainstBaseURL: false), let query = componets.queryItems else {
+            print("NO QUERY ITEMS")
+            logManager.trackEvent(event: Event.deepLinkEmpty(url: url))
+            return
+        }
+        
+        for queryItem in query {
+            if queryItem.name == "category", let value = queryItem.value, let category = CharacterOption(rawValue: value) {
+                let imageName = Constants.randomImage
+                path.append(.category(category: category, imageName: imageName))
+                logManager.trackEvent(event: Event.deepLinkCategory(category: category))
+                return
+            }
+        }
+        
+        logManager.trackEvent(event: Event.deepLinkUnknown(url: url))
     }
     
     private func handleShowPushNotificationButton() async {
@@ -315,6 +338,7 @@ struct ExploreView: View {
         case avatarPressed(avatar: AvatarModel), categoryPressed(categoty: CharacterOption)
         case tryAgainButtonPressed, devSettingsButtonPressed
         case pushNotificationStart, pushNotificationEnable(isAuthorized: Bool), pushNotificationCancel
+        case deepLinkStart(url: URL), deepLinkEmpty(url: URL), deepLinkCategory(category: CharacterOption), deepLinkUnknown(url: URL)
         
         static var screenName: String = "ExploreView"
         
@@ -333,6 +357,10 @@ struct ExploreView: View {
             case .pushNotificationStart:                     return "\(Event.screenName)_PushNotification_Start"
             case .pushNotificationEnable:                    return "\(Event.screenName)_PushNotification_Enable"
             case .pushNotificationCancel:                    return "\(Event.screenName)_PushNotification_Cancel"
+            case .deepLinkStart:                             return "\(Event.screenName)_DeepLink_Start"
+            case .deepLinkEmpty:                             return "\(Event.screenName)_DeepLink_Empty"
+            case .deepLinkCategory:                          return "\(Event.screenName)_DeepLink_Category"
+            case .deepLinkUnknown:                           return "\(Event.screenName)_DeepLink_Unknown"
             }
         }
         
@@ -342,10 +370,12 @@ struct ExploreView: View {
                 return error.eventParameters
             case .avatarPressed(avatar: let avatar):
                 return avatar.eventParameters
-            case .categoryPressed(categoty: let category):
+            case .categoryPressed(categoty: let category), .deepLinkCategory(category: let category):
                 return ["category": category.rawValue]
             case .pushNotificationEnable(isAuthorized: let isAuthorized):
                 return ["is_authorized": isAuthorized]
+            case .deepLinkStart(url: let url), .deepLinkEmpty(url: let url), .deepLinkUnknown(url: let url):
+                return ["deep_link_url": url.absoluteString]
             default:
                 return nil
             }
