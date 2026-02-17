@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct AppView: View {
+    @Environment(\.scenePhase) private var scenePhase
+    
     @Environment(AuthManager.self) private var authManager
     @Environment(UserManager.self) private var userManager
     @Environment(LogManager.self) private var logManager
@@ -31,6 +33,18 @@ struct AppView: View {
             try? await Task.sleep(for: .seconds(2))
             await showATTPromptIfNeeded()
         }
+        .onChange(of: scenePhase, { oldValue, newValue in
+            switch newValue {
+            case .active:
+                Task { await checkUserStatus() }
+            case .inactive:
+                break
+            case .background:
+                break
+            default:
+                break
+            }
+        })
         .onChange(of: appState.showTabBar) { _, showTabBar in
             if !showTabBar {
                 Task {

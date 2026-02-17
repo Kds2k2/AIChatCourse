@@ -28,8 +28,13 @@ struct CreateAccountWithAppleView: View {
                 Text(title)
                     .font(.largeTitle)
                     .fontWeight(.semibold)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
+                
                 Text(subtitle)
                     .font(.body)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -113,4 +118,5 @@ struct CreateAccountWithAppleView: View {
     CreateAccountWithAppleView { newUser in
         print("newUser:\(newUser)")
     }
+    .previewEnvironment()
 }

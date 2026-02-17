@@ -261,13 +261,12 @@ struct SettingsView: View {
             do {
                 let uid = try authManager.getAuthId()
                 
-                async let deleteAuth: () = authManager.deleteAccount()
-                async let deleteUser: () = userManager.deleleCurrentUser()
-                async let deleteAvatars: () = avatarManager.removeAuthorIdFromAllUserAvatars(userId: uid)
-                async let deleteChats: () = chatManager.deleteAllChatsForUser(userId: uid)
-                async let deleteAnalytics: () = logManager.deleteUserProfile()
+                try await chatManager.deleteAllChatsForUser(userId: uid)
+                try await avatarManager.removeAuthorIdFromAllUserAvatars(userId: uid)
+                try await userManager.deleleCurrentUser()
+                try await authManager.deleteAccount()
                 
-                let (_, _, _, _, _) = try await (deleteAuth, deleteUser, deleteAvatars, deleteChats, deleteAnalytics)
+                logManager.deleteUserProfile()
                 logManager.trackEvent(event: Event.deleteAccountSuccess)
                 
                 await dismissScreen()

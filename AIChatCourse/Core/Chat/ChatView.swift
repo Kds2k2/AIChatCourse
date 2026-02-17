@@ -179,6 +179,8 @@ struct ChatView: View {
         }
         .foregroundStyle(.secondary)
         .font(.callout)
+        .lineLimit(1)
+        .minimumScaleFactor(0.3)
     }
     
     private var textFieldSection: some View {
