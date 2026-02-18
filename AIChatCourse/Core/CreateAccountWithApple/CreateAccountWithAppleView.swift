@@ -33,8 +33,6 @@ struct CreateAccountWithAppleView: View {
                 
                 Text(subtitle)
                     .font(.body)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.5)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
 

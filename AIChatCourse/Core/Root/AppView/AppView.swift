@@ -33,7 +33,7 @@ struct AppView: View {
             try? await Task.sleep(for: .seconds(2))
             await showATTPromptIfNeeded()
         }
-        .onChange(of: scenePhase, { oldValue, newValue in
+        .onChange(of: scenePhase, { _, newValue in
             switch newValue {
             case .active:
                 Task { await checkUserStatus() }

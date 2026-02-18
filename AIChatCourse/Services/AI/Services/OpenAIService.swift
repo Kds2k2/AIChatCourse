@@ -10,8 +10,8 @@ import FirebaseFunctions
 
 struct OpenAIService: AIService {
     
-/// DEPRECATED
-/// Direct call by API_KEY
+//    /// DEPRECATED
+//    /// Direct call by API_KEY
 //    func generateImage(input: String) async throws -> UIImage {
 //        let query = ImagesQuery(
 //            prompt: input,
@@ -52,8 +52,8 @@ struct OpenAIService: AIService {
         return image
     }
        
-/// DEPRECATED
-/// Direct call by API_KEY
+//    /// DEPRECATED
+//    /// Direct call by API_KEY
 //    func generateText(chats: [AIChatModel]) async throws -> AIChatModel {
 //        let messages = chats.compactMap({ $0.toOpenAIModel() })
 //        let query = ChatQuery(messages: messages, model: .gpt4_o_mini)

@@ -12,6 +12,8 @@ struct ExploreView: View {
     @Environment(AvatarManager.self) private var avatarManager
     @Environment(LogManager.self) private var logManager
     @Environment(PushManager.self) private var pushManager
+    @Environment(AuthManager.self) private var authManager
+    @Environment(ABTestManager.self) private var abTestManager
     
     @State private var categories: [CharacterOption] = CharacterOption.allCases
     
@@ -33,7 +35,8 @@ struct ExploreView: View {
     
     @State private var showPushNotificationButton: Bool = false
     @State private var showPushNotificationModal: Bool = false
-
+    @State private var showAppleProvider: Bool = false
+    
     var body: some View {
         NavigationStack(path: $path) {
             List {
@@ -76,6 +79,10 @@ struct ExploreView: View {
             .sheet(isPresented: $showDevSettings, content: {
                 DevSettingsView()
             })
+            .sheet(isPresented: $showAppleProvider, content: {
+                CreateAccountWithAppleView()
+                    .presentationDetents([.medium])
+            })
             .showModal($showPushNotificationModal, content: {
                 pushNotificationModal
             })
@@ -90,6 +97,7 @@ struct ExploreView: View {
             }
             .onFirstAppear {
                 schedulePushNotifications()
+                showCreateAccountIfNeeded()
             }
             .onOpenURL { url in
                 handleDeepLink(url: url)
@@ -154,6 +162,21 @@ struct ExploreView: View {
     
     private func schedulePushNotifications() {
         pushManager.schedulePushNotificationForTheNextWeek()
+    }
+    
+    private func showCreateAccountIfNeeded() {
+        Task {
+            try? await Task.sleep(for: .seconds(1))
+            
+            guard
+                authManager.auth?.isAnonymous == true &&
+                abTestManager.activeTests.createAccountTest == true
+            else {
+                return
+            }
+            
+            showAppleProvider = true
+        }
     }
     
     // MARK: - Views
@@ -395,6 +418,14 @@ struct ExploreView: View {
 #Preview("Has data") {
     ExploreView()
         .environment(AvatarManager(remote: MockAvatarService()))
+        .previewEnvironment()
+}
+
+#Preview("Has data w/ CreateAcc test") {
+    ExploreView()
+        .environment(AvatarManager(remote: MockAvatarService()))
+        .environment(AuthManager(service: MockAuthService(user: .mock(isAnonymous: true))))
+        .environment(ABTestManager(service: MockABTestService(createAccountTest: true)))
         .previewEnvironment()
 }
 
