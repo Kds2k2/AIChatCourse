@@ -8,15 +8,6 @@
 import SwiftUI
 
 struct AppKeys {
-    static let openAI: String = {
-        guard let key = Bundle.main.object(
-            forInfoDictionaryKey: "OPENAI_API_KEY"
-        ) as? String else {
-            fatalError("OPENAI_API_KEY not set")
-        }
-        return key
-    }()
-    
     static let mixpanel: String = {
         guard let key = Bundle.main.object(
             forInfoDictionaryKey: "MIXPANEL_PROJECT_TOKEN"

@@ -6,29 +6,43 @@
 //
 
 import SwiftUI
-import OpenAI
 import FirebaseFunctions
 
 struct OpenAIService: AIService {
     
-    var openAI: OpenAI {
-        OpenAI(apiToken: AppKeys.openAI)
-    }
+/// DEPRECATED
+/// Direct call by API_KEY
+//    func generateImage(input: String) async throws -> UIImage {
+//        let query = ImagesQuery(
+//            prompt: input,
+//            model: .gpt_image_1,
+//            n: 1,
+//            quality: .low,
+//            size: ._1024,
+//            user: nil
+//        )
+//        
+//        let result = try await openAI.images(query: query)
+//        
+//        guard
+//            let base64 = result.data.first?.b64Json,
+//            let data = Data(base64Encoded: base64),
+//            let image = UIImage(data: data)
+//        else {
+//            throw OpenAIError.invalidResponse
+//        }
+//        
+//        return image
+//    }
     
     func generateImage(input: String) async throws -> UIImage {
-        let query = ImagesQuery(
-            prompt: input,
-            model: .gpt_image_1,
-            n: 1,
-            quality: .low,
-            size: ._1024,
-            user: nil
-        )
-        
-        let result = try await openAI.images(query: query)
-        
+        let response = try await Functions
+            .functions(region: "europe-west1")
+            .httpsCallable("generateOpenAIImage")
+            .call(["input": input])
+
         guard
-            let base64 = result.data.first?.b64Json,
+            let base64 = response.data as? String,
             let data = Data(base64Encoded: base64),
             let image = UIImage(data: data)
         else {
@@ -38,8 +52,8 @@ struct OpenAIService: AIService {
         return image
     }
        
-    ///Direct call by API_KEY
-    ///
+/// DEPRECATED
+/// Direct call by API_KEY
 //    func generateText(chats: [AIChatModel]) async throws -> AIChatModel {
 //        let messages = chats.compactMap({ $0.toOpenAIModel() })
 //        let query = ChatQuery(messages: messages, model: .gpt4_o_mini)
@@ -57,7 +71,7 @@ struct OpenAIService: AIService {
     
     func generateText(chats: [AIChatModel]) async throws -> AIChatModel {
         let messages = chats.compactMap { chat in
-            let role = chat.role.openAIRole.rawValue
+            let role = chat.role.rawValue
             let content = chat.message
             return [
                 "role": role,
@@ -73,11 +87,11 @@ struct OpenAIService: AIService {
         guard
             let dict = response.data as? [String: Any],
             let roleString = dict["role"] as? String,
+            let role = AIChatRole(rawValue: roleString),
             let content = dict["content"] as? String else {
             throw OpenAIError.invalidResponse
         }
         
-        let role = AIChatRole(rawRole: roleString)
         return AIChatModel(role: role, message: content)
     }
     
@@ -95,16 +109,6 @@ struct AIChatModel: Hashable, Codable {
         self.message = message
     }
     
-    init?(chat: ChatResult.Choice.Message) {
-        self.role = AIChatRole(rawRole: chat.role)
-        
-        if let content = chat.content {
-            self.message = content
-        } else {
-            return nil
-        }
-    }
-    
     enum CodingKeys: String, CodingKey {
         case role
         case message
@@ -112,69 +116,14 @@ struct AIChatModel: Hashable, Codable {
     
     var eventParameters: [String: Any] {
         let dict: [String: Any?] = [
-            "aiChatMessage_\(CodingKeys.role.rawValue)": role.openAIRole.rawValue,
+            "aiChatMessage_\(CodingKeys.role.rawValue)": role.rawValue,
             "aiChatMessage_\(CodingKeys.message.rawValue)": message
         ]
         
         return dict.compactMapValues({ $0 })
     }
-    
-    func toOpenAIModel() -> ChatQuery.ChatCompletionMessageParam? {
-        ChatQuery.ChatCompletionMessageParam(
-            role: role.openAIRole,
-            content: message
-        )
-    }
 }
 
-enum AIChatRole: Hashable, Codable {
+enum AIChatRole: String, Hashable, Codable {
     case system, user, assistant, tool, developer
-    
-    init(role: ChatQuery.ChatCompletionMessageParam.Role) {
-        switch role {
-        case .system:
-            self = .system
-        case .user:
-            self = .user
-        case .assistant:
-            self = .assistant
-        case .tool:
-            self = .tool
-        case .developer:
-            self = .developer
-        }
-    }
-    
-    init(rawRole: String) {
-        let role = ChatQuery.ChatCompletionMessageParam.Role(rawValue: rawRole)
-        switch role {
-        case .system:
-            self = .system
-        case .user:
-            self = .user
-        case .assistant:
-            self = .assistant
-        case .tool:
-            self = .tool
-        case .none:
-            self = .system
-        case .some(.developer):
-            self = .developer
-        }
-    }
-    
-    var openAIRole: ChatQuery.ChatCompletionMessageParam.Role {
-        switch self {
-        case .system:
-            return .system
-        case .user:
-            return .user
-        case .assistant:
-            return .assistant
-        case .tool:
-            return .tool
-        case .developer:
-            return .developer
-        }
-    }
 }
