@@ -17,6 +17,7 @@
 		26C599762F0FAF2200D7A1DE /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 26C599752F0FAF2200D7A1DE /* FirebaseAuth */; };
 		26F02C102F36396100270AC3 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 26F02C0F2F36396100270AC3 /* FirebaseAnalytics */; };
 		26F1AAB62F17E5A800B18BF9 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 26F1AAB52F17E5A800B18BF9 /* FirebaseStorage */; };
+		26FD54D52F44FB8000364A2E /* FirebaseFunctions in Frameworks */ = {isa = PBXBuildFile; productRef = 26FD54D42F44FB8000364A2E /* FirebaseFunctions */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -87,6 +88,7 @@
 				262536612F37CD870008B70C /* Mixpanel in Frameworks */,
 				262536632F37D23B0008B70C /* FirebaseCrashlytics in Frameworks */,
 				26A92EB12F142FDA007A738A /* FirebaseFirestore in Frameworks */,
+				26FD54D52F44FB8000364A2E /* FirebaseFunctions in Frameworks */,
 				26F1AAB62F17E5A800B18BF9 /* FirebaseStorage in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -168,6 +170,7 @@
 				26F02C0F2F36396100270AC3 /* FirebaseAnalytics */,
 				262536602F37CD870008B70C /* Mixpanel */,
 				262536622F37D23B0008B70C /* FirebaseCrashlytics */,
+				26FD54D42F44FB8000364A2E /* FirebaseFunctions */,
 			);
 			productName = AIChatCourse;
 			productReference = 26CA90F22F032E9500E21190 /* AIChatCourse.app */;
@@ -1064,6 +1067,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 26C599742F0FAF2200D7A1DE /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseStorage;
+		};
+		26FD54D42F44FB8000364A2E /* FirebaseFunctions */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 26C599742F0FAF2200D7A1DE /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFunctions;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

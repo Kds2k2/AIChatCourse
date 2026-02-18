@@ -7,6 +7,7 @@
 
 import SwiftUI
 import OpenAI
+import FirebaseFunctions
 
 struct OpenAIService: AIService {
     
@@ -36,20 +37,48 @@ struct OpenAIService: AIService {
         
         return image
     }
+       
+    ///Direct call by API_KEY
+    ///
+//    func generateText(chats: [AIChatModel]) async throws -> AIChatModel {
+//        let messages = chats.compactMap({ $0.toOpenAIModel() })
+//        let query = ChatQuery(messages: messages, model: .gpt4_o_mini)
+//        let result = try await openAI.chats(query: query)
+//        
+//        guard
+//            let chat = result.choices.first?.message,
+//            let model = AIChatModel(chat: chat)
+//        else {
+//            throw OpenAIError.invalidResponse
+//        }
+//        
+//        return model
+//    }
     
     func generateText(chats: [AIChatModel]) async throws -> AIChatModel {
-        let messages = chats.compactMap({ $0.toOpenAIModel() })
-        let query = ChatQuery(messages: messages, model: .gpt4_o_mini)
-        let result = try await openAI.chats(query: query)
+        let messages = chats.compactMap { chat in
+            let role = chat.role.openAIRole.rawValue
+            let content = chat.message
+            return [
+                "role": role,
+                "content": content
+            ]
+        }
+        
+        let response = try await Functions
+            .functions(region: "europe-west1")
+            .httpsCallable("generateOpenAIText")
+            .call(["messages": messages])
         
         guard
-            let chat = result.choices.first?.message,
-            let model = AIChatModel(chat: chat)
-        else {
+            let dict = response.data as? [String: Any],
+            let roleString = dict["role"] as? String,
+            let content = dict["content"] as? String else {
             throw OpenAIError.invalidResponse
         }
         
-        return model
+        let role = AIChatRole(rawRole: roleString)
+        return AIChatModel(role: role, message: content)
     }
     
     enum OpenAIError: LocalizedError {
