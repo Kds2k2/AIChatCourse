@@ -11,11 +11,16 @@ struct DevSettingsView: View {
     
     @Environment(AuthManager.self) private var authManager
     @Environment(UserManager.self) private var userManager
+    @Environment(ABTestManager.self) private var abTestManager
+    
     @Environment(\.dismiss) private var dismiss
+    
+    @State private var createAccountTest: Bool = false
     
     var body: some View {
         NavigationStack {
             List {
+                abTestSection
                 authSection
                 userSection
                 deviceSection
@@ -27,7 +32,26 @@ struct DevSettingsView: View {
                 }
             }
             .screenAppearAnalytics(name: "DevSettings")
+            .onFirstAppear {
+                loadABTests()
+            }
         }
+    }
+    
+    // MARK: - Loading
+    private func loadABTests() {
+        createAccountTest = abTestManager.activeTests.createAccountTest
+    }
+    
+    // MARK: - Views
+    private var abTestSection: some View {
+        Section {
+            Toggle("Create Account Test", isOn: $createAccountTest)
+                .onChange(of: createAccountTest, handleCreateAccountChange)
+        } header: {
+            Text("AB Tests")
+        }
+        .font(.caption)
     }
     
     private var authSection: some View {
@@ -72,6 +96,7 @@ struct DevSettingsView: View {
             }
     }
     
+    // MARK: - Actions
     private func itemRow(item: (key: String, value: Any)) -> some View {
         HStack {
             Text(item.key)
@@ -85,6 +110,18 @@ struct DevSettingsView: View {
         .font(.caption)
         .lineLimit(1)
         .minimumScaleFactor(0.3)
+    }
+    
+    private func handleCreateAccountChange(oldValue: Bool, newValue: Bool) {
+        if newValue != abTestManager.activeTests.createAccountTest {
+            do {
+                var tests = abTestManager.activeTests
+                tests.update(createAccountTest: newValue)
+                try abTestManager.override(updateTests: tests)
+            } catch {
+                createAccountTest = abTestManager.activeTests.createAccountTest
+            }
+        }
     }
 }
 
