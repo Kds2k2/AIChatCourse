@@ -15,10 +15,14 @@ class LocalABTestService: ABTestService {
     @UserDefault(key: ActiveABTests.CodingKeys.onboardingCommunityTest.rawValue, startingValue: .random())
     private var onboardingCommunityTest: Bool
     
+    @UserDefault(key: ActiveABTests.CodingKeys.categoryRowTest.rawValue, startingValue: .random())
+    private var categoryRowTest: CategoryRowTestOption
+    
     var activeTests: ActiveABTests {
         ActiveABTests(
             createAccountTest: createAccountTest,
-            onboardingCommunityTest: onboardingCommunityTest
+            onboardingCommunityTest: onboardingCommunityTest,
+            categoryRowTest: categoryRowTest
         )
     }
     
@@ -27,5 +31,6 @@ class LocalABTestService: ABTestService {
     func saveUpdatedConfig(updatedTests: ActiveABTests) throws {
         createAccountTest = updatedTests.createAccountTest
         onboardingCommunityTest = updatedTests.onboardingCommunityTest
+        categoryRowTest = updatedTests.categoryRowTest
     }
 }

@@ -51,12 +51,18 @@ struct ExploreView: View {
                     .removeListRowFormatting()
                 }
                 
+                if abTestManager.activeTests.categoryRowTest == .top {
+                    categorySection
+                }
+                
                 if !featuredAvatars.isEmpty {
                     featuredSection
                 }
                 
                 if !popularAvatars.isEmpty {
-                    categorySection
+                    if abTestManager.activeTests.categoryRowTest == .original {
+                        categorySection
+                    }
                     popularSection
                 }
             }
@@ -415,17 +421,10 @@ struct ExploreView: View {
     }
 }
 
+// MARK: - Previews
 #Preview("Has data") {
     ExploreView()
         .environment(AvatarManager(remote: MockAvatarService()))
-        .previewEnvironment()
-}
-
-#Preview("Has data w/ CreateAcc test") {
-    ExploreView()
-        .environment(AvatarManager(remote: MockAvatarService()))
-        .environment(AuthManager(service: MockAuthService(user: .mock(isAnonymous: true))))
-        .environment(ABTestManager(service: MockABTestService(createAccountTest: true)))
         .previewEnvironment()
 }
 
@@ -438,5 +437,31 @@ struct ExploreView: View {
 #Preview("Slow loading") {
     ExploreView()
         .environment(AvatarManager(remote: MockAvatarService(delay: 10)))
+        .previewEnvironment()
+}
+
+#Preview("CreateAccountTest, Has data") {
+    ExploreView()
+        .environment(AvatarManager(remote: MockAvatarService()))
+        .environment(AuthManager(service: MockAuthService(user: .mock(isAnonymous: true))))
+        .environment(ABTestManager(service: MockABTestService(createAccountTest: true)))
+        .previewEnvironment()
+}
+
+#Preview("CategoryRowTest: Original") {
+    ExploreView()
+        .environment(ABTestManager(service: MockABTestService(categoryRowTest: .original)))
+        .previewEnvironment()
+}
+
+#Preview("CategoryRowTest: Top") {
+    ExploreView()
+        .environment(ABTestManager(service: MockABTestService(categoryRowTest: .top)))
+        .previewEnvironment()
+}
+
+#Preview("CategoryRowTest: Hidden") {
+    ExploreView()
+        .environment(ABTestManager(service: MockABTestService(categoryRowTest: .hidden)))
         .previewEnvironment()
 }

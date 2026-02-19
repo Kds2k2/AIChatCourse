@@ -17,6 +17,7 @@ struct DevSettingsView: View {
     
     @State private var createAccountTest: Bool = false
     @State private var onboardingCommunityTest: Bool = false
+    @State private var categoryRowTest: CategoryRowTestOption = .original
     
     var body: some View {
         NavigationStack {
@@ -43,6 +44,7 @@ struct DevSettingsView: View {
     private func loadABTests() {
         createAccountTest = abTestManager.activeTests.createAccountTest
         onboardingCommunityTest = abTestManager.activeTests.onboardingCommunityTest
+        categoryRowTest = abTestManager.activeTests.categoryRowTest
     }
     
     // MARK: - Views
@@ -53,6 +55,14 @@ struct DevSettingsView: View {
             
             Toggle("Onboarding Community Test", isOn: $onboardingCommunityTest)
                 .onChange(of: onboardingCommunityTest, handleOnboardingCommunityChange)
+            
+            Picker("Category Row Test", selection: $categoryRowTest) {
+                ForEach(CategoryRowTestOption.allCases) { option in
+                    Text(option.rawValue)
+                        .tag(option)
+                }
+            }
+            .onChange(of: categoryRowTest, handleCategoryRowChange)
         } header: {
             Text("AB Tests")
         }
@@ -137,10 +147,20 @@ struct DevSettingsView: View {
         }
     }
     
-    private func updateTest(
-        property: inout Bool,
-        newValue: Bool,
-        savedValue: Bool,
+    private func handleCategoryRowChange(oldValue: CategoryRowTestOption, newValue: CategoryRowTestOption) {
+        updateTest(
+            property: &categoryRowTest,
+            newValue: newValue,
+            savedValue: abTestManager.activeTests.categoryRowTest
+        ) { tests in
+            tests.update(categoryRowTest: newValue)
+        }
+    }
+    
+    private func updateTest<T: Codable & Equatable>(
+        property: inout T,
+        newValue: T,
+        savedValue: T,
         updateAction: (inout ActiveABTests) -> Void
     ) {
         if newValue != savedValue {
