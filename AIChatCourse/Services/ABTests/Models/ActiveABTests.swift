@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import FirebaseRemoteConfig
 
 struct ActiveABTests: Codable {
     private(set) var createAccountTest: Bool
@@ -47,6 +48,29 @@ struct ActiveABTests: Codable {
     
     mutating func update(categoryRowTest newValue: CategoryRowTestOption) {
         categoryRowTest = newValue
+    }
+}
+
+extension ActiveABTests {
+    init(config: RemoteConfig) {
+        self.createAccountTest = config.configValue(forKey: ActiveABTests.CodingKeys.createAccountTest.rawValue).boolValue
+        
+        self.onboardingCommunityTest = config.configValue(forKey: ActiveABTests.CodingKeys.onboardingCommunityTest.rawValue).boolValue
+        
+        let categoryRowTestString = config.configValue(forKey: ActiveABTests.CodingKeys.categoryRowTest.rawValue).stringValue
+        if let categoryRowTest = CategoryRowTestOption(rawValue: categoryRowTestString) {
+            self.categoryRowTest = categoryRowTest
+        } else {
+            self.categoryRowTest = .default
+        }
+    }
+    
+    var asNSObjectDictionary: [String: NSObject]? {
+        [
+            CodingKeys.createAccountTest.rawValue: createAccountTest as NSObject,
+            CodingKeys.onboardingCommunityTest.rawValue: onboardingCommunityTest as NSObject,
+            CodingKeys.categoryRowTest.rawValue: categoryRowTest.rawValue as NSObject
+        ]
     }
 }
 

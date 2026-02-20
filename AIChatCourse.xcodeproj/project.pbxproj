@@ -10,6 +10,7 @@
 		260C87972F0705DC0078F742 /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 260C87962F0705DC0078F742 /* SDWebImageSwiftUI */; };
 		262536612F37CD870008B70C /* Mixpanel in Frameworks */ = {isa = PBXBuildFile; productRef = 262536602F37CD870008B70C /* Mixpanel */; };
 		262536632F37D23B0008B70C /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = 262536622F37D23B0008B70C /* FirebaseCrashlytics */; };
+		2671E6182F47966E00178008 /* FirebaseRemoteConfig in Frameworks */ = {isa = PBXBuildFile; productRef = 2671E6172F47966E00178008 /* FirebaseRemoteConfig */; };
 		26A528452F2FD1F90065FCFF /* SignInAppleAsync in Frameworks */ = {isa = PBXBuildFile; productRef = 26A528442F2FD1F90065FCFF /* SignInAppleAsync */; };
 		26A92EB12F142FDA007A738A /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 26A92EB02F142FDA007A738A /* FirebaseFirestore */; };
 		26A92EB42F145E7D007A738A /* SwiftfulFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 26A92EB32F145E7D007A738A /* SwiftfulFirestore */; };
@@ -78,6 +79,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2671E6182F47966E00178008 /* FirebaseRemoteConfig in Frameworks */,
 				26A92EB42F145E7D007A738A /* SwiftfulFirestore in Frameworks */,
 				26F02C102F36396100270AC3 /* FirebaseAnalytics in Frameworks */,
 				260C87972F0705DC0078F742 /* SDWebImageSwiftUI in Frameworks */,
@@ -168,6 +170,7 @@
 				262536602F37CD870008B70C /* Mixpanel */,
 				262536622F37D23B0008B70C /* FirebaseCrashlytics */,
 				26FD54D42F44FB8000364A2E /* FirebaseFunctions */,
+				2671E6172F47966E00178008 /* FirebaseRemoteConfig */,
 			);
 			productName = AIChatCourse;
 			productReference = 26CA90F22F032E9500E21190 /* AIChatCourse.app */;
@@ -1020,6 +1023,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 26C599742F0FAF2200D7A1DE /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseCrashlytics;
+		};
+		2671E6172F47966E00178008 /* FirebaseRemoteConfig */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 26C599742F0FAF2200D7A1DE /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseRemoteConfig;
 		};
 		26A528442F2FD1F90065FCFF /* SignInAppleAsync */ = {
 			isa = XCSwiftPackageProductDependency;

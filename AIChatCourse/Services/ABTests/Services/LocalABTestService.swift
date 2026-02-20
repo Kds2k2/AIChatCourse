@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+@MainActor
 class LocalABTestService: ABTestService {
     
     @UserDefault(key: ActiveABTests.CodingKeys.createAccountTest.rawValue, startingValue: .random())
@@ -32,5 +33,9 @@ class LocalABTestService: ABTestService {
         createAccountTest = updatedTests.createAccountTest
         onboardingCommunityTest = updatedTests.onboardingCommunityTest
         categoryRowTest = updatedTests.categoryRowTest
+    }
+    
+    func fetchUpdatedConfig() async throws -> ActiveABTests {
+        return activeTests
     }
 }

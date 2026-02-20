@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+@MainActor
 class MockABTestService: ABTestService {
     var activeTests: ActiveABTests
     
@@ -24,5 +25,9 @@ class MockABTestService: ABTestService {
     
     func saveUpdatedConfig(updatedTests: ActiveABTests) throws {
         activeTests = updatedTests
+    }
+    
+    func fetchUpdatedConfig() async throws -> ActiveABTests {
+        return activeTests
     }
 }
