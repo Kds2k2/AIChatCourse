@@ -14,7 +14,7 @@ public enum EntitlementOwnershipOption: Codable, Sendable {
 import StoreKit
 
 extension EntitlementOwnershipOption {
-    init(type: Transition.OwnershipType) {
+    init(type: StoreKit.Transaction.OwnershipType) {
         switch type {
         case .purchased:
             self = .purchased

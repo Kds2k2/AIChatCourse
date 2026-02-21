@@ -83,13 +83,13 @@ extension Array where Element == PurchasedEntitlement {
     public var eventParameters: [String: Any] {
         let activeEntitlements = self.active
         var dict: [String: Any?] = [
-            "entitlements_count_all" : count,
-            "entitlements_count_active" : activeEntitlements.count,
-            "entitlements_ids_all" : compactMap({ $0.id }).sorted().joined(separator: ", "),
-            "entitlements_ids_active" : activeEntitlements.compactMap({ $0.id }).sorted().joined(separator: ", "),
-            "entitlements_product_ids_all" : compactMap({ $0.productId }).sorted().joined(separator: ", "),
-            "entitlements_product_ids_active" : activeEntitlements.compactMap({ $0.productId }).sorted().joined(separator: ", "),
-            "has_active_entitlement" : hasActiveEntitlement
+            "entitlements_count_all": count,
+            "entitlements_count_active": activeEntitlements.count,
+            "entitlements_ids_all": compactMap({ $0.id }).sorted().joined(separator: ", "),
+            "entitlements_ids_active": activeEntitlements.compactMap({ $0.id }).sorted().joined(separator: ", "),
+            "entitlements_product_ids_all": compactMap({ $0.productId }).sorted().joined(separator: ", "),
+            "entitlements_product_ids_active": activeEntitlements.compactMap({ $0.productId }).sorted().joined(separator: ", "),
+            "has_active_entitlement": hasActiveEntitlement
         ]
         for product in self {
             for (key, value) in product.eventParameters {

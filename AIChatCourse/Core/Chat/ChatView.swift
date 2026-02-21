@@ -15,6 +15,7 @@ struct ChatView: View {
     @Environment(AvatarManager.self) private var avatarManager
     @Environment(ChatManager.self) private var chatManager
     @Environment(LogManager.self) private var logManager
+    @Environment(PurchaseManager.self) private var purchaseManager
     @Environment(\.dismiss) private var dismiss
     
     @State private var chatMessages: [ChatMessageModel] = []
@@ -28,6 +29,7 @@ struct ChatView: View {
     @State private var showAlert: AnyAppAlert?
     @State private var showChatSettings: AnyAppAlert?
     @State private var showProfileModel: Bool = false
+    @State private var showPaywall: Bool = false
     
     @State private var isGeneratingResponse: Bool = false
     @State private var chatMessagesTask: Task<Void, Never>?
@@ -53,6 +55,9 @@ struct ChatView: View {
                 profileModal(avatar: avatar)
             }
         }
+        .sheet(isPresented: $showPaywall, content: {
+            PaywallView()
+        })
         .onAppear { loadCurrentUser() }
         .onDisappear {
             chatMessagesTask?.cancel()
@@ -276,6 +281,14 @@ struct ChatView: View {
         
         Task {
             do {
+                // Condition for showing paywall
+                let isPremium = purchaseManager.entitlements.hasActiveEntitlement
+                if !isPremium && chatMessages.count >= 3 {
+                    logManager.trackEvent(event: Event.sendMessagePaywall(chat: chat, avatar: avatar))
+                    showPaywall = true
+                    return
+                }
+                
                 let userId = try authManager.getAuthId()
                 try TextValidationHelper.checkIfTextIsValid(text: content)
                 
@@ -415,6 +428,7 @@ struct ChatView: View {
         case sendMessageSent(chat: ChatModel?, avatar: AvatarModel?, message: ChatMessageModel)
         case sendMessageResponse(chat: ChatModel?, avatar: AvatarModel?, message: ChatMessageModel)
         case sendMessageReponseSent(chat: ChatModel?, avatar: AvatarModel?, message: ChatMessageModel)
+        case sendMessagePaywall(chat: ChatModel?, avatar: AvatarModel?)
         case createChatStart
         case chatSettingsPressed
         case reportChatStart, reportChatSuccess, reportChatFail(error: Error)
@@ -439,6 +453,7 @@ struct ChatView: View {
             case .sendMessageSent:          return "\(Event.screenName)_SendMessage_Sent"
             case .sendMessageResponse:      return "\(Event.screenName)_SendMessage_Response"
             case .sendMessageReponseSent:   return "\(Event.screenName)_SendMessage_ReponseSent"
+            case .sendMessagePaywall:       return "\(Event.screenName)_SendMessage_Paywall"
             case .createChatStart:          return "\(Event.screenName)_CreateChat_Start"
             case .chatSettingsPressed:      return "\(Event.screenName)_ChatSettings_Pressed"
             case .reportChatStart:          return "\(Event.screenName)_ReportChat_Start"
@@ -459,7 +474,7 @@ struct ChatView: View {
                 return chat?.eventParameters
             case .loadAvatarsSuccess(avatar: let avatar):
                 return avatar.eventParameters
-            case .sendMessageStart(chat: let chat, avatar: let avatar):
+            case .sendMessageStart(chat: let chat, avatar: let avatar), .sendMessagePaywall(chat: let chat, avatar: let avatar):
                 var dict = chat?.eventParameters ?? [:]
                 dict.merge(avatar?.eventParameters)
                 return dict
@@ -488,9 +503,17 @@ struct ChatView: View {
     }
 }
 
-#Preview("Working chat") {
+#Preview("Working chat, Not Premium") {
     NavigationStack {
         ChatView(chat: ChatModel.mock, avatarId: AvatarModel.mock.avatarId)
+            .previewEnvironment(isSignedIn: true)
+    }
+}
+
+#Preview("Working chat, Premium") {
+    NavigationStack {
+        ChatView(chat: ChatModel.mock, avatarId: AvatarModel.mock.avatarId)
+            .environment(PurchaseManager(service: MockPurchaseService(activeEntitlements: [.mock])))
             .previewEnvironment(isSignedIn: true)
     }
 }

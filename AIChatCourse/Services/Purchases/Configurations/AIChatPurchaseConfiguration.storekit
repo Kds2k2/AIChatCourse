@@ -24,7 +24,7 @@
     "_developerTeamID" : "5UM2S2VR73",
     "_disableDialogs" : false,
     "_failTransactionsEnabled" : false,
-    "_lastSynchronizedDate" : 793376653.268314,
+    "_lastSynchronizedDate" : 793390445.058424,
     "_locale" : "en_US",
     "_renewalBillingIssuesEnabled" : false,
     "_storefront" : "USA",
@@ -53,7 +53,7 @@
           "groupNumber" : 1,
           "internalID" : "6759490688",
           "introductoryOffer" : {
-            "internalID" : "78D7F7FA",
+            "internalID" : "70F63CC6",
             "numberOfPeriods" : 1,
             "paymentMode" : "free",
             "subscriptionPeriod" : "P3D"

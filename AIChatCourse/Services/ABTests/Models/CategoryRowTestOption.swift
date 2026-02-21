@@ -5,7 +5,7 @@
 //  Created by Dmitro Kryzhanovsky on 20.02.2026.
 //
 
-import SwiftUi
+import SwiftUI
 
 enum CategoryRowTestOption: String, Codable, CaseIterable, Identifiable {
     case original, top, hidden

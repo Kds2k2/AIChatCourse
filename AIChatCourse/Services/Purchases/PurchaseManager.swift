@@ -9,7 +9,7 @@ import SwiftUI
 import Foundation
 
 protocol PurchaseService: Sendable {
-    func listenForTransactions(onTransactionsUpdated: @Sendable ([PurchasedEntitlement]) async -> Void) async
+    func listenForTransactions(onTransactionsUpdated: @escaping @Sendable ([PurchasedEntitlement]) async -> Void) async
     func getUserEntitlements() async -> [PurchasedEntitlement]
 }
 
@@ -21,67 +21,82 @@ struct MockPurchaseService: PurchaseService {
         self.activeEntitlements = activeEntitlements
     }
     
-    func listenForTransactions(onTransactionsUpdated: ([PurchasedEntitlement]) async -> Void) async {
-        await onTransactionsUpdated(activeEntitlements)
+    func listenForTransactions(onTransactionsUpdated: @escaping @Sendable ([PurchasedEntitlement]) async -> Void) {
+        Task {
+            await onTransactionsUpdated(activeEntitlements)
+        }
     }
     
     func getUserEntitlements() async -> [PurchasedEntitlement] {
-        return activeEntitlements
+        activeEntitlements
     }
 }
 
 import StoreKit
-struct StoreKitPurchaseService: PurchaseService {
+
+actor StoreKitPurchaseService: PurchaseService {
     
-    func listenForTransactions(onTransactionsUpdated: ([PurchasedEntitlement]) async -> Void) async {
-        for await update in StoreKit.Transaction.updates {
-            if let transaction = try? update.payloadData {
-                let entitlements = await getUserEntitlements()
+    private var transactionListenerTask: Task<Void, Never>?
+    
+    init() {}
+    
+    deinit {
+        transactionListenerTask?.cancel()
+    }
+    
+    func listenForTransactions(onTransactionsUpdated: @escaping @Sendable ([PurchasedEntitlement]) async -> Void) {
+        transactionListenerTask?.cancel()
+        
+        transactionListenerTask = Task {
+            for await result in Transaction.updates {
+                guard case .verified(let transaction) = result else {
+                    continue
+                }
+                
+                let entitlements = await self.getUserEntitlements()
                 await onTransactionsUpdated(entitlements)
+                
                 await transaction.finish()
             }
         }
     }
     
     func getUserEntitlements() async -> [PurchasedEntitlement] {
-        var activeTransactions: [PurchasedEntitlement] = []
+        var activeEntitlements: [PurchasedEntitlement] = []
         
-        for await verificationResult in StoreKit.Transaction.currentEntitlements {
-            
-            switch verificationResult {
-            case .verified(let transaction):
-                let isActive: Bool
-                if let expirationDate = transaction.expirationDate {
-                    isActive = expirationDate >= Date.now
-                } else {
-                    isActive = transaction.revocationDate == nil
-                }
-                
-                activeTransactions
-                    .append(
-                        PurchasedEntitlement(
-                            productId: transaction.productID,
-                            expirationDate: transaction.expirationDate,
-                            isActive: isActive,
-                            originalPurchaseDate: transaction.originalPurchaseDate,
-                            latestPurchaseDate: transaction.purchaseDate,
-                            ownershipType: EntitlementOwnershipOption(type: transaction.ownershipType),
-                            isSandbox: transaction.environment == .sandbox,
-                            isVerified: true
-                        )
-                    )
-            case .unverified:
-                break
+        for await result in Transaction.currentEntitlements {
+            guard case .verified(let transaction) = result else {
+                continue
             }
+            
+            // Transaction.currentEntitlements already filters expired,
+            // but we defensively double-check revocation.
+            guard transaction.revocationDate == nil else {
+                continue
+            }
+            
+            let entitlement = await PurchasedEntitlement(
+                id: transaction.id.description,
+                productId: transaction.productID,
+                expirationDate: transaction.expirationDate,
+                isActive: true,
+                originalPurchaseDate: transaction.originalPurchaseDate,
+                latestPurchaseDate: transaction.purchaseDate,
+                ownershipType: EntitlementOwnershipOption(type: transaction.ownershipType),
+                isSandbox: transaction.environment == .sandbox,
+                isVerified: true
+            )
+            
+            activeEntitlements.append(entitlement)
         }
         
-        return activeTransactions
+        return activeEntitlements
     }
 }
-
+    
 @MainActor
 @Observable
-class PurchaseManager {
+final class PurchaseManager {
     
     private let service: PurchaseService
     private let logManager: LogManager?
@@ -91,23 +106,25 @@ class PurchaseManager {
     init(service: PurchaseService, logManager: LogManager? = nil) {
         self.service = service
         self.logManager = logManager
+        
         self.configure()
     }
     
     private func configure() {
         Task {
             let entitlements = await service.getUserEntitlements()
-            await updateActiveEntitlements(entitlements: entitlements)
+            updateActiveEntitlements(entitlements)
         }
         
         Task {
-            await service.listenForTransactions { updatedEntitlements in
-                await updateActiveEntitlements(entitlements: updatedEntitlements)
+            await service.listenForTransactions { [weak self] updatedEntitlements in
+                guard let self else { return }
+                await self.updateActiveEntitlements(updatedEntitlements)
             }
         }
     }
     
-    private func updateActiveEntitlements(entitlements: [PurchasedEntitlement]) {
+    private func updateActiveEntitlements(_ entitlements: [PurchasedEntitlement]) {
         self.entitlements = entitlements.sortedByKeyPath(keyPath: \.expirationDateCalc, order: .ascending)
         logManager?.addUserProperties(dict: self.entitlements.eventParameters, isHighPriority: false)
     }
