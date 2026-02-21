@@ -24,6 +24,7 @@ struct AIChatCourseApp: App {
                 .environment(delegate.dependencies.logManager)
                 .environment(delegate.dependencies.pushManager)
                 .environment(delegate.dependencies.abTestManager)
+                .environment(delegate.dependencies.purchaseManager)
         }
     }
 }
@@ -85,6 +86,7 @@ struct AppDependencies {
     let logManager: LogManager
     let pushManager: PushManager
     let abTestManager: ABTestManager
+    let purchaseManager: PurchaseManager
     
     init(_ config: BuildConfiguration) {
         switch config {
@@ -99,6 +101,7 @@ struct AppDependencies {
                                           local: MockLocalAvatarPersistence())
             chatManager = ChatManager(service: MockChatService())
             abTestManager = ABTestManager(service: MockABTestService(), logManager: logManager)
+            purchaseManager = PurchaseManager(service: MockPurchaseService())
         case .dev:
             logManager = LogManager(services: [
                 ConsoleService(printParameters: true),
@@ -113,6 +116,7 @@ struct AppDependencies {
                                           local: SwiftDataLocalPersistence())
             chatManager = ChatManager(service: FirebaseChatService())
             abTestManager = ABTestManager(service: LocalABTestService(), logManager: logManager)
+            purchaseManager = PurchaseManager(service: StoreKitPurchaseService())
         case .prod:
             logManager = LogManager(services: [
                 FirebaseAnalyticsService(),
@@ -126,6 +130,7 @@ struct AppDependencies {
                                           local: SwiftDataLocalPersistence())
             chatManager = ChatManager(service: FirebaseChatService())
             abTestManager = ABTestManager(service: FirebaseABTestService(), logManager: logManager)
+            purchaseManager = PurchaseManager(service: StoreKitPurchaseService())
         }
         
         pushManager = PushManager(logManager: logManager)
@@ -143,6 +148,7 @@ extension View {
             .environment(LogManager(services: []))
             .environment(PushManager())
             .environment(ABTestManager(service: MockABTestService()))
+            .environment(PurchaseManager(service: MockPurchaseService()))
             .environment(AppState())
     }
 }
