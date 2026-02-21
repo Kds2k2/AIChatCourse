@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Firebase
+import FirebaseInstallations
 
 @main
 struct AIChatCourseApp: App {

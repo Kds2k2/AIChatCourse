@@ -11,6 +11,8 @@
 		262536612F37CD870008B70C /* Mixpanel in Frameworks */ = {isa = PBXBuildFile; productRef = 262536602F37CD870008B70C /* Mixpanel */; };
 		262536632F37D23B0008B70C /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = 262536622F37D23B0008B70C /* FirebaseCrashlytics */; };
 		2671E6182F47966E00178008 /* FirebaseRemoteConfig in Frameworks */ = {isa = PBXBuildFile; productRef = 2671E6172F47966E00178008 /* FirebaseRemoteConfig */; };
+		26A3265C2F49F69E0047D76B /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26A3265B2F49F69E0047D76B /* StoreKit.framework */; };
+		26A38EC42F48767000598FF2 /* FirebaseInstallations in Frameworks */ = {isa = PBXBuildFile; productRef = 26A38EC32F48767000598FF2 /* FirebaseInstallations */; };
 		26A528452F2FD1F90065FCFF /* SignInAppleAsync in Frameworks */ = {isa = PBXBuildFile; productRef = 26A528442F2FD1F90065FCFF /* SignInAppleAsync */; };
 		26A92EB12F142FDA007A738A /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 26A92EB02F142FDA007A738A /* FirebaseFirestore */; };
 		26A92EB42F145E7D007A738A /* SwiftfulFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 26A92EB32F145E7D007A738A /* SwiftfulFirestore */; };
@@ -38,6 +40,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		26A3265B2F49F69E0047D76B /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		26CA90F22F032E9500E21190 /* AIChatCourse.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AIChatCourse.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		26CA90FF2F032E9700E21190 /* AIChatCourseTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AIChatCourseTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		26CA91092F032E9800E21190 /* AIChatCourseUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AIChatCourseUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -82,6 +85,7 @@
 				2671E6182F47966E00178008 /* FirebaseRemoteConfig in Frameworks */,
 				26A92EB42F145E7D007A738A /* SwiftfulFirestore in Frameworks */,
 				26F02C102F36396100270AC3 /* FirebaseAnalytics in Frameworks */,
+				26A38EC42F48767000598FF2 /* FirebaseInstallations in Frameworks */,
 				260C87972F0705DC0078F742 /* SDWebImageSwiftUI in Frameworks */,
 				26A528452F2FD1F90065FCFF /* SignInAppleAsync in Frameworks */,
 				26C599762F0FAF2200D7A1DE /* FirebaseAuth in Frameworks */,
@@ -89,6 +93,7 @@
 				262536632F37D23B0008B70C /* FirebaseCrashlytics in Frameworks */,
 				26A92EB12F142FDA007A738A /* FirebaseFirestore in Frameworks */,
 				26FD54D52F44FB8000364A2E /* FirebaseFunctions in Frameworks */,
+				26A3265C2F49F69E0047D76B /* StoreKit.framework in Frameworks */,
 				26F1AAB62F17E5A800B18BF9 /* FirebaseStorage in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -113,6 +118,7 @@
 		26A92EAF2F142FDA007A738A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				26A3265B2F49F69E0047D76B /* StoreKit.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -171,6 +177,7 @@
 				262536622F37D23B0008B70C /* FirebaseCrashlytics */,
 				26FD54D42F44FB8000364A2E /* FirebaseFunctions */,
 				2671E6172F47966E00178008 /* FirebaseRemoteConfig */,
+				26A38EC32F48767000598FF2 /* FirebaseInstallations */,
 			);
 			productName = AIChatCourse;
 			productReference = 26CA90F22F032E9500E21190 /* AIChatCourse.app */;
@@ -1028,6 +1035,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 26C599742F0FAF2200D7A1DE /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseRemoteConfig;
+		};
+		26A38EC32F48767000598FF2 /* FirebaseInstallations */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 26C599742F0FAF2200D7A1DE /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseInstallations;
 		};
 		26A528442F2FD1F90065FCFF /* SignInAppleAsync */ = {
 			isa = XCSwiftPackageProductDependency;
