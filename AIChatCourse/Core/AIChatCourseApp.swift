@@ -89,6 +89,7 @@ struct AppDependencies {
     let abTestManager: ABTestManager
     let purchaseManager: PurchaseManager
     
+    // swiftlint:disable function_body_length
     init(_ config: BuildConfiguration) {
         switch config {
         case .mock(isSignedIn: let isSignedIn):
@@ -118,7 +119,7 @@ struct AppDependencies {
             chatManager = ChatManager(service: FirebaseChatService())
             abTestManager = ABTestManager(service: LocalABTestService(), logManager: logManager)
             purchaseManager = PurchaseManager(
-                service: RevenueCatPurchaseService(apiKey: AppKeys.revenueCatDev), //StoreKitPurchaseService(),
+                service: RevenueCatPurchaseService(apiKey: AppKeys.revenueCatDev), // StoreKitPurchaseService(),
                 logManager: logManager
             )
         case .prod:
@@ -136,13 +137,14 @@ struct AppDependencies {
             chatManager = ChatManager(service: FirebaseChatService())
             abTestManager = ABTestManager(service: FirebaseABTestService(), logManager: logManager)
             purchaseManager = PurchaseManager(
-                service: RevenueCatPurchaseService(apiKey: AppKeys.revenueCat), //StoreKitPurchaseService(),
+                service: RevenueCatPurchaseService(apiKey: AppKeys.revenueCat), // StoreKitPurchaseService(),
                 logManager: logManager
             )
         }
         
         pushManager = PushManager(logManager: logManager)
     }
+    // swiftlint:enable function_body_length
 }
 
 extension View {

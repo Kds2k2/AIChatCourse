@@ -62,25 +62,32 @@ actor RevenueCatPurchaseService: PurchaseService {
     
     func updateProfileAttributes(attributes: PurchaseProfileAttributes) async throws {
         if let email = attributes.email {
-            Purchases.shared.attribution.setEmail(attributes.email)
+            Purchases.shared.attribution.setEmail(email)
+        }
+        
+        if let firebaseAppInstanceId = attributes.firebaseAppInstanceId {
+            Purchases.shared.attribution.setFirebaseAppInstanceID(firebaseAppInstanceId)
         }
     }
     
     func logOut() async throws {
-        let _ = try await Purchases.shared.logOut()
+        _ = try await Purchases.shared.logOut()
     }
 }
 
 struct PurchaseProfileAttributes: Codable {
-    var email: String?
+    let email: String?
+    let firebaseAppInstanceId: String?
     
     enum CodingKeys: String, CodingKey {
         case email
+        case firebaseAppInstanceId
     }
     
     var eventParameters: [String: Any] {
-        var dict: [String: Any?] = [
-            "PurAtr_\(CodingKeys.email.rawValue)": email
+        let dict: [String: Any?] = [
+            "PurAtr_\(CodingKeys.email.rawValue)": email,
+            "PurAtr_\(CodingKeys.firebaseAppInstanceId.rawValue)": firebaseAppInstanceId
         ]
         
         return dict.compactMapValues({ $0 })

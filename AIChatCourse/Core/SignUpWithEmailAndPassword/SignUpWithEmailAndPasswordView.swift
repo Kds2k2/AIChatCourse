@@ -86,7 +86,7 @@ struct SignUpWithEmailAndPasswordView: View {
                 logManager.trackEvent(event: Event.registerSuccess(user: result.user, isNewUser: result.isNewUser))
                 
                 try await userManager.logIn(auth: result.user, isNewUser: result.isNewUser)
-                try await purchaseManager.logIn(userId: result.user.uid, attributes: .init(email: result.user.email))
+                try await purchaseManager.logIn(userId: result.user.uid, attributes: .init(email: result.user.email, firebaseAppInstanceId: FirebaseAnalyticsService.appInstanceId))
                 logManager.trackEvent(event: Event.loginUserSuccess(user: result.user, isNewUser: result.isNewUser))
             } catch {
                 logManager.trackEvent(event: Event.registerFail(error: error))

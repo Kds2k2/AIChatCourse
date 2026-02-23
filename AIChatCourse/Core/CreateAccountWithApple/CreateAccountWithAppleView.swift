@@ -62,7 +62,11 @@ struct CreateAccountWithAppleView: View {
                 logManager.trackEvent(event: Event.appleAuthSuccess(user: result.user, isNewUser: result.isNewUser))
                 
                 try await userManager.logIn(auth: result.user, isNewUser: result.isNewUser)
-                try await purchaseManager.logIn(userId: result.user.uid, attributes: .init(email: result.user.email))
+                try await purchaseManager.logIn(userId: result.user.uid,
+                                                attributes: .init(
+                                                    email: result.user.email,
+                                                    firebaseAppInstanceId: FirebaseAnalyticsService.appInstanceId))
+                
                 logManager.trackEvent(event: Event.appleAuthLoginSucess(user: result.user, isNewUser: result.isNewUser))
                 
                 dismiss()
