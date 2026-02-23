@@ -8,6 +8,7 @@
 import SwiftUI
 import Firebase
 import FirebaseInstallations
+import FirebaseCore
 
 @main
 struct AIChatCourseApp: App {
@@ -116,9 +117,13 @@ struct AppDependencies {
                                           local: SwiftDataLocalPersistence())
             chatManager = ChatManager(service: FirebaseChatService())
             abTestManager = ABTestManager(service: LocalABTestService(), logManager: logManager)
-            purchaseManager = PurchaseManager(service: StoreKitPurchaseService())
+            purchaseManager = PurchaseManager(
+                service: RevenueCatPurchaseService(apiKey: AppKeys.revenueCatDev), //StoreKitPurchaseService(),
+                logManager: logManager
+            )
         case .prod:
             logManager = LogManager(services: [
+                ConsoleService(printParameters: true),
                 FirebaseAnalyticsService(),
                 FirebaseCrashlyticsService(),
                 MixpanelService(token: AppKeys.mixpanel)
@@ -130,7 +135,10 @@ struct AppDependencies {
                                           local: SwiftDataLocalPersistence())
             chatManager = ChatManager(service: FirebaseChatService())
             abTestManager = ABTestManager(service: FirebaseABTestService(), logManager: logManager)
-            purchaseManager = PurchaseManager(service: StoreKitPurchaseService())
+            purchaseManager = PurchaseManager(
+                service: RevenueCatPurchaseService(apiKey: AppKeys.revenueCat), //StoreKitPurchaseService(),
+                logManager: logManager
+            )
         }
         
         pushManager = PushManager(logManager: logManager)

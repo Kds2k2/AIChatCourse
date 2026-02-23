@@ -56,17 +56,17 @@ public struct AnyProduct: Identifiable, Codable, Sendable {
     }
 
     public static let mockYearly: AnyProduct = AnyProduct(
-        id: "mock.yearly.id",
+        id: EntitlementOption.yearly.productId,
         title: "Yearly subscription",
         subtitle: "This is a yearly subscription description.",
-        priceString: "$99/year",
+        priceString: "$99",
         productDuration: .year
     )
     public static let mockMonthly: AnyProduct = AnyProduct(
         id: "mock.monthly.id",
         title: "Monthly subscription",
         subtitle: "This is a monthly subscription description.",
-        priceString: "$10/month",
+        priceString: "$10",
         productDuration: .month
     )
 
@@ -81,7 +81,7 @@ extension Array where Element == AnyProduct {
         var dict: [String: Any?] = [
             "products_count": self.count,
             "products_ids": self.compactMap({ $0.id }).sorted().joined(separator: ", "),
-            "products_titles": self.compactMap({ $0.title }).sorted().joined(separator: ", "),
+            "products_titles": self.compactMap({ $0.title }).sorted().joined(separator: ", ")
         ]
         for product in self {
             for (key, value) in product.eventParameters {

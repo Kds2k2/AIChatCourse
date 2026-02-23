@@ -15,6 +15,7 @@ struct CreateAccountWithAppleView: View {
     @Environment(AuthManager.self) private var authManager
     @Environment(UserManager.self) private var userManager
     @Environment(LogManager.self) private var logManager
+    @Environment(PurchaseManager.self) private var purchaseManager
     @Environment(\.dismiss) private var dismiss
     
     var onDidSignIn: ((_ isNewUser: Bool) -> Void)?
@@ -61,6 +62,7 @@ struct CreateAccountWithAppleView: View {
                 logManager.trackEvent(event: Event.appleAuthSuccess(user: result.user, isNewUser: result.isNewUser))
                 
                 try await userManager.logIn(auth: result.user, isNewUser: result.isNewUser)
+                try await purchaseManager.logIn(userId: result.user.uid, attributes: .init(email: result.user.email))
                 logManager.trackEvent(event: Event.appleAuthLoginSucess(user: result.user, isNewUser: result.isNewUser))
                 
                 dismiss()

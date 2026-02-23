@@ -25,3 +25,18 @@ extension EntitlementOwnershipOption {
         }
     }
 }
+
+import RevenueCat
+
+extension EntitlementOwnershipOption {
+    init(type: PurchaseOwnershipType) {
+        switch type {
+        case .purchased:
+            self = .purchased
+        case .familyShared:
+            self = .familyShared
+        default:
+            self = .unknown
+        }
+    }
+}

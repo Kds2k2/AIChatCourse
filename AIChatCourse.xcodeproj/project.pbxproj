@@ -17,6 +17,8 @@
 		26A92EB12F142FDA007A738A /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 26A92EB02F142FDA007A738A /* FirebaseFirestore */; };
 		26A92EB42F145E7D007A738A /* SwiftfulFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 26A92EB32F145E7D007A738A /* SwiftfulFirestore */; };
 		26C599762F0FAF2200D7A1DE /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 26C599752F0FAF2200D7A1DE /* FirebaseAuth */; };
+		26CF26702F4B981900C04FEF /* RevenueCat in Frameworks */ = {isa = PBXBuildFile; productRef = 26CF266F2F4B981900C04FEF /* RevenueCat */; };
+		26CF26722F4B981900C04FEF /* RevenueCatUI in Frameworks */ = {isa = PBXBuildFile; productRef = 26CF26712F4B981900C04FEF /* RevenueCatUI */; };
 		26F02C102F36396100270AC3 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 26F02C0F2F36396100270AC3 /* FirebaseAnalytics */; };
 		26F1AAB62F17E5A800B18BF9 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 26F1AAB52F17E5A800B18BF9 /* FirebaseStorage */; };
 		26FD54D52F44FB8000364A2E /* FirebaseFunctions in Frameworks */ = {isa = PBXBuildFile; productRef = 26FD54D42F44FB8000364A2E /* FirebaseFunctions */; };
@@ -84,11 +86,13 @@
 			files = (
 				2671E6182F47966E00178008 /* FirebaseRemoteConfig in Frameworks */,
 				26A92EB42F145E7D007A738A /* SwiftfulFirestore in Frameworks */,
+				26CF26702F4B981900C04FEF /* RevenueCat in Frameworks */,
 				26F02C102F36396100270AC3 /* FirebaseAnalytics in Frameworks */,
 				26A38EC42F48767000598FF2 /* FirebaseInstallations in Frameworks */,
 				260C87972F0705DC0078F742 /* SDWebImageSwiftUI in Frameworks */,
 				26A528452F2FD1F90065FCFF /* SignInAppleAsync in Frameworks */,
 				26C599762F0FAF2200D7A1DE /* FirebaseAuth in Frameworks */,
+				26CF26722F4B981900C04FEF /* RevenueCatUI in Frameworks */,
 				262536612F37CD870008B70C /* Mixpanel in Frameworks */,
 				262536632F37D23B0008B70C /* FirebaseCrashlytics in Frameworks */,
 				26A92EB12F142FDA007A738A /* FirebaseFirestore in Frameworks */,
@@ -178,6 +182,8 @@
 				26FD54D42F44FB8000364A2E /* FirebaseFunctions */,
 				2671E6172F47966E00178008 /* FirebaseRemoteConfig */,
 				26A38EC32F48767000598FF2 /* FirebaseInstallations */,
+				26CF266F2F4B981900C04FEF /* RevenueCat */,
+				26CF26712F4B981900C04FEF /* RevenueCatUI */,
 			);
 			productName = AIChatCourse;
 			productReference = 26CA90F22F032E9500E21190 /* AIChatCourse.app */;
@@ -267,6 +273,7 @@
 				26A92EB22F145E7D007A738A /* XCRemoteSwiftPackageReference "SwiftfulFirestore" */,
 				26A528432F2FD1F90065FCFF /* XCRemoteSwiftPackageReference "SignInAppleAsync" */,
 				2625365F2F37CD870008B70C /* XCRemoteSwiftPackageReference "mixpanel-swift" */,
+				26CF266E2F4B981900C04FEF /* XCRemoteSwiftPackageReference "purchases-ios" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 26CA90F32F032E9500E21190 /* Products */;
@@ -609,7 +616,7 @@
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AIChatCourse/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "AI Chat - Dev";
+				INFOPLIST_KEY_CFBundleDisplayName = "AI Chat";
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_NSUserTrackingUsageDescription = "Your data will be used to deliver personolized ads and experience";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
@@ -839,7 +846,7 @@
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AIChatCourse/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "AI Chat - Dev";
+				INFOPLIST_KEY_CFBundleDisplayName = "AI Chat - Mock";
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_NSUserTrackingUsageDescription = "Your data will be used to deliver personolized ads and experience";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
@@ -1013,6 +1020,14 @@
 				minimumVersion = 12.7.0;
 			};
 		};
+		26CF266E2F4B981900C04FEF /* XCRemoteSwiftPackageReference "purchases-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/RevenueCat/purchases-ios";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.59.2;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -1060,6 +1075,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 26C599742F0FAF2200D7A1DE /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseAuth;
+		};
+		26CF266F2F4B981900C04FEF /* RevenueCat */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 26CF266E2F4B981900C04FEF /* XCRemoteSwiftPackageReference "purchases-ios" */;
+			productName = RevenueCat;
+		};
+		26CF26712F4B981900C04FEF /* RevenueCatUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 26CF266E2F4B981900C04FEF /* XCRemoteSwiftPackageReference "purchases-ios" */;
+			productName = RevenueCatUI;
 		};
 		26F02C0F2F36396100270AC3 /* FirebaseAnalytics */ = {
 			isa = XCSwiftPackageProductDependency;

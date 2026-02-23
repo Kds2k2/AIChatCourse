@@ -17,6 +17,7 @@ struct SignInWithEmailAndPasswordView: View {
     @Environment(AuthManager.self) private var authManager
     @Environment(UserManager.self) private var userManager
     @Environment(LogManager.self) private var logManager
+    @Environment(PurchaseManager.self) private var purchaseManager
     @Environment(\.dismiss) private var dismiss
     
     @State var email: String = "test@gmail.com"
@@ -100,6 +101,7 @@ struct SignInWithEmailAndPasswordView: View {
                 logManager.trackEvent(event: Event.loginAuthSuccess(user: result.user, isNewUser: result.isNewUser))
                 
                 try await userManager.logIn(auth: result.user, isNewUser: result.isNewUser)
+                try await purchaseManager.logIn(userId: result.user.uid, attributes: .init(email: result.user.email))
                 logManager.trackEvent(event: Event.loginUserSuccess(user: result.user, isNewUser: result.isNewUser))
                 
                 dismiss()
@@ -155,5 +157,5 @@ struct SignInWithEmailAndPasswordView: View {
     SignInWithEmailAndPasswordView { isNewUser in
         print("\(isNewUser)")
     }
-    .environment(AppState())
+    .previewEnvironment()
 }
