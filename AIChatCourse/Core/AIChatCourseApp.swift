@@ -127,7 +127,8 @@ struct AppDependencies {
             avatarManager = AvatarManager(remote: MockAvatarService(),
                                           local: MockLocalAvatarPersistence())
             chatManager = ChatManager(service: MockChatService())
-            abTestManager = ABTestManager(service: MockABTestService(), logManager: logManager)
+            let abTestService = MockABTestService(onboardingCommunityTest: LaunchArgumentOptions.onboardingCommunity.value)
+            abTestManager = ABTestManager(service: abTestService, logManager: logManager)
             purchaseManager = PurchaseManager(service: MockPurchaseService())
         case .dev:
             logManager = LogManager(services: [
