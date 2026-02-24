@@ -67,6 +67,7 @@ struct WelcomeView: View {
                 Text("Get Started!")
                     .callToActionButton()
             }
+            .accessibilityIdentifier("StartButton")
             
             Text("Already have an account? Sign in!")
                 .underline()

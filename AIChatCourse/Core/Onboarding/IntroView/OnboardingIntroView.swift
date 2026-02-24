@@ -41,6 +41,7 @@ struct OnboardingIntroView: View {
                 Text("Continue")
                     .callToActionButton()
             }
+            .accessibilityIdentifier("ContinueButton")
         }
         .font(.title3)
         .padding(24)

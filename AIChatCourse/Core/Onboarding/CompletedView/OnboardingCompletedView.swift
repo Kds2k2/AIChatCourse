@@ -36,6 +36,7 @@ struct OnboardingCompletedView: View {
                 title: "Finish",
                 action: onFinishButtonPressed
             )
+            .accessibilityIdentifier("FinishButton")
         })
         .padding(24)
         .toolbarVisibility(.hidden, for: .navigationBar)

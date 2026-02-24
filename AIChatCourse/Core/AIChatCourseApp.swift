@@ -59,7 +59,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         // PRODUCTION - production dependencies
         // Also could: Staging, Beta, Alpha, ...
         
-        let config: BuildConfiguration
+        var config: BuildConfiguration
         
         #if MOCK
         config = .mock(isSignedIn: true)
@@ -68,6 +68,13 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         #else
         config = .prod
         #endif
+        
+        if AppInfo.isUITesting {
+            let signIn = LaunchArgumentOptions.signIn.value
+            UserDefaults.showTabBarView = signIn
+            config = .mock(isSignedIn: signIn)
+            print("MOOOOCK")
+        }
         
         config.configure()
         dependencies = AppDependencies(config)

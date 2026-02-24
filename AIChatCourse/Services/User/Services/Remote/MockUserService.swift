@@ -6,10 +6,12 @@
 //
 
 import SwiftUI
+import Combine
 
-struct MockUserService: RemoteUserService, MockService {
+@MainActor
+class MockUserService: RemoteUserService, MockService {
     
-    let currentUser: UserModel?
+    var currentUser: UserModel?
     let delay: Double
     let showError: Bool
     
@@ -20,12 +22,28 @@ struct MockUserService: RemoteUserService, MockService {
     }
     
     func saveUser(user: UserModel) async throws {
+        currentUser = user
     }
     
     func deleteUser(userId: String) async throws {
+        currentUser = nil
     }
     
     func markOnboardingCompleted(userId: String, profileColorHex: String) async throws {
+        guard let currentUser else {
+            throw URLError(.unknown)
+        }
+        
+        self.currentUser = UserModel(
+            userId: currentUser.userId,
+            email: currentUser.email,
+            isAnonymous: currentUser.isAnonymous,
+            createdAt: currentUser.createdAt,
+            lastSignInAt: currentUser.lastSignInAt,
+            creationVersion: currentUser.creationVersion,
+            didCompleteOnboarding: true,
+            profileColorHex: profileColorHex
+        )
     }
     
     func streamUser(userId: String) -> AsyncThrowingStream<UserModel, any Error> {

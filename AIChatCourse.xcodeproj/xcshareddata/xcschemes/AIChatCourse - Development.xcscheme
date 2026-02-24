@@ -34,6 +34,19 @@
             default = "YES">
          </TestPlanReference>
       </TestPlans>
+      <Testables>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "26A21AFF2F4E062D0039E2B3"
+               BuildableName = "AIChatCourseUITests.xctest"
+               BlueprintName = "AIChatCourseUITests"
+               ReferencedContainer = "container:AIChatCourse.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+      </Testables>
    </TestAction>
    <LaunchAction
       buildConfiguration = "Debug"
