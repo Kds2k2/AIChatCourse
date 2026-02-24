@@ -11,6 +11,24 @@ import FirebaseInstallations
 import FirebaseCore
 
 @main
+struct AppEntryPoint {
+    static func main() {
+        if AppInfo.isUnitTesting {
+            TestingApp.main()
+        } else {
+            AIChatCourseApp.main()
+        }
+    }
+}
+
+struct TestingApp: App {
+    var body: some Scene {
+        WindowGroup {
+            Text("Testing")
+        }
+    }
+}
+
 struct AIChatCourseApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     
@@ -124,7 +142,6 @@ struct AppDependencies {
             )
         case .prod:
             logManager = LogManager(services: [
-                ConsoleService(printParameters: true),
                 FirebaseAnalyticsService(),
                 FirebaseCrashlyticsService(),
                 MixpanelService(token: AppKeys.mixpanel)
