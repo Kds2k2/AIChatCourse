@@ -337,7 +337,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "#For SwiftUI preview.\nif [[ \"$(uname -m)\" == arm64 ]]; then\n    export PATH=\"/opt/homebrew/bin:$PATH\"\nfi\n\n#Default.\n#swiftlint --fix is optional, that allows swiftlint fix things that he can autometicaly.\nif which swiftlint >/dev/null; then\n    swiftlint\nelse\n    echo \"warning: `swiftlint` command not found - See https://github.com/realm/SwiftLint#installation for installation instructions.\"\nfi\n";
+			shellScript = "if [[ -z \"$CI\" ]]; then\n    #For SwiftUI preview.\n    if [[ \"$(uname -m)\" == arm64 ]]; then\n        export PATH=\"/opt/homebrew/bin:$PATH\"\n    fi\n\n    #Default.\n    #swiftlint --fix is optional, that allows swiftlint fix things that he can autometicaly.\n    if which swiftlint >/dev/null; then\n        swiftlint\n    else\n        echo \"warning: `swiftlint` command not found - See https://github.com/realm/SwiftLint#installation for installation instructions.\"\n    fi\nelse\n    echo \"Running in Xcode Cloud. Skipping SwiftLint.\"\nfi\n";
 			showEnvVarsInLog = 0;
 		};
 		262536642F37D2F60008B70C /* Run Script (Crashlytics) */ = {
