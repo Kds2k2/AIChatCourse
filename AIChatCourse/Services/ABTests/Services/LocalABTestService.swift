@@ -19,11 +19,15 @@ class LocalABTestService: ABTestService {
     @UserDefault(key: ActiveABTests.CodingKeys.categoryRowTest.rawValue, startingValue: .random())
     private var categoryRowTest: CategoryRowTestOption
     
+    @UserDefault(key: ActiveABTests.CodingKeys.paywallTest.rawValue, startingValue: .random())
+    private var paywallTest: PaywallTestOption
+    
     var activeTests: ActiveABTests {
         ActiveABTests(
             createAccountTest: createAccountTest,
             onboardingCommunityTest: onboardingCommunityTest,
-            categoryRowTest: categoryRowTest
+            categoryRowTest: categoryRowTest,
+            paywallTest: paywallTest
         )
     }
     
@@ -33,6 +37,7 @@ class LocalABTestService: ABTestService {
         createAccountTest = updatedTests.createAccountTest
         onboardingCommunityTest = updatedTests.onboardingCommunityTest
         categoryRowTest = updatedTests.categoryRowTest
+        paywallTest = updatedTests.paywallTest
     }
     
     func fetchUpdatedConfig() async throws -> ActiveABTests {

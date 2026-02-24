@@ -68,6 +68,10 @@ actor RevenueCatPurchaseService: PurchaseService {
         if let firebaseAppInstanceId = attributes.firebaseAppInstanceId {
             Purchases.shared.attribution.setFirebaseAppInstanceID(firebaseAppInstanceId)
         }
+        
+        if let mixpanelDistinctId = attributes.mixpanelDistinctId {
+            Purchases.shared.attribution.setMixpanelDistinctID(mixpanelDistinctId)
+        }
     }
     
     func logOut() async throws {
@@ -78,16 +82,19 @@ actor RevenueCatPurchaseService: PurchaseService {
 struct PurchaseProfileAttributes: Codable {
     let email: String?
     let firebaseAppInstanceId: String?
+    let mixpanelDistinctId: String?
     
     enum CodingKeys: String, CodingKey {
         case email
         case firebaseAppInstanceId
+        case mixpanelDistinctId
     }
     
     var eventParameters: [String: Any] {
         let dict: [String: Any?] = [
             "PurAtr_\(CodingKeys.email.rawValue)": email,
-            "PurAtr_\(CodingKeys.firebaseAppInstanceId.rawValue)": firebaseAppInstanceId
+            "PurAtr_\(CodingKeys.firebaseAppInstanceId.rawValue)": firebaseAppInstanceId,
+            "PurAtr_\(CodingKeys.mixpanelDistinctId.rawValue)": mixpanelDistinctId
         ]
         
         return dict.compactMapValues({ $0 })

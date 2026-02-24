@@ -10,6 +10,14 @@ import Mixpanel
 
 struct MixpanelService: LogService {
     
+    static var distinctId: String? {
+        #if MOCK
+        return nil
+        #else
+        return Mixpanel.mainInstance().distinctId
+        #endif
+    }
+    
     private var instance: MixpanelInstance {
         Mixpanel.mainInstance()
     }

@@ -18,6 +18,7 @@ struct DevSettingsView: View {
     @State private var createAccountTest: Bool = false
     @State private var onboardingCommunityTest: Bool = false
     @State private var categoryRowTest: CategoryRowTestOption = .original
+    @State private var paywallTest: PaywallTestOption = .custom
     
     var body: some View {
         NavigationStack {
@@ -45,6 +46,7 @@ struct DevSettingsView: View {
         createAccountTest = abTestManager.activeTests.createAccountTest
         onboardingCommunityTest = abTestManager.activeTests.onboardingCommunityTest
         categoryRowTest = abTestManager.activeTests.categoryRowTest
+        paywallTest = abTestManager.activeTests.paywallTest
     }
     
     // MARK: - Views
@@ -63,6 +65,14 @@ struct DevSettingsView: View {
                 }
             }
             .onChange(of: categoryRowTest, handleCategoryRowChange)
+            
+            Picker("Paywall Test", selection: $paywallTest) {
+                ForEach(PaywallTestOption.allCases) { option in
+                    Text(option.rawValue)
+                        .tag(option)
+                }
+            }
+            .onChange(of: paywallTest, handlePaywallTestChange)
         } header: {
             Text("AB Tests")
         }
@@ -154,6 +164,16 @@ struct DevSettingsView: View {
             savedValue: abTestManager.activeTests.categoryRowTest
         ) { tests in
             tests.update(categoryRowTest: newValue)
+        }
+    }
+    
+    private func handlePaywallTestChange(oldValue: PaywallTestOption, newValue: PaywallTestOption) {
+        updateTest(
+            property: &paywallTest,
+            newValue: newValue,
+            savedValue: abTestManager.activeTests.paywallTest
+        ) { tests in
+            tests.update(paywallTest: newValue)
         }
     }
     

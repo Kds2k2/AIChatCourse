@@ -65,7 +65,8 @@ struct CreateAccountWithAppleView: View {
                 try await purchaseManager.logIn(userId: result.user.uid,
                                                 attributes: .init(
                                                     email: result.user.email,
-                                                    firebaseAppInstanceId: FirebaseAnalyticsService.appInstanceId))
+                                                    firebaseAppInstanceId: FirebaseAnalyticsService.appInstanceId,
+                                                    mixpanelDistinctId: MixpanelService.distinctId))
                 
                 logManager.trackEvent(event: Event.appleAuthLoginSucess(user: result.user, isNewUser: result.isNewUser))
                 

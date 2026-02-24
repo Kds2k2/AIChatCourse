@@ -68,7 +68,8 @@ struct AppView: View {
                 try await purchaseManager.logIn(userId: user.uid,
                                                 attributes: .init(
                                                     email: user.email,
-                                                    firebaseAppInstanceId: FirebaseAnalyticsService.appInstanceId))
+                                                    firebaseAppInstanceId: FirebaseAnalyticsService.appInstanceId,
+                                                    mixpanelDistinctId: MixpanelService.distinctId))
             } catch {
                 logManager.trackEvent(event: Event.existingAuthFail(error: error))
                 try? await Task.sleep(for: .seconds(5))
@@ -84,7 +85,8 @@ struct AppView: View {
                 try await purchaseManager.logIn(userId: result.user.uid,
                                                 attributes: .init(
                                                     email: nil,
-                                                    firebaseAppInstanceId: FirebaseAnalyticsService.appInstanceId))
+                                                    firebaseAppInstanceId: FirebaseAnalyticsService.appInstanceId,
+                                                    mixpanelDistinctId: MixpanelService.distinctId))
             } catch {
                 logManager.trackEvent(event: Event.anonAuthFail(error: error))
                 try? await Task.sleep(for: .seconds(5))

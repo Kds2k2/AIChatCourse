@@ -2,7 +2,7 @@
 //  AIChatCourseTests.swift
 //  AIChatCourseTests
 //
-//  Created by Dmitro Kryzhanovsky on 29.12.2025.
+//  Created by Dmitro Kryzhanovsky on 24.02.2026.
 //
 
 import Testing
