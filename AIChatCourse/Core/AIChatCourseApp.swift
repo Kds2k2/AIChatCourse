@@ -24,7 +24,7 @@ struct AppEntryPoint {
 struct TestingApp: App {
     var body: some Scene {
         WindowGroup {
-            Text("Testing")
+            Text("Testing...")
         }
     }
 }
