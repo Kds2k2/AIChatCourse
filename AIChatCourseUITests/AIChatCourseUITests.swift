@@ -128,4 +128,37 @@ final class AIChatCourseUITests: XCTestCase {
         let exploreExistsAgain = app.navigationBars["Explore"].exists
         XCTAssertTrue(exploreExistsAgain)
     }
+    
+    func testSignOutFlow() throws {
+        let app = XCUIApplication()
+        app.launchArguments = ["UI_TESTING", LaunchArgumentOptions.signIn.rawValue]
+        app.launch()
+        
+        // Tab Bar
+        let tabBar = app.tabBars["Tab Bar"]
+        
+        // Explore View
+        let exploreExists = app.navigationBars["Explore"].exists
+        XCTAssertTrue(exploreExists)
+        
+        // ProfileTab
+        tabBar.buttons["Profile"].tap()
+        let profileExists = app.navigationBars["Profile"].exists
+        XCTAssertTrue(profileExists)
+        
+        app.navigationBars["Profile"].buttons["Settings"].tap()
+        app.collectionViews.buttons["Sign out"].tap()
+        
+        let startButtonExists = app.buttons["StartButton"].waitForExistence(timeout: 2)
+        XCTAssertTrue(startButtonExists)
+    }
+    
+    func testCreateAvatar() throws {
+        let app = XCUIApplication()
+        app.launchArguments = ["UI_TESTING", LaunchArgumentOptions.signIn.rawValue, LaunchArgumentOptions.screenCreateAvatar.rawValue]
+        app.launch()
+        
+        let exploreExists = app.navigationBars["Create Avatar"].exists
+        XCTAssertTrue(exploreExists)
+    }
 }

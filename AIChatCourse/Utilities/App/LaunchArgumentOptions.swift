@@ -12,6 +12,7 @@ public enum LaunchArgumentOptions: String {
     case signIn                 = "SIGN_IN"
     case signOut                = "SIGN_OUT"
     case onboardingCommunity    = "ONBCOMM"
+    case screenCreateAvatar     = "SCREEN_CREATEAVATAR"
     
     var value: Bool {
         ProcessInfo.processInfo.arguments.contains(self.rawValue)

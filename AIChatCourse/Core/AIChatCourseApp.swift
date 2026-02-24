@@ -34,16 +34,32 @@ struct AIChatCourseApp: App {
     
     var body: some Scene {
         WindowGroup {
+            Group {
+                if AppInfo.isUITesting {
+                    AppViewForUITesting()
+                } else {
+                    AppView()
+                }
+            }
+            .environment(delegate.dependencies.authManager)
+            .environment(delegate.dependencies.userManager)
+            .environment(delegate.dependencies.aiManager)
+            .environment(delegate.dependencies.avatarManager)
+            .environment(delegate.dependencies.chatManager)
+            .environment(delegate.dependencies.logManager)
+            .environment(delegate.dependencies.pushManager)
+            .environment(delegate.dependencies.abTestManager)
+            .environment(delegate.dependencies.purchaseManager)
+        }
+    }
+}
+
+struct AppViewForUITesting: View {
+    var body: some View {
+        if LaunchArgumentOptions.screenCreateAvatar.value {
+            CreateAvatarView()
+        } else {
             AppView()
-                .environment(delegate.dependencies.authManager)
-                .environment(delegate.dependencies.userManager)
-                .environment(delegate.dependencies.aiManager)
-                .environment(delegate.dependencies.avatarManager)
-                .environment(delegate.dependencies.chatManager)
-                .environment(delegate.dependencies.logManager)
-                .environment(delegate.dependencies.pushManager)
-                .environment(delegate.dependencies.abTestManager)
-                .environment(delegate.dependencies.purchaseManager)
         }
     }
 }
