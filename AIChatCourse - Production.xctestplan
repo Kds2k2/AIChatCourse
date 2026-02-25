@@ -1,0 +1,37 @@
+{
+  "configurations" : [
+    {
+      "id" : "70546D0D-1F9B-49DF-AA5E-2E3A7CBECE26",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "performanceAntipatternCheckerEnabled" : true,
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:AIChatCourse.xcodeproj",
+      "identifier" : "26CA90F12F032E9500E21190",
+      "name" : "AIChatCourse"
+    }
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:AIChatCourse.xcodeproj",
+        "identifier" : "26A21AE12F4DC62D0039E2B3",
+        "name" : "AIChatCourseTests"
+      }
+    },
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:AIChatCourse.xcodeproj",
+        "identifier" : "26A21AFF2F4E062D0039E2B3",
+        "name" : "AIChatCourseUITests"
+      }
+    }
+  ],
+  "version" : 1
+}

@@ -62,10 +62,15 @@ final class AIChatCourseUITests: XCTestCase {
         let randomIndex = Int.random(in: 0..<colorCircles.count)
         let colorCircle = colorCircles.element(boundBy: randomIndex)
         colorCircle.tap()
-        app.buttons["ContinueButton"].tap()
         
-        // Onb.Completed View
-        app.buttons["FinishButton"].tap()
+        let continueAfterColor = app.buttons["ContinueButton"]
+        XCTAssertTrue(continueAfterColor.waitForExistence(timeout: 2))
+        continueAfterColor.tap()
+        
+        // Completed View
+        let finishButton = app.buttons["FinishButton"]
+        XCTAssertTrue(finishButton.waitForExistence(timeout: 2))
+        finishButton.tap()
         
         // Explore View
         let exploreExists = app.navigationBars["Explore"].exists
