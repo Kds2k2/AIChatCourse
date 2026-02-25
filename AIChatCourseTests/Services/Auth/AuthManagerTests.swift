@@ -50,7 +50,7 @@ struct AuthManagerTests {
         _ = AuthManager(service: service, logManager: LogManager(services: [logger]))
         
         // Allow async listener to execute
-        try await Task.sleep(nanoseconds: 50_000_000)
+        try? await Task.sleep(for: .seconds(1))
         
         #expect(logger.trackedEvents.contains {
             $0.name == "AuthManager_AuthListener_Success"
