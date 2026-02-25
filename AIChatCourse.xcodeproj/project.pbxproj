@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		260B3BAC2F4F7A5E002000BD /* AIChatCourse - Development.xctestplan in Resources */ = {isa = PBXBuildFile; fileRef = 2696C1372F4F542A00B6EB77 /* AIChatCourse - Development.xctestplan */; };
+		260B3BAD2F4F7A5E002000BD /* AIChatCourse - Development.xctestplan in Resources */ = {isa = PBXBuildFile; fileRef = 2696C1372F4F542A00B6EB77 /* AIChatCourse - Development.xctestplan */; };
+		260B3BAE2F4F7A5E002000BD /* AIChatCourse - Development.xctestplan in Resources */ = {isa = PBXBuildFile; fileRef = 2696C1372F4F542A00B6EB77 /* AIChatCourse - Development.xctestplan */; };
+		260B3BAF2F4F7A64002000BD /* AIChatCourse - Production.xctestplan in Resources */ = {isa = PBXBuildFile; fileRef = 2696C1362F4F540800B6EB77 /* AIChatCourse - Production.xctestplan */; };
+		260B3BB02F4F7A64002000BD /* AIChatCourse - Production.xctestplan in Resources */ = {isa = PBXBuildFile; fileRef = 2696C1362F4F540800B6EB77 /* AIChatCourse - Production.xctestplan */; };
+		260B3BB12F4F7A64002000BD /* AIChatCourse - Production.xctestplan in Resources */ = {isa = PBXBuildFile; fileRef = 2696C1362F4F540800B6EB77 /* AIChatCourse - Production.xctestplan */; };
 		260C87972F0705DC0078F742 /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 260C87962F0705DC0078F742 /* SDWebImageSwiftUI */; };
 		262536612F37CD870008B70C /* Mixpanel in Frameworks */ = {isa = PBXBuildFile; productRef = 262536602F37CD870008B70C /* Mixpanel */; };
 		262536632F37D23B0008B70C /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = 262536622F37D23B0008B70C /* FirebaseCrashlytics */; };
@@ -42,7 +48,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		2696C1362F4F540800B6EB77 /* AIChatCourse - Production.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = file; path = "AIChatCourse - Production.xctestplan"; sourceTree = "<group>"; };
+		2696C1362F4F540800B6EB77 /* AIChatCourse - Production.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = "AIChatCourse - Production.xctestplan"; sourceTree = "<group>"; };
 		2696C1372F4F542A00B6EB77 /* AIChatCourse - Development.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; name = "AIChatCourse - Development.xctestplan"; path = "../AIChatCourse - Development.xctestplan"; sourceTree = "<group>"; };
 		26A21AE22F4DC62D0039E2B3 /* AIChatCourseTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AIChatCourseTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		26A21B002F4E062D0039E2B3 /* AIChatCourseUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AIChatCourseUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -304,6 +310,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				260B3BAD2F4F7A5E002000BD /* AIChatCourse - Development.xctestplan in Resources */,
+				260B3BB02F4F7A64002000BD /* AIChatCourse - Production.xctestplan in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -311,6 +319,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				260B3BAE2F4F7A5E002000BD /* AIChatCourse - Development.xctestplan in Resources */,
+				260B3BB12F4F7A64002000BD /* AIChatCourse - Production.xctestplan in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -318,6 +328,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				260B3BAC2F4F7A5E002000BD /* AIChatCourse - Development.xctestplan in Resources */,
+				260B3BAF2F4F7A64002000BD /* AIChatCourse - Production.xctestplan in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
