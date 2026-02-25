@@ -1,0 +1,31 @@
+{
+  "configurations" : [
+    {
+      "id" : "A4052453-FAD1-471E-B1B0-49982338ECEA",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:AIChatCourse.xcodeproj",
+        "identifier" : "26A21AFF2F4E062D0039E2B3",
+        "name" : "AIChatCourseUITests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:AIChatCourse.xcodeproj",
+        "identifier" : "26A21AE12F4DC62D0039E2B3",
+        "name" : "AIChatCourseTests"
+      }
+    }
+  ],
+  "version" : 1
+}

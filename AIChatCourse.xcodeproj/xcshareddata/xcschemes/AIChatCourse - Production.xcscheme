@@ -30,7 +30,7 @@
       shouldUseLaunchSchemeArgsEnv = "YES">
       <TestPlans>
          <TestPlanReference
-            reference = "container:AIChatCourse - Production.xctestplan"
+            reference = "container:AIChatCourse/Configurations/TestPlans/AIChatCourse - Production.xctestplan"
             default = "YES">
          </TestPlanReference>
       </TestPlans>
