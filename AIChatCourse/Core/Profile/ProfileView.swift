@@ -11,10 +11,11 @@ import SwiftUI
 @MainActor
 class ProfileViewModel {
     
-    private let authManager: AuthManager
-    private let userManager: UserManager
-    private let avatarManager: AvatarManager
-    private let logManager: LogManager
+    let authManager: AuthManager
+    let userManager: UserManager
+    let avatarManager: AvatarManager
+    let logManager: LogManager
+    let aiManager: AIManager
     
     private(set) var currentUser: UserModel?
     private(set) var myAvatars: [AvatarModel] = []
@@ -29,12 +30,14 @@ class ProfileViewModel {
         authManager: AuthManager,
         userManager: UserManager,
         avatarManager: AvatarManager,
-        logManager: LogManager
+        logManager: LogManager,
+        aiManager: AIManager
     ) {
         self.authManager = authManager
         self.userManager = userManager
         self.avatarManager = avatarManager
         self.logManager = logManager
+        self.aiManager = aiManager
     }
     
     // MARK: - Loading
@@ -156,10 +159,20 @@ struct ProfileView: View {
         .sheet(isPresented: $viewModel.showSettingsView) {
             SettingsView()
         }
-        .fullScreenCover(isPresented: $viewModel.showCreateAvatarView, onDismiss: {
-            Task { await viewModel.loadData() }
-        }, content: {
-            CreateAvatarView()
+        .fullScreenCover(
+            isPresented: $viewModel.showCreateAvatarView,
+            onDismiss: {
+                Task { await viewModel.loadData() }
+            },
+            content: {
+                CreateAvatarView(
+                    viewModel: CreateAvatarViewModel(
+                        aiManager: viewModel.aiManager,
+                        authManager: viewModel.authManager,
+                        avatarManager: viewModel.avatarManager,
+                        logManager: viewModel.logManager
+                    )
+                )
         })
         .task {
             await viewModel.loadData()
@@ -241,7 +254,9 @@ struct ProfileView: View {
             authManager: DevPreview.shared.authManager,
             userManager: DevPreview.shared.userManager,
             avatarManager: DevPreview.shared.avatarManager,
-            logManager: DevPreview.shared.logManager
+            logManager: DevPreview.shared.logManager,
+            aiManager: DevPreview.shared.aiManager
         )
     )
+    .previewEnvironment()
 }

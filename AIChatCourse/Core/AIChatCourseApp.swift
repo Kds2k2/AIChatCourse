@@ -57,7 +57,8 @@ struct AIChatCourseApp: App {
 struct AppViewForUITesting: View {
     var body: some View {
         if LaunchArgumentOptions.screenCreateAvatar.value {
-            CreateAvatarView()
+            // CreateAvatarView()
+            // TODO: FIX ME!
         } else {
             AppView()
         }
