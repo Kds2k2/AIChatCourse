@@ -8,6 +8,12 @@
 import SwiftUI
 
 struct TabBarView: View {
+    
+    @Environment(AuthManager.self) private var authManager
+    @Environment(UserManager.self) private var userManager
+    @Environment(AvatarManager.self) private var avatarManager
+    @Environment(LogManager.self) private var logManager
+    
     var body: some View {
         TabView {
             Tab("Explore", systemImage: "eyes") {
@@ -19,7 +25,14 @@ struct TabBarView: View {
             }
 
             Tab("Profile", systemImage: "person.fill") {
-                ProfileView()
+                ProfileView(
+                    viewModel: ProfileViewModel(
+                        authManager: authManager,
+                        userManager: userManager,
+                        avatarManager: avatarManager,
+                        logManager: logManager
+                    )
+                )
             }
         }
     }
