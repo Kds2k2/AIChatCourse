@@ -14,7 +14,7 @@ struct TabBarView: View {
     var body: some View {
         TabView {
             Tab("Explore", systemImage: "eyes") {
-                ExploreView()
+                ExploreView(viewModel: ExploreViewModel(container: container))
             }
 
             Tab("Chats", systemImage: "bubble.left.and.bubble.right.fill") {
