@@ -22,7 +22,7 @@ struct TabBarView: View {
             }
 
             Tab("Profile", systemImage: "person.fill") {
-                ProfileView(viewModel: ProfileViewModel(container: container))
+                ProfileView(viewModel: ProfileViewModel(interactor: ProductionProfileInteractor.init(container: container)))
             }
         }
     }
