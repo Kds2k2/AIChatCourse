@@ -51,6 +51,8 @@ protocol ProfileInteractor {
     func getAuthId() throws -> String
 }
 
+extension CoreInteractor: ProfileInteractor { }
+
 @Observable
 @MainActor
 class ProfileViewModel {
@@ -273,6 +275,6 @@ struct ProfileView: View {
 }
 
 #Preview {
-    ProfileView(viewModel: .init(interactor: ProductionProfileInteractor(container: DevPreview.shared.container)))
+    ProfileView(viewModel: .init(interactor: CoreInteractor(container: DevPreview.shared.container)))
         .previewEnvironment()
 }
