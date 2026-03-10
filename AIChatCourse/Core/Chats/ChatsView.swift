@@ -9,72 +9,39 @@ import SwiftUI
 
 struct ChatsView: View {
     
-    @Environment(AuthManager.self) private var authManager
-    @Environment(AvatarManager.self) private var avatarManager
-    @Environment(ChatManager.self) private var chatManager
-    @Environment(LogManager.self) private var logManager
-    
-    @State private var chats: [ChatModel] = []
-    @State private var isLoadingChats: Bool = true
-    @State private var recentAvatars: [AvatarModel] = []
-    
-    @State private var path: [NavigationPathOption] = []
+    @State var viewModel: ChatsViewModel
     
     var body: some View {
-        NavigationStack(path: $path) {
+        NavigationStack(path: $viewModel.path) {
             List {
-                if !recentAvatars.isEmpty {
+                if !viewModel.recentAvatars.isEmpty {
                     recentsSection
                 }
                 
                 chatsSection
             }
             .navigationTitle("Chats")
-            .navigationDestinationForCoreModule(path: $path)
+            .navigationDestinationForCoreModule(path: $viewModel.path)
             .screenAppearAnalytics(name: "ChatsView")
             .onAppear {
-                loadRecentAvatars()
+                viewModel.loadRecentAvatars()
             }
             .task {
-                await loadChats()
+                await viewModel.loadChats()
             }
         }
-    }
-    
-    // MARK: - Loading
-    private func loadRecentAvatars() {
-        logManager.trackEvent(event: Event.loadAvatarsStart)
-        do {
-            recentAvatars = try avatarManager.getRecentAvatars()
-            logManager.trackEvent(event: Event.loadAvatarsSuccess)
-        } catch {
-            logManager.trackEvent(event: Event.loadAvatarsFail(error: error))
-        }
-    }
-    
-    private func loadChats() async {
-        logManager.trackEvent(event: Event.loadChatsStart)
-        do {
-            let uid = try authManager.getAuthId()
-            chats = try await chatManager.getAllChats(userId: uid) // .sorted(by: { $0.updatedAt > $1.updatedAt })
-                .sortedByKeyPath(keyPath: \.updatedAt, order: .descending)
-            logManager.trackEvent(event: Event.loadChatsSuccess)
-        } catch {
-            logManager.trackEvent(event: Event.loadChatsFail(error: error))
-        }
-        isLoadingChats = false
     }
     
     // MARK: - Views
     private var chatsSection: some View {
         Section {
-            if isLoadingChats {
+            if viewModel.isLoadingChats {
                 ProgressView()
                     .padding(40)
                     .frame(maxWidth: .infinity)
                     .removeListRowFormatting()
             } else {
-                if chats.isEmpty {
+                if viewModel.chats.isEmpty {
                     Text("Your chats will appear here!")
                         .foregroundStyle(.secondary)
                         .font(.title3)
@@ -83,26 +50,26 @@ struct ChatsView: View {
                         .padding(40)
                         .removeListRowFormatting()
                 } else {
-                    ForEach(chats, id: \.self) { chat in
+                    ForEach(viewModel.chats, id: \.self) { chat in
                         ChatRowCellViewBuilder(
                             chat: chat,
-                            currentUserId: authManager.auth?.uid,
+                            currentUserId: viewModel.currentUserId,
                             getAvatar: {
-                                try? await avatarManager.getAvatar(id: chat.avatarId)
+                                try? await viewModel.getAvatar(avatarId: chat.avatarId)
                             },
                             getLastChatMessage: {
-                                try? await chatManager.getLastChatMessage(chatId: chat.id)
+                                try? await viewModel.getLastChatMessage(chatId: chat.id)
                             }
                         )
                         .anyButton(.highlight, action: {
-                            onChatPressed(chat: chat)
+                            viewModel.onChatPressed(chat: chat)
                         })
                         .removeListRowFormatting()
                     }
                 }
             }
         } header: {
-            Text(chats.isEmpty ? "" : "Chats")
+            Text(viewModel.chats.isEmpty ? "" : "Chats")
         }
     }
     
@@ -110,7 +77,7 @@ struct ChatsView: View {
         Section {
             ScrollView(.horizontal) {
                 LazyHStack(spacing: 8) {
-                    ForEach(recentAvatars, id: \.self) { avatar in
+                    ForEach(viewModel.recentAvatars, id: \.self) { avatar in
                         if let imageName = avatar.profileImageName {
                             VStack(spacing: 8) {
                                 ImageLoaderView(urlString: imageName)
@@ -124,7 +91,7 @@ struct ChatsView: View {
                                     .lineLimit(1)
                             }
                             .anyButton(.press) {
-                                onAvatarPresser(avatar: avatar)
+                                viewModel.onAvatarPresser(avatar: avatar)
                             }
                         }
                     }
@@ -138,93 +105,41 @@ struct ChatsView: View {
             Text("Recents")
         }
     }
-    
-    // MARK: - Actions
-    private func onChatPressed(chat: ChatModel) {
-        path.append(.chat(avatarId: chat.avatarId, chat: chat))
-        logManager.trackEvent(event: Event.chatPressed(chat: chat))
-    }
-    
-    private func onAvatarPresser(avatar: AvatarModel) {
-        path.append(.chat(avatarId: avatar.avatarId, chat: nil))
-        logManager.trackEvent(event: Event.avatarPressed(avatar: avatar))
-    }
-    
-    // MARK: - Logs
-    enum Event: LoggableEvent {
-        case loadAvatarsStart, loadAvatarsSuccess, loadAvatarsFail(error: Error)
-        case loadChatsStart, loadChatsSuccess, loadChatsFail(error: Error)
-        case chatPressed(chat: ChatModel), avatarPressed(avatar: AvatarModel)
-        
-        static var screenName: String = "ChatsView"
-        
-        var eventName: String {
-            switch self {
-            case .loadAvatarsStart:         return "\(Event.screenName)_LoadAvatars_Start"
-            case .loadAvatarsSuccess:       return "\(Event.screenName)_LoadAvatars_Success"
-            case .loadAvatarsFail:          return "\(Event.screenName)_LoadAvatars_Fail"
-            case .loadChatsStart:           return "\(Event.screenName)_LoadChats_Start"
-            case .loadChatsSuccess:         return "\(Event.screenName)_LoadChats_Success"
-            case .loadChatsFail:            return "\(Event.screenName)_LoadChats_Fail"
-            case .chatPressed:              return "\(Event.screenName)_Chat_Pressed"
-            case .avatarPressed:            return "\(Event.screenName)_Avatar_Pressed"
-            }
-        }
-        
-        var parameters: [String: Any]? {
-            switch self {
-            case .loadChatsFail(error: let error), .loadAvatarsFail(error: let error):
-                return error.eventParameters
-            case .chatPressed(chat: let chat):
-                return chat.eventParameters
-            case .avatarPressed(avatar: let avatar):
-                return avatar.eventParameters
-            default:
-                return nil
-            }
-        }
-        
-        var type: LogType {
-            switch self {
-            case .loadChatsFail, .loadAvatarsFail:
-                    .severe
-            default:
-                    .analytic
-            }
-        }
-    }
 }
 
 // MARK: - Previews
 #Preview("Has data") {
-    ChatsView()
-        .environment(AuthManager(service: MockAuthService(user: .mock(isAnonymous: true))))
+    let container = DevPreview.shared.container
+    container.register(AuthManager.self, service: AuthManager(service: MockAuthService(user: .mock(isAnonymous: true))))
+    
+    return ChatsView(viewModel: ChatsViewModel(interactor: CoreInteractor(container: container)))
         .previewEnvironment()
 }
 
 #Preview("No data") {
-    ChatsView()
-        .environment(
-            AvatarManager(
-                remote: MockAvatarService(avatars: []),
-                local: MockLocalAvatarPersistence(avatars: [])
-            )
-        )
-        .environment(ChatManager(service: MockChatService(chats: [])))
-        .environment(AuthManager(service: MockAuthService(user: .mock(isAnonymous: true))))
+    let container = DevPreview.shared.container
+    container.register(AuthManager.self, service: AuthManager(service: MockAuthService(user: .mock(isAnonymous: true))))
+    container.register(ChatManager.self, service: ChatManager(service: MockChatService(chats: [])))
+    container.register(AvatarManager.self, service: AvatarManager(remote: MockAvatarService(avatars: []), local: MockLocalAvatarPersistence(avatars: [])))
+    
+    return ChatsView(viewModel: ChatsViewModel(interactor: CoreInteractor(container: container)))
         .previewEnvironment()
 }
 
 #Preview("Slow loading chats") {
-    ChatsView()
-        .environment(ChatManager(service: MockChatService(delay: 5)))
-        .environment(AuthManager(service: MockAuthService(user: .mock(isAnonymous: true))))
+    let container = DevPreview.shared.container
+    container.register(AuthManager.self, service: AuthManager(service: MockAuthService(user: .mock(isAnonymous: true))))
+    container.register(ChatManager.self, service: ChatManager(service: MockChatService(delay: 5)))
+    
+    return ChatsView(viewModel: ChatsViewModel(interactor: CoreInteractor(container: container)))
         .previewEnvironment()
 }
 
 #Preview("Error loading chats") {
-    ChatsView()
-        .environment(ChatManager(service: MockChatService(delay: 5, showError: true)))
-        .environment(AuthManager(service: MockAuthService(user: .mock(isAnonymous: true))))
+    let container = DevPreview.shared.container
+    container.register(AuthManager.self, service: AuthManager(service: MockAuthService(user: .mock(isAnonymous: true))))
+    container.register(ChatManager.self, service: ChatManager(service: MockChatService(delay: 5, showError: true)))
+    
+    return ChatsView(viewModel: ChatsViewModel(interactor: CoreInteractor(container: container)))
         .previewEnvironment()
 }

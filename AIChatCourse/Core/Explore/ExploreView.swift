@@ -7,224 +7,6 @@
 
 import SwiftUI
 
-@Observable
-@MainActor
-class ExploreViewModel {
-    let avatarManager: AvatarManager
-    let logManager: LogManager
-    let pushManager: PushManager
-    let authManager: AuthManager
-    let abTestManager: ABTestManager
-    
-    private(set) var categories: [CharacterOption] = CharacterOption.allCases
-    private(set) var featuredAvatars: [AvatarModel] = []
-    private(set) var popularAvatars: [AvatarModel] = []
-    
-    private(set) var isLoadingFeatured: Bool = true
-    private(set) var isLoadingPopular: Bool = true
-    private(set) var showPushNotificationButton: Bool = false
-    
-    var path: [NavigationPathOption] = []
-    var showPushNotificationModal: Bool = false
-    var showAppleProvider: Bool = false
-    var showDevSettings: Bool = false
-    var showDevSettingsButton: Bool {
-        #if DEV || MOCK
-            return true
-        #else
-            return false
-        #endif
-    }
-    
-    init(container: DependencyContainer) {
-        self.avatarManager = container.resolve(AvatarManager.self)!
-        self.logManager = container.resolve(LogManager.self)!
-        self.pushManager = container.resolve(PushManager.self)!
-        self.authManager = container.resolve(AuthManager.self)!
-        self.abTestManager = container.resolve(ABTestManager.self)!
-    }
-    
-    // MARK: - Loading
-    func loadFeatureAvatars() async {
-        guard featuredAvatars.isEmpty else { return }
-        logManager.trackEvent(event: Event.loadFeatureAvatarsStart)
-        isLoadingFeatured = true
-        
-        do {
-            featuredAvatars = try await avatarManager.getFeaturedAvatars()
-            logManager.trackEvent(event: Event.loadFeatureAvatarsSuccess)
-        } catch {
-            logManager.trackEvent(event: Event.loadFeatureAvatarsFail(error: error))
-        }
-        
-        isLoadingFeatured = false
-    }
-
-    func loadPopularAvatars() async {
-        guard popularAvatars.isEmpty else { return }
-        logManager.trackEvent(event: Event.loadPopularAvatarsStart)
-        isLoadingPopular = true
-        
-        do {
-            popularAvatars = try await avatarManager.getPopularAvatars()
-            logManager.trackEvent(event: Event.loadPopularAvatarsSuccess)
-        } catch {
-            logManager.trackEvent(event: Event.loadPopularAvatarsFail(error: error))
-        }
-        
-        isLoadingPopular = false
-    }
-    
-    func handleDeepLink(url: URL) {
-        logManager.trackEvent(event: Event.deepLinkStart(url: url))
-        guard let componets = URLComponents(url: url, resolvingAgainstBaseURL: false), let query = componets.queryItems else {
-            print("NO QUERY ITEMS")
-            logManager.trackEvent(event: Event.deepLinkEmpty(url: url))
-            return
-        }
-        
-        for queryItem in query {
-            if queryItem.name == "category", let value = queryItem.value, let category = CharacterOption(rawValue: value) {
-                let imageName = Constants.randomImage
-                path.append(.category(category: category, imageName: imageName))
-                logManager.trackEvent(event: Event.deepLinkCategory(category: category))
-                return
-            }
-        }
-        
-        logManager.trackEvent(event: Event.deepLinkUnknown(url: url))
-    }
-    
-    func handleShowPushNotificationButton() async {
-        showPushNotificationButton = await pushManager.canRequestAuthorization()
-    }
-    
-    func schedulePushNotifications() {
-        pushManager.schedulePushNotificationForTheNextWeek()
-    }
-    
-    func showCreateAccountIfNeeded() {
-        Task {
-            try? await Task.sleep(for: .seconds(1))
-            
-            guard
-                authManager.auth?.isAnonymous == true &&
-                abTestManager.activeTests.createAccountTest == true
-            else {
-                return
-            }
-            
-            showAppleProvider = true
-        }
-    }
-    
-    // MARK: - Actions
-    func onTryAgainPressed() {
-        logManager.trackEvent(event: Event.tryAgainButtonPressed)
-        Task {
-            await loadFeatureAvatars()
-        }
-        Task {
-            await loadPopularAvatars()
-        }
-    }
-    
-    func onAvatarPressed(avatar: AvatarModel) {
-        path.append(.chat(avatarId: avatar.avatarId, chat: nil))
-        logManager.trackEvent(event: Event.avatarPressed(avatar: avatar))
-    }
-    
-    func onCategoryPressed(category: CharacterOption, imageName: String) {
-        path.append(.category(category: category, imageName: imageName))
-        logManager.trackEvent(event: Event.categoryPressed(categoty: category))
-    }
-
-    func onDevSettingsPressed() {
-        showDevSettings = true
-        logManager.trackEvent(event: Event.devSettingsButtonPressed)
-    }
-    
-    func onPushNotificationButtonPressed() {
-        showPushNotificationModal = true
-        logManager.trackEvent(event: Event.pushNotificationStart)
-    }
-    
-    func onEnablePushNotificationModalPressed() {
-        showPushNotificationModal = false
-        
-        Task {
-            let isAuthorized = try await LocalNotifications.requestAuthorization()
-            logManager.trackEvent(event: Event.pushNotificationEnable(isAuthorized: isAuthorized))
-            await handleShowPushNotificationButton()
-        }
-    }
-    
-    func onCancelPushNotificationModalPressed() {
-        showPushNotificationModal = false
-        logManager.trackEvent(event: Event.pushNotificationCancel)
-    }
-    
-    // MARK: - Logs
-    enum Event: LoggableEvent {
-        case loadFeatureAvatarsStart, loadFeatureAvatarsSuccess, loadFeatureAvatarsFail(error: Error)
-        case loadPopularAvatarsStart, loadPopularAvatarsSuccess, loadPopularAvatarsFail(error: Error)
-        case avatarPressed(avatar: AvatarModel), categoryPressed(categoty: CharacterOption)
-        case tryAgainButtonPressed, devSettingsButtonPressed
-        case pushNotificationStart, pushNotificationEnable(isAuthorized: Bool), pushNotificationCancel
-        case deepLinkStart(url: URL), deepLinkEmpty(url: URL), deepLinkCategory(category: CharacterOption), deepLinkUnknown(url: URL)
-        
-        static var screenName: String = "ExploreView"
-        
-        var eventName: String {
-            switch self {
-            case .loadFeatureAvatarsStart:                   return "\(Event.screenName)_LoadFeatureAvatars_Start"
-            case .loadFeatureAvatarsSuccess:                 return "\(Event.screenName)_LoadFeatureAvatars_Success"
-            case .loadFeatureAvatarsFail:                    return "\(Event.screenName)_LoadFeatureAvatars_Fail"
-            case .loadPopularAvatarsStart:                   return "\(Event.screenName)_LoadPopularAvatars_Start"
-            case .loadPopularAvatarsSuccess:                 return "\(Event.screenName)_LoadPopularAvatars_Success"
-            case .loadPopularAvatarsFail:                    return "\(Event.screenName)_LoadPopularAvatars_Fail"
-            case .avatarPressed:                             return "\(Event.screenName)_Avatar_Pressed"
-            case .categoryPressed:                           return "\(Event.screenName)_Category_Pressed"
-            case .tryAgainButtonPressed:                     return "\(Event.screenName)_TryAgainButton_Pressed"
-            case .devSettingsButtonPressed:                  return "\(Event.screenName)_DevSettingsButton_Pressed"
-            case .pushNotificationStart:                     return "\(Event.screenName)_PushNotification_Start"
-            case .pushNotificationEnable:                    return "\(Event.screenName)_PushNotification_Enable"
-            case .pushNotificationCancel:                    return "\(Event.screenName)_PushNotification_Cancel"
-            case .deepLinkStart:                             return "\(Event.screenName)_DeepLink_Start"
-            case .deepLinkEmpty:                             return "\(Event.screenName)_DeepLink_Empty"
-            case .deepLinkCategory:                          return "\(Event.screenName)_DeepLink_Category"
-            case .deepLinkUnknown:                           return "\(Event.screenName)_DeepLink_Unknown"
-            }
-        }
-        
-        var parameters: [String: Any]? {
-            switch self {
-            case .loadFeatureAvatarsFail(error: let error), .loadPopularAvatarsFail(error: let error):
-                return error.eventParameters
-            case .avatarPressed(avatar: let avatar):
-                return avatar.eventParameters
-            case .categoryPressed(categoty: let category), .deepLinkCategory(category: let category):
-                return ["category": category.rawValue]
-            case .pushNotificationEnable(isAuthorized: let isAuthorized):
-                return ["is_authorized": isAuthorized]
-            case .deepLinkStart(url: let url), .deepLinkEmpty(url: let url), .deepLinkUnknown(url: let url):
-                return ["deep_link_url": url.absoluteString]
-            default:
-                return nil
-            }
-        }
-        
-        var type: LogType {
-            switch self {
-            case .loadFeatureAvatarsFail, .loadPopularAvatarsFail:
-                    .severe
-            default:
-                    .analytic
-            }
-        }
-    }
-}
-
 struct ExploreView: View {
     
     @State var viewModel: ExploreViewModel
@@ -243,7 +25,7 @@ struct ExploreView: View {
                     .removeListRowFormatting()
                 }
                 
-                if viewModel.abTestManager.activeTests.categoryRowTest == .top {
+                if viewModel.categoryRowTest == .top {
                     categorySection
                 }
                 
@@ -252,7 +34,7 @@ struct ExploreView: View {
                 }
                 
                 if !viewModel.popularAvatars.isEmpty {
-                    if viewModel.abTestManager.activeTests.categoryRowTest == .original {
+                    if viewModel.categoryRowTest == .original {
                         categorySection
                     }
                     popularSection
@@ -438,7 +220,7 @@ struct ExploreView: View {
     let container = DevPreview.shared.container
     container.register(AvatarManager.self, service: AvatarManager(remote: MockAvatarService()))
     
-    return ExploreView(viewModel: ExploreViewModel(container: container))
+    return ExploreView(viewModel: ExploreViewModel(interactor: CoreInteractor(container: container)))
         .previewEnvironment()
 }
 
@@ -446,7 +228,7 @@ struct ExploreView: View {
     let container = DevPreview.shared.container
     container.register(AvatarManager.self, service: AvatarManager(remote: MockAvatarService(avatars: [], delay: 2.0)))
     
-    return ExploreView(viewModel: ExploreViewModel(container: container))
+    return ExploreView(viewModel: ExploreViewModel(interactor: CoreInteractor(container: container)))
         .previewEnvironment()
 }
 
@@ -454,7 +236,7 @@ struct ExploreView: View {
     let container = DevPreview.shared.container
     container.register(AvatarManager.self, service: AvatarManager(remote: MockAvatarService(delay: 10)))
     
-    return ExploreView(viewModel: ExploreViewModel(container: container))
+    return ExploreView(viewModel: ExploreViewModel(interactor: CoreInteractor(container: container)))
         .previewEnvironment()
 }
 
@@ -464,7 +246,7 @@ struct ExploreView: View {
     container.register(AuthManager.self, service: AuthManager(service: MockAuthService(user: .mock(isAnonymous: true))))
     container.register(ABTestManager.self, service: ABTestManager(service: MockABTestService(createAccountTest: true)))
     
-    return ExploreView(viewModel: ExploreViewModel(container: container))
+    return ExploreView(viewModel: ExploreViewModel(interactor: CoreInteractor(container: container)))
         .previewEnvironment()
 }
 
@@ -472,7 +254,7 @@ struct ExploreView: View {
     let container = DevPreview.shared.container
     container.register(ABTestManager.self, service: ABTestManager(service: MockABTestService(categoryRowTest: .original)))
     
-    return ExploreView(viewModel: ExploreViewModel(container: container))
+    return ExploreView(viewModel: ExploreViewModel(interactor: CoreInteractor(container: container)))
         .previewEnvironment()
 }
 
@@ -480,7 +262,7 @@ struct ExploreView: View {
     let container = DevPreview.shared.container
     container.register(ABTestManager.self, service: ABTestManager(service: MockABTestService(categoryRowTest: .top)))
     
-    return ExploreView(viewModel: ExploreViewModel(container: container))
+    return ExploreView(viewModel: ExploreViewModel(interactor: CoreInteractor(container: container)))
         .previewEnvironment()
 }
 
@@ -488,6 +270,6 @@ struct ExploreView: View {
     let container = DevPreview.shared.container
     container.register(ABTestManager.self, service: ABTestManager(service: MockABTestService(categoryRowTest: .hidden)))
     
-    return ExploreView(viewModel: ExploreViewModel(container: container))
+    return ExploreView(viewModel: ExploreViewModel(interactor: CoreInteractor(container: container)))
         .previewEnvironment()
 }

@@ -14,11 +14,11 @@ struct TabBarView: View {
     var body: some View {
         TabView {
             Tab("Explore", systemImage: "eyes") {
-                ExploreView(viewModel: ExploreViewModel(container: container))
+                ExploreView(viewModel: ExploreViewModel(interactor: CoreInteractor(container: container)))
             }
 
             Tab("Chats", systemImage: "bubble.left.and.bubble.right.fill") {
-                ChatsView()
+                ChatsView(viewModel: ChatsViewModel(interactor: CoreInteractor(container: container)))
             }
 
             Tab("Profile", systemImage: "person.fill") {

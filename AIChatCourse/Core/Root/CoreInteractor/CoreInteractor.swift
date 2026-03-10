@@ -243,6 +243,22 @@ extension CoreInteractor {
         abTestManager.activeTests
     }
     
+    var categoryRowTest: CategoryRowTestOption {
+        abTestManager.activeTests.categoryRowTest
+    }
+    
+    var createAccountTest: Bool {
+        abTestManager.activeTests.createAccountTest
+    }
+    
+    var onboardingCommunityTest: Bool {
+        abTestManager.activeTests.onboardingCommunityTest
+    }
+    
+    var paywallTest: PaywallTestOption {
+        abTestManager.activeTests.paywallTest
+    }
+    
     func override(updateTests: ActiveABTests) throws {
         try abTestManager.override(updateTests: updateTests)
     }
