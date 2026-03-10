@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ChatsView: View {
     
+    @Environment(DependencyContainer.self) private var container
     @State var viewModel: ChatsViewModel
     
     var body: some View {
@@ -52,14 +53,12 @@ struct ChatsView: View {
                 } else {
                     ForEach(viewModel.chats, id: \.self) { chat in
                         ChatRowCellViewBuilder(
-                            chat: chat,
-                            currentUserId: viewModel.currentUserId,
-                            getAvatar: {
-                                try? await viewModel.getAvatar(avatarId: chat.avatarId)
-                            },
-                            getLastChatMessage: {
-                                try? await viewModel.getLastChatMessage(chatId: chat.id)
-                            }
+                            viewModel: ChatRowCellViewModel(
+                                interactor: CoreInteractor(
+                                    container: container
+                                )
+                            ),
+                            chat: chat
                         )
                         .anyButton(.highlight, action: {
                             viewModel.onChatPressed(chat: chat)

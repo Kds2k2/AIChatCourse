@@ -68,7 +68,7 @@ struct ProfileViewTests {
             self.anyGetAuthId = interactor.getAuthId
         }
         
-        init(interactor: ProductionProfileInteractor) {
+        init(interactor: ProfileInteractor) {
             self.anyGetCurrentUser = interactor.currentUser
             self.anyGetAvatarsForUser = interactor.getAvatarsForUser
             self.anyRemoveAuthorIdFromAvatar = interactor.removeAuthorIdFromAvatar

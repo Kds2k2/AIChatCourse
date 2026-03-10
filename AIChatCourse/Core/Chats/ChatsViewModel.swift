@@ -15,8 +15,6 @@ protocol ChatsInteractor {
     func getRecentAvatars() throws -> [AvatarModel]
     func getAuthId() throws -> String
     func getAllChats(userId: String) async throws -> [ChatModel]
-    func getAvatar(id: String) async throws -> AvatarModel
-    func getLastChatMessage(chatId: String) async throws -> ChatMessageModel?
 }
 
 extension CoreInteractor: ChatsInteractor { }
@@ -61,14 +59,6 @@ class ChatsViewModel {
             interactor.trackEvent(event: Event.loadChatsFail(error: error))
         }
         isLoadingChats = false
-    }
-    
-    func getAvatar(avatarId: String) async throws -> AvatarModel {
-        try await interactor.getAvatar(id: avatarId)
-    }
-    
-    func getLastChatMessage(chatId: String) async throws -> ChatMessageModel? {
-        try await interactor.getLastChatMessage(chatId: chatId)
     }
     
     func onChatPressed(chat: ChatModel) {
