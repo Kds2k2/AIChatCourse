@@ -13,16 +13,9 @@ struct SignUpWithEmailAndPasswordView: View {
         case password
     }
     
-    @Environment(AppState.self) private var root
-    @Environment(AuthManager.self) private var authManager
-    @Environment(UserManager.self) private var userManager
-    @Environment(LogManager.self) private var logManager
-    @Environment(PurchaseManager.self) private var purchaseManager
+    @State var viewModel: SignUpWithEmailAndPasswordViewModel
     @Environment(\.dismiss) private var dismiss
     
-    @State var email: String = "test@gmail.com"
-    @State var password: String = "Password12345!"
-
     var body: some View {
         NavigationStack {
             VStack {
@@ -54,13 +47,13 @@ struct SignUpWithEmailAndPasswordView: View {
             
             VStack(spacing: 28) {
                 FloatingTextField(
-                    text: $email,
+                    text: $viewModel.email,
                     placeholder: "Email",
                     leftIcon: "person.fill",
                     rightIcon: nil
                 )
                 
-                FloatingTextField(secureText: $password)
+                FloatingTextField(secureText: $viewModel.password)
             }
         }
         .padding(.horizontal)
@@ -71,73 +64,17 @@ struct SignUpWithEmailAndPasswordView: View {
             Text("Register")
                 .callToActionButton()
                 .anyButton {
-                    onRegisterPressed()
+                    viewModel.onRegisterPressed {
+                        dismiss()
+                    }
                 }
         }
         .padding(.horizontal)
         .padding(.top, 10)
     }
-
-    private func onRegisterPressed() {
-        logManager.trackEvent(event: Event.registerStart)
-        Task {
-            do {
-                let result = try await authManager.signUpWithEmailAndPassword(email: email, password: password)
-                logManager.trackEvent(event: Event.registerSuccess(user: result.user, isNewUser: result.isNewUser))
-                
-                try await userManager.logIn(auth: result.user, isNewUser: result.isNewUser)
-                try await purchaseManager.logIn(userId: result.user.uid, attributes: .init(email: result.user.email, firebaseAppInstanceId: FirebaseAnalyticsService.appInstanceId, mixpanelDistinctId: MixpanelService.distinctId))
-                logManager.trackEvent(event: Event.loginUserSuccess(user: result.user, isNewUser: result.isNewUser))
-            } catch {
-                logManager.trackEvent(event: Event.registerFail(error: error))
-            }
-            
-            dismiss()
-        }
-    }
-    
-    enum Event: LoggableEvent {
-        case registerStart
-        case registerSuccess(user: UserAuthInfo, isNewUser: Bool)
-        case loginUserSuccess(user: UserAuthInfo, isNewUser: Bool)
-        case registerFail(error: Error)
-        
-        static var screenName: String = "SignUpWithEmailAndPasswordView"
-        
-        var eventName: String {
-            switch self {
-            case .registerStart:               return "\(Event.screenName)_Register_Start"
-            case .registerSuccess:             return "\(Event.screenName)_Register_Success"
-            case .loginUserSuccess:            return "\(Event.screenName)_LoginUser_Success"
-            case .registerFail:                return "\(Event.screenName)_Register_Fail"
-            }
-        }
-        
-        var parameters: [String: Any]? {
-            switch self {
-            case .registerFail(error: let error):
-                return error.eventParameters
-            case .registerSuccess(user: let user, isNewUser: let isNewUser), .loginUserSuccess(user: let user, isNewUser: let isNewUser):
-                var dict = user.eventParameters
-                dict["register_is_new_user"] = isNewUser
-                return dict
-            default:
-                return nil
-            }
-        }
-        
-        var type: LogType {
-            switch self {
-            case .registerFail:
-                    .severe
-            default:
-                    .analytic
-            }
-        }
-    }
 }
 
 #Preview {
-    SignUpWithEmailAndPasswordView()
+    SignUpWithEmailAndPasswordView(viewModel: SignUpWithEmailAndPasswordViewModel(interactor: CoreInteractor(container: DevPreview.shared.container)))
         .previewEnvironment()
 }

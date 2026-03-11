@@ -10,6 +10,7 @@ import SwiftUI
 struct WelcomeView: View {
     @Environment(AppState.self) private var root
     @Environment(LogManager.self) private var logManager
+    @Environment(DependencyContainer.self) private var container
     
     @State private var imageName: String = Constants.randomImage
     @State private var showCreateAccountMenu: AnyAppAlert?
@@ -34,13 +35,13 @@ struct WelcomeView: View {
         .screenAppearAnalytics(name: "WelcomeView")
         .showCustomAlert(type: .confirmationDialog, alert: $showCreateAccountMenu)
         .sheet(isPresented: $showAppleProvider) {
-            CreateAccountWithAppleView { isNewUser in
+            CreateAccountWithAppleView(viewModel: .init(interactor: CoreInteractor(container: container))) { isNewUser in
                 handleDidSignIn(isNewUser: isNewUser)
             }
             .presentationDetents([.medium])
         }
         .sheet(isPresented: $showEmailProvider) {
-            SignInWithEmailAndPasswordView { isNewUser in
+            SignInWithEmailAndPasswordView(viewModel: .init(interactor: CoreInteractor(container: container))) { isNewUser in
                 handleDidSignIn(isNewUser: isNewUser)
             }
         }

@@ -37,7 +37,7 @@ struct ProfileView: View {
                 Task { await viewModel.loadData() }
             },
             content: {
-                CreateAvatarView(viewModel: .init(container: container))
+                CreateAvatarView(viewModel: CreateAvatarViewModel(interactor: CoreInteractor(container: container)))
         })
         .task {
             await viewModel.loadData()

@@ -79,6 +79,23 @@ struct AnyChatRowCellInteractor: ChatRowCellInteractor {
         ChatRowCellViewBuilder(
             viewModel: ChatRowCellViewModel(
                 interactor: AnyChatRowCellInteractor(
+                    auth: UserAuthInfo.mock(isAnonymous: true),
+                    getAvatar: { _ in
+                        try? await Task.sleep(for: .seconds(1))
+                        return .mock
+                    },
+                    getLastChatMessage: { _ in
+                        try? await Task.sleep(for: .seconds(1))
+                        return .mock
+                    }
+                )
+            ),
+            chat: .mock
+        )
+        
+        ChatRowCellViewBuilder(
+            viewModel: ChatRowCellViewModel(
+                interactor: AnyChatRowCellInteractor(
                     auth: UserAuthInfo.mock(),
                     getAvatar: { _ in
                         try? await Task.sleep(for: .seconds(10))

@@ -70,10 +70,6 @@ extension CoreInteractor {
         userManager.currentUser
     }
     
-    func logIn(auth: UserAuthInfo, isNewUser: Bool) async throws {
-        try await userManager.logIn(auth: auth, isNewUser: isNewUser)
-    }
-    
     func deleleCurrentUser() async throws {
         try await userManager.deleleCurrentUser()
     }
@@ -270,6 +266,10 @@ extension CoreInteractor {
         purchaseManager.entitlements
     }
     
+    var isPremium: Bool {
+        entitlements.hasActiveEntitlement
+    }
+    
     func getProducts(productIds: [String]) async throws -> [AnyProduct] {
         try await purchaseManager.getProducts(productIds: productIds)
     }
@@ -280,11 +280,6 @@ extension CoreInteractor {
     
     func purchaseProduct(productId: String) async throws -> [PurchasedEntitlement] {
         try await purchaseManager.purchaseProduct(productId: productId)
-    }
-    
-    @discardableResult
-    func logIn(userId: String, attributes: PurchaseProfileAttributes? = nil) async throws -> [PurchasedEntitlement] {
-        try await purchaseManager.logIn(userId: userId, attributes: attributes)
     }
     
     func updateProfileAttributes(attributes: PurchaseProfileAttributes) async throws {
@@ -299,5 +294,14 @@ extension CoreInteractor {
         try authManager.signOut()
         try await purchaseManager.logOut()
         userManager.signOut()
+    }
+    
+    func logIn(auth: UserAuthInfo, isNewUser: Bool) async throws {
+        try await userManager.logIn(auth: auth, isNewUser: isNewUser)
+        try await purchaseManager.logIn(userId: auth.uid,
+                                        attributes: .init(
+                                            email: auth.email,
+                                            firebaseAppInstanceId: FirebaseAnalyticsService.appInstanceId,
+                                            mixpanelDistinctId: MixpanelService.distinctId))
     }
 }

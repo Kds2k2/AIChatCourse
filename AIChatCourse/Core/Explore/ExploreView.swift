@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ExploreView: View {
     
+    @Environment(DependencyContainer.self) private var container
     @State var viewModel: ExploreViewModel
     
     var body: some View {
@@ -60,7 +61,7 @@ struct ExploreView: View {
                 DevSettingsView()
             })
             .sheet(isPresented: $viewModel.showAppleProvider, content: {
-                CreateAccountWithAppleView()
+                CreateAccountWithAppleView(viewModel: .init(interactor: CoreInteractor(container: container)))
                     .presentationDetents([.medium])
             })
             .showModal($viewModel.showPushNotificationModal, content: {

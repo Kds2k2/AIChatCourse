@@ -9,6 +9,7 @@ import SwiftUI
 
 struct SettingsView: View {
     
+    @Environment(DependencyContainer.self) private var container
     @Environment(\.dismiss) private var dismiss
     @Environment(AuthManager.self) private var authManager
     @Environment(UserManager.self) private var userManager
@@ -45,13 +46,13 @@ struct SettingsView: View {
             .sheet(isPresented: $showAppleProvider, onDismiss: {
                 setAnonymousAccountStatus()
             }, content: {
-                CreateAccountWithAppleView()
+                CreateAccountWithAppleView(viewModel: .init(interactor: CoreInteractor(container: container)))
                     .presentationDetents([.medium])
             })
             .sheet(isPresented: $showEmailProvider, onDismiss: {
                 setAnonymousAccountStatus()
             }, content: {
-                SignUpWithEmailAndPasswordView()
+                SignUpWithEmailAndPasswordView(viewModel: .init(interactor: CoreInteractor(container: container)))
             })
             .onAppear {
                 setAnonymousAccountStatus()
