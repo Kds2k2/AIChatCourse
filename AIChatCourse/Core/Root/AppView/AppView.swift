@@ -10,6 +10,7 @@ import SwiftUI
 struct AppView: View {
     @Environment(\.scenePhase) private var scenePhase
     
+    @Environment(DependencyContainer.self) private var container
     @Environment(AuthManager.self) private var authManager
     @Environment(UserManager.self) private var userManager
     @Environment(LogManager.self) private var logManager
@@ -23,7 +24,7 @@ struct AppView: View {
                 TabBarView()
             },
             onboardingView: {
-                WelcomeView()
+                WelcomeView(viewModel: WelcomeViewModel(interactor: CoreInteractor(container: container)))
             }
         )
         .environment(appState)

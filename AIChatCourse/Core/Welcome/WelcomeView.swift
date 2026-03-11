@@ -8,19 +8,14 @@
 import SwiftUI
 
 struct WelcomeView: View {
-    @Environment(AppState.self) private var root
-    @Environment(LogManager.self) private var logManager
     @Environment(DependencyContainer.self) private var container
-    
-    @State private var imageName: String = Constants.randomImage
-    @State private var showCreateAccountMenu: AnyAppAlert?
-    @State private var showAppleProvider: Bool = false
-    @State private var showEmailProvider: Bool = false
+    @Environment(AppState.self) private var root
+    @State var viewModel: WelcomeViewModel
     
     var body: some View {
         NavigationStack {
             VStack(spacing: 8) {
-                ImageLoaderView(urlString: imageName)
+                ImageLoaderView(urlString: viewModel.imageName)
                     .ignoresSafeArea()
                 
                 titleSection
@@ -33,16 +28,20 @@ struct WelcomeView: View {
             }
         }
         .screenAppearAnalytics(name: "WelcomeView")
-        .showCustomAlert(type: .confirmationDialog, alert: $showCreateAccountMenu)
-        .sheet(isPresented: $showAppleProvider) {
-            CreateAccountWithAppleView(viewModel: .init(interactor: CoreInteractor(container: container))) { isNewUser in
-                handleDidSignIn(isNewUser: isNewUser)
+        .showCustomAlert(type: .confirmationDialog, alert: $viewModel.showCreateAccountMenu)
+        .sheet(isPresented: $viewModel.showAppleProvider) {
+            CreateAccountWithAppleView(viewModel: CreateAccountWithAppleViewModel(interactor: CoreInteractor(container: container))) { isNewUser in
+                viewModel.handleDidSignIn(isNewUser: isNewUser, onOldUser: {
+                    root.updateViewState(showTabBarView: true)
+                })
             }
             .presentationDetents([.medium])
         }
-        .sheet(isPresented: $showEmailProvider) {
-            SignInWithEmailAndPasswordView(viewModel: .init(interactor: CoreInteractor(container: container))) { isNewUser in
-                handleDidSignIn(isNewUser: isNewUser)
+        .sheet(isPresented: $viewModel.showEmailProvider) {
+            SignInWithEmailAndPasswordView(viewModel: SignInWithEmailAndPasswordViewModel(interactor: CoreInteractor(container: container))) { isNewUser in
+                viewModel.handleDidSignIn(isNewUser: isNewUser, onOldUser: {
+                    root.updateViewState(showTabBarView: true)
+                })
             }
         }
     }
@@ -75,7 +74,7 @@ struct WelcomeView: View {
                 .font(.body)
                 .padding(8)
                 .onTapGesture {
-                    onSignInPressed()
+                    viewModel.onSignInPressed()
                 }
         }
     }
@@ -95,74 +94,11 @@ struct WelcomeView: View {
             }
         }
     }
-    
-    // MARK: - Actions
-    private func onSignInPressed() {
-        showCreateAccountMenu = AnyAppAlert(
-            title: "",
-            subtitle: "Select provider",
-            buttons: {
-                AnyView(
-                    Group {
-                        Button("Apple", role: .destructive) {
-                            showAppleProvider = true
-                        }
-                        Button("Email", role: .destructive) {
-                            showEmailProvider = true
-                        }
-                    }
-                )
-            }
-        )
-    }
-
-    private func handleDidSignIn(isNewUser: Bool) {
-        if isNewUser {
-            // Do nothing
-        } else {
-            Task {
-                try? await Task.sleep(for: .seconds(0.5))
-                root.updateViewState(showTabBarView: true)
-            }
-        }
-    }
-    
-    // MARK: - Logs
-    enum Event: LoggableEvent {
-        case signInWithApple, signInWithEmail
-        case didSignIn(isNewUser: Bool)
-        
-        static var screenName: String = "WelcomeView"
-        
-        var eventName: String {
-            switch self {
-            case .signInWithApple:          return "\(Event.screenName)_SignIn_Apple"
-            case .signInWithEmail:          return "\(Event.screenName)_SignIn_Email"
-            case .didSignIn:                return "\(Event.screenName)_DidSignIn"
-            }
-        }
-        
-        var parameters: [String: Any]? {
-            switch self {
-            case .didSignIn(isNewUser: let isNewUser):
-                return ["welcome_is_new_user": isNewUser]
-            default:
-                return nil
-            }
-        }
-        
-        var type: LogType {
-            switch self {
-            default:
-                    .analytic
-            }
-        }
-    }
 }
 
 #Preview {
     NavigationStack {
-        WelcomeView()
+        WelcomeView(viewModel: WelcomeViewModel(interactor: CoreInteractor(container: DevPreview.shared.container)))
             .previewEnvironment()
     }
 }

@@ -11,6 +11,7 @@ struct ChatView: View {
     
     @State var viewModel: ChatViewModel
     @Environment(\.dismiss) private var dismiss
+    @Environment(DependencyContainer.self) private var container
     
     var chat: ChatModel?
     var avatarId: String
@@ -35,7 +36,7 @@ struct ChatView: View {
             }
         }
         .sheet(isPresented: $viewModel.showPaywall, content: {
-            PaywallView()
+            PaywallView(viewModel: PaywallViewModel(interactor: CoreInteractor(container: container)))
         })
         .onFirstAppear {
             viewModel.onViewFirstAppear(chat: chat)

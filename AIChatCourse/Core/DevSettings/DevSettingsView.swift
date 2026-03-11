@@ -8,17 +8,9 @@
 import SwiftUI
 
 struct DevSettingsView: View {
-    
-    @Environment(AuthManager.self) private var authManager
-    @Environment(UserManager.self) private var userManager
-    @Environment(ABTestManager.self) private var abTestManager
-    
+
+    @State var viewModel: DevSettingsViewModel
     @Environment(\.dismiss) private var dismiss
-    
-    @State private var createAccountTest: Bool = false
-    @State private var onboardingCommunityTest: Bool = false
-    @State private var categoryRowTest: CategoryRowTestOption = .original
-    @State private var paywallTest: PaywallTestOption = .custom
     
     var body: some View {
         NavigationStack {
@@ -36,43 +28,35 @@ struct DevSettingsView: View {
             }
             .screenAppearAnalytics(name: "DevSettings")
             .onFirstAppear {
-                loadABTests()
+                viewModel.loadABTests()
             }
         }
-    }
-    
-    // MARK: - Loading
-    private func loadABTests() {
-        createAccountTest = abTestManager.activeTests.createAccountTest
-        onboardingCommunityTest = abTestManager.activeTests.onboardingCommunityTest
-        categoryRowTest = abTestManager.activeTests.categoryRowTest
-        paywallTest = abTestManager.activeTests.paywallTest
     }
     
     // MARK: - Views
     private var abTestSection: some View {
         Section {
-            Toggle("Create Account Test", isOn: $createAccountTest)
-                .onChange(of: createAccountTest, handleCreateAccountChange)
+            Toggle("Create Account Test", isOn: $viewModel.createAccountTest)
+                .onChange(of: viewModel.createAccountTest, viewModel.handleCreateAccountChange)
             
-            Toggle("Onboarding Community Test", isOn: $onboardingCommunityTest)
-                .onChange(of: onboardingCommunityTest, handleOnboardingCommunityChange)
+            Toggle("Onboarding Community Test", isOn: $viewModel.onboardingCommunityTest)
+                .onChange(of: viewModel.onboardingCommunityTest, viewModel.handleOnboardingCommunityChange)
             
-            Picker("Category Row Test", selection: $categoryRowTest) {
+            Picker("Category Row Test", selection: $viewModel.categoryRowTest) {
                 ForEach(CategoryRowTestOption.allCases) { option in
                     Text(option.rawValue)
                         .tag(option)
                 }
             }
-            .onChange(of: categoryRowTest, handleCategoryRowChange)
+            .onChange(of: viewModel.categoryRowTest, viewModel.handleCategoryRowChange)
             
-            Picker("Paywall Test", selection: $paywallTest) {
+            Picker("Paywall Test", selection: $viewModel.paywallTest) {
                 ForEach(PaywallTestOption.allCases) { option in
                     Text(option.rawValue)
                         .tag(option)
                 }
             }
-            .onChange(of: paywallTest, handlePaywallTestChange)
+            .onChange(of: viewModel.paywallTest, viewModel.handlePaywallTestChange)
         } header: {
             Text("AB Tests")
         }
@@ -81,9 +65,9 @@ struct DevSettingsView: View {
     
     private var authSection: some View {
         Section {
-            let array = authManager.auth?.eventParameters.asAlphabeticalArray ?? []
+            let array = viewModel.getAuthParameters()
             ForEach(array, id: \.key) { item in
-                itemRow(item: item)
+                viewModel.itemRow(item: item)
             }
         } header: {
             Text("Auth Info")
@@ -92,9 +76,9 @@ struct DevSettingsView: View {
     
     private var userSection: some View {
         Section {
-            let array = userManager.currentUser?.eventParameters.asAlphabeticalArray ?? []
+            let array = viewModel.getCurrentUserParameters()
             ForEach(array, id: \.key) { item in
-                itemRow(item: item)
+                viewModel.itemRow(item: item)
             }
         } header: {
             Text("User Info")
@@ -105,7 +89,7 @@ struct DevSettingsView: View {
         Section {
             let array = AppInfo.eventParameters.asAlphabeticalArray
             ForEach(array, id: \.key) { item in
-                itemRow(item: item)
+                viewModel.itemRow(item: item)
             }
         } header: {
             Text("Device Info")
@@ -120,82 +104,9 @@ struct DevSettingsView: View {
                 dismiss()
             }
     }
-    
-    // MARK: - Actions
-    private func itemRow(item: (key: String, value: Any)) -> some View {
-        HStack {
-            Text(item.key)
-            Spacer(minLength: 4)
-            if let value = String.convertToStirng(item.value) {
-                Text(value)
-            } else {
-                Text("Unknown")
-            }
-        }
-        .font(.caption)
-        .lineLimit(1)
-        .minimumScaleFactor(0.3)
-    }
-    
-    private func handleCreateAccountChange(oldValue: Bool, newValue: Bool) {
-        updateTest(
-            property: &createAccountTest,
-            newValue: newValue,
-            savedValue: abTestManager.activeTests.createAccountTest
-        ) { tests in
-            tests.update(createAccountTest: newValue)
-        }
-    }
-    
-    private func handleOnboardingCommunityChange(oldValue: Bool, newValue: Bool) {
-        updateTest(
-            property: &onboardingCommunityTest,
-            newValue: newValue,
-            savedValue: abTestManager.activeTests.onboardingCommunityTest
-        ) { tests in
-            tests.update(onboardingCommunityTest: newValue)
-        }
-    }
-    
-    private func handleCategoryRowChange(oldValue: CategoryRowTestOption, newValue: CategoryRowTestOption) {
-        updateTest(
-            property: &categoryRowTest,
-            newValue: newValue,
-            savedValue: abTestManager.activeTests.categoryRowTest
-        ) { tests in
-            tests.update(categoryRowTest: newValue)
-        }
-    }
-    
-    private func handlePaywallTestChange(oldValue: PaywallTestOption, newValue: PaywallTestOption) {
-        updateTest(
-            property: &paywallTest,
-            newValue: newValue,
-            savedValue: abTestManager.activeTests.paywallTest
-        ) { tests in
-            tests.update(paywallTest: newValue)
-        }
-    }
-    
-    private func updateTest<T: Codable & Equatable>(
-        property: inout T,
-        newValue: T,
-        savedValue: T,
-        updateAction: (inout ActiveABTests) -> Void
-    ) {
-        if newValue != savedValue {
-            do {
-                var tests = abTestManager.activeTests
-                updateAction(&tests)
-                try abTestManager.override(updateTests: tests)
-            } catch {
-                property = savedValue
-            }
-        }
-    }
 }
 
 #Preview {
-    DevSettingsView()
+    DevSettingsView(viewModel: DevSettingsViewModel(interactor: CoreInteractor(container: DevPreview.shared.container)))
         .previewEnvironment()
 }

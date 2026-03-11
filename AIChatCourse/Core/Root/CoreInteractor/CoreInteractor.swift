@@ -58,20 +58,12 @@ extension CoreInteractor {
     func signUpWithEmailAndPassword(email: String, password: String) async throws -> (user: UserAuthInfo, isNewUser: Bool) {
         try await authManager.signUpWithEmailAndPassword(email: email, password: password)
     }
-    
-    func deleteAccount() async throws {
-        try await authManager.deleteAccount()
-    }
 }
 
 // MARK: - User Manager
 extension CoreInteractor {
     var currentUser: UserModel? {
         userManager.currentUser
-    }
-    
-    func deleleCurrentUser() async throws {
-        try await userManager.deleleCurrentUser()
     }
     
     func markOnboardingCompletedForCurrentUser(profileColorHex: String) async throws {
@@ -128,10 +120,6 @@ extension CoreInteractor {
         try await avatarManager.removeAuthorIdFromAvatar(avatarId: avatarId)
     }
     
-    func removeAuthorIdFromAllUserAvatars(userId: String) async throws {
-        try await avatarManager.removeAuthorIdFromAllUserAvatars(userId: userId)
-    }
-    
     func getAvatarsForUser(userId: String) async throws -> [AvatarModel] {
         try await avatarManager.getAvatarsForUser(userId: userId)
     }
@@ -171,10 +159,6 @@ extension CoreInteractor {
     func deleteChat(chatId: String) async throws {
         try await chatManager.deleteChat(chatId: chatId)
     }
-                                                                    
-    func deleteAllChatsForUser(userId: String) async throws {
-        try await chatManager.deleteAllChatsForUser(userId: userId)
-    }
     
     func reportChat(chatId: String, userId: String) async throws {
         try await chatManager.reportChat(chatId: chatId, userId: userId)
@@ -189,10 +173,6 @@ extension CoreInteractor {
     
     func addUserProperties(dict: [String: Any], isHighPriority: Bool) {
         logManager.addUserProperties(dict: dict, isHighPriority: isHighPriority)
-    }
-    
-    func deleteUserProfile() {
-        logManager.deleteUserProfile()
     }
     
     func trackEvent(eventName: String, parameners: [String: Any]? = nil, type: LogType = .analytic) {
@@ -303,5 +283,14 @@ extension CoreInteractor {
                                             email: auth.email,
                                             firebaseAppInstanceId: FirebaseAnalyticsService.appInstanceId,
                                             mixpanelDistinctId: MixpanelService.distinctId))
+    }
+    
+    func deleteAccount(userId: String) async throws {
+        try await chatManager.deleteAllChatsForUser(userId: userId)
+        try await avatarManager.removeAuthorIdFromAllUserAvatars(userId: userId)
+        try await userManager.deleleCurrentUser()
+        try await authManager.deleteAccount()
+        try await purchaseManager.logOut()
+        logManager.deleteUserProfile()
     }
 }

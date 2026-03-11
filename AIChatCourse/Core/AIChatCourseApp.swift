@@ -167,7 +167,10 @@ struct AppDependencies {
             avatarManager = AvatarManager(remote: MockAvatarService(),
                                           local: MockLocalAvatarPersistence())
             chatManager = ChatManager(service: MockChatService())
-            let abTestService = MockABTestService(onboardingCommunityTest: LaunchArgumentOptions.onboardingCommunity.value)
+            let abTestService = MockABTestService(
+                onboardingCommunityTest: LaunchArgumentOptions.onboardingCommunity.value,
+                paywallTest: .custom
+            )
             abTestManager = ABTestManager(service: abTestService, logManager: logManager)
             purchaseManager = PurchaseManager(service: MockPurchaseService())
         case .dev:
@@ -237,6 +240,7 @@ extension View {
             .environment(ABTestManager(service: MockABTestService()))
             .environment(PurchaseManager(service: MockPurchaseService()))
             .environment(AppState())
+            .environment(DevPreview.shared.container)
     }
 }
 
