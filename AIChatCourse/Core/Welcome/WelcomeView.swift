@@ -9,7 +9,6 @@ import SwiftUI
 
 struct WelcomeView: View {
     @Environment(DependencyContainer.self) private var container
-    @Environment(AppState.self) private var root
     @State var viewModel: WelcomeViewModel
     
     var body: some View {
@@ -32,17 +31,13 @@ struct WelcomeView: View {
         .showCustomAlert(type: .confirmationDialog, alert: $viewModel.showCreateAccountMenu)
         .sheet(isPresented: $viewModel.showAppleProvider) {
             CreateAccountWithAppleView(viewModel: CreateAccountWithAppleViewModel(interactor: CoreInteractor(container: container))) { isNewUser in
-                viewModel.handleDidSignIn(isNewUser: isNewUser, onOldUser: {
-                    root.updateViewState(showTabBarView: true)
-                })
+                viewModel.handleDidSignIn(isNewUser: isNewUser)
             }
             .presentationDetents([.medium])
         }
         .sheet(isPresented: $viewModel.showEmailProvider) {
             SignInWithEmailAndPasswordView(viewModel: SignInWithEmailAndPasswordViewModel(interactor: CoreInteractor(container: container))) { isNewUser in
-                viewModel.handleDidSignIn(isNewUser: isNewUser, onOldUser: {
-                    root.updateViewState(showTabBarView: true)
-                })
+                viewModel.handleDidSignIn(isNewUser: isNewUser)
             }
         }
     }

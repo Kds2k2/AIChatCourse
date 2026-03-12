@@ -14,7 +14,11 @@ struct MixpanelService: LogService {
         #if MOCK
         return nil
         #else
-        return Mixpanel.mainInstance().distinctId
+        if AppInfo.isUITesting {
+            return nil
+        } else {
+            return Mixpanel.mainInstance().distinctId
+        }
         #endif
     }
     

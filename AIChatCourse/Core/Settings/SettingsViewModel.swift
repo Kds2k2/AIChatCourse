@@ -12,6 +12,7 @@ protocol SettingsInteractor {
     var auth: UserAuthInfo? { get }
     
     func trackEvent(event: LoggableEvent)
+    func updateAppState(showTabBar: Bool)
     func getAuthId() throws -> String
     func signOut() async throws
     func deleteAccount(userId: String) async throws
@@ -101,6 +102,7 @@ class SettingsViewModel {
                 interactor.trackEvent(event: Event.signOutSuccess)
                 
                 await onDismiss()
+                interactor.updateAppState(showTabBar: false)
             } catch {
                 showAlert = AnyAppAlert(error: error)
                 interactor.trackEvent(event: Event.signOutFail(error: error))
@@ -132,6 +134,7 @@ class SettingsViewModel {
                 interactor.trackEvent(event: Event.deleteAccountSuccess)
                 
                 await onDismiss()
+                interactor.updateAppState(showTabBar: false)
             } catch {
                 showAlert = AnyAppAlert(error: error)
                 interactor.trackEvent(event: Event.deleteAccountFail(error: error))

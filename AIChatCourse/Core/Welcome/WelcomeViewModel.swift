@@ -10,6 +10,7 @@ import SwiftUI
 @MainActor
 protocol WelcomeInteractor {
     func trackEvent(event: LoggableEvent)
+    func updateAppState(showTabBar: Bool)
 }
 
 extension CoreInteractor: WelcomeInteractor { }
@@ -55,14 +56,14 @@ class WelcomeViewModel {
         )
     }
     
-    func handleDidSignIn(isNewUser: Bool, onOldUser: @escaping () -> Void) {
+    func handleDidSignIn(isNewUser: Bool) {
         interactor.trackEvent(event: Event.didSignIn(isNewUser: isNewUser))
         if isNewUser {
             // Do nothing
         } else {
             Task {
                 try? await Task.sleep(for: .seconds(0.5))
-                onOldUser()
+                interactor.updateAppState(showTabBar: true)
             }
         }
     }

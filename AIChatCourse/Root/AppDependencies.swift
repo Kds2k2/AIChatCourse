@@ -1,146 +1,11 @@
 //
-//  AIChatCourseApp.swift
+//  AppDependencies.swift
 //  AIChatCourse
 //
-//  Created by Dmitro Kryzhanovsky on 29.12.2025.
+//  Created by Dmitro Kryzhanovsky on 12.03.2026.
 //
 
 import SwiftUI
-import Firebase
-import FirebaseInstallations
-import FirebaseCore
-
-@main
-struct AppEntryPoint {
-    static func main() {
-        if AppInfo.isUnitTesting {
-            TestingApp.main()
-        } else {
-            AIChatCourseApp.main()
-        }
-    }
-}
-
-struct TestingApp: App {
-    var body: some Scene {
-        WindowGroup {
-            Text("Testing!")
-        }
-    }
-}
-
-struct AIChatCourseApp: App {
-    @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
-    
-    var body: some Scene {
-        WindowGroup {
-            Group {
-                if AppInfo.isUITesting {
-                    AppViewForUITesting()
-                } else {
-                    AppView(viewModel: AppViewModel(interactor: CoreInteractor(container: delegate.dependencies.container)))
-                }
-            }
-            .environment(delegate.dependencies.container)
-            .environment(delegate.dependencies.authManager)
-            .environment(delegate.dependencies.userManager)
-            .environment(delegate.dependencies.aiManager)
-            .environment(delegate.dependencies.avatarManager)
-            .environment(delegate.dependencies.chatManager)
-            .environment(delegate.dependencies.logManager)
-            .environment(delegate.dependencies.pushManager)
-            .environment(delegate.dependencies.abTestManager)
-            .environment(delegate.dependencies.purchaseManager)
-        }
-    }
-}
-
-struct AppViewForUITesting: View {
-    
-    @Environment(DependencyContainer.self) private var container
-    
-    var body: some View {
-        if LaunchArgumentOptions.screenCreateAvatar.value {
-            CreateAvatarView(viewModel: CreateAvatarViewModel(interactor: CoreInteractor(container: container)))
-        } else {
-            AppView(viewModel: AppViewModel(interactor: CoreInteractor(container: container)))
-        }
-    }
-}
-
-class AppDelegate: NSObject, UIApplicationDelegate {
-    
-    var dependencies: AppDependencies!
-    
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
-        
-        // MOCK - mock dependencies
-        // DEVELOPMENT - production dependencies + some extra dev tool
-        // PRODUCTION - production dependencies
-        // Also could: Staging, Beta, Alpha, ...
-        
-        var config: BuildConfiguration
-        
-        #if MOCK
-        config = .mock(isSignedIn: true)
-        #elseif DEV
-        config = .dev
-        #else
-        config = .prod
-        #endif
-        
-        if AppInfo.isUITesting {
-            let signIn = LaunchArgumentOptions.signIn.value
-            UserDefaults.showTabBarView = signIn
-            config = .mock(isSignedIn: signIn)
-            print("MOOOOCK")
-        }
-        
-        config.configure()
-        dependencies = AppDependencies(config)
-        return true
-    }
-}
-
-enum BuildConfiguration {
-    case mock(isSignedIn: Bool), dev, prod
-    
-    func configure() {
-        switch self {
-        case .mock:
-            break
-        case .dev:
-            let plist = Bundle.main.path(forResource: "GoogleService-Info-Dev", ofType: "plist")!
-            let options = FirebaseOptions(contentsOfFile: plist)!
-            FirebaseApp.configure(options: options)
-        case .prod:
-            let plist = Bundle.main.path(forResource: "GoogleService-Info-Prod", ofType: "plist")!
-            let options = FirebaseOptions(contentsOfFile: plist)!
-            FirebaseApp.configure(options: options)
-        }
-    }
-}
-
-@Observable
-@MainActor
-class DependencyContainer {
-    private var services: [String: Any] = [:]
-    
-    func register<T>(_ type: T.Type, service: T) {
-        let key = "\(type)"
-        services[key] = service
-    }
-    
-    func register<T>(_ type: T.Type, service: () -> T) {
-        let key = "\(type)"
-        services[key] = service()
-    }
-    
-    func resolve<T>(_ type: T.Type) -> T? {
-        let key = "\(type)"
-        return services[key] as? T
-    }
-}
 
 @MainActor
 struct AppDependencies {
@@ -155,6 +20,7 @@ struct AppDependencies {
     let pushManager: PushManager
     let abTestManager: ABTestManager
     let purchaseManager: PurchaseManager
+    let appState: AppState
     
     // swiftlint:disable function_body_length
     init(_ config: BuildConfiguration) {
@@ -175,6 +41,7 @@ struct AppDependencies {
             )
             abTestManager = ABTestManager(service: abTestService, logManager: logManager)
             purchaseManager = PurchaseManager(service: MockPurchaseService())
+            appState = AppState(showTabBar: isSignedIn)
         case .dev:
             logManager = LogManager(services: [
                 ConsoleService(printParameters: true),
@@ -193,6 +60,7 @@ struct AppDependencies {
                 service: RevenueCatPurchaseService(apiKey: AppKeys.revenueCatDev), // StoreKitPurchaseService(),
                 logManager: logManager
             )
+            appState = AppState()
         case .prod:
             logManager = LogManager(services: [
                 FirebaseAnalyticsService(),
@@ -210,6 +78,7 @@ struct AppDependencies {
                 service: RevenueCatPurchaseService(apiKey: AppKeys.revenueCat), // StoreKitPurchaseService(),
                 logManager: logManager
             )
+            appState = AppState()
         }
         
         pushManager = PushManager(logManager: logManager)
@@ -224,6 +93,7 @@ struct AppDependencies {
         container.register(PushManager.self, service: pushManager)
         container.register(ABTestManager.self, service: abTestManager)
         container.register(PurchaseManager.self, service: purchaseManager)
+        container.register(AppState.self, service: appState)
         self.container = container
     }
     // swiftlint:enable function_body_length
@@ -232,16 +102,7 @@ struct AppDependencies {
 extension View {
     func previewEnvironment(isSignedIn: Bool = true) -> some View {
         self
-            .environment(AuthManager(service: MockAuthService(user: isSignedIn ? .mock() : nil)))
-            .environment(UserManager(services: MockUserServices(user: isSignedIn ? .mock : nil)))
-            .environment(AIManager(service: MockAIService()))
-            .environment(AvatarManager(remote: MockAvatarService(), local: MockLocalAvatarPersistence()))
-            .environment(ChatManager(service: MockChatService()))
             .environment(LogManager(services: []))
-            .environment(PushManager())
-            .environment(ABTestManager(service: MockABTestService()))
-            .environment(PurchaseManager(service: MockPurchaseService()))
-            .environment(AppState())
             .environment(DevPreview.shared.container)
     }
 }
@@ -261,6 +122,7 @@ class DevPreview {
         container.register(PushManager.self, service: pushManager)
         container.register(ABTestManager.self, service: abTestManager)
         container.register(PurchaseManager.self, service: purchaseManager)
+        container.register(AppState.self, service: appState)
         return container
     }
     
@@ -273,6 +135,7 @@ class DevPreview {
     let pushManager: PushManager
     let abTestManager: ABTestManager
     let purchaseManager: PurchaseManager
+    let appState: AppState
     
     init(isSignedIn: Bool = true) {
         self.authManager = AuthManager(service: MockAuthService(user: isSignedIn ? .mock() : nil))
@@ -284,5 +147,6 @@ class DevPreview {
         self.pushManager = PushManager()
         self.abTestManager = ABTestManager(service: MockABTestService())
         self.purchaseManager = PurchaseManager(service: MockPurchaseService())
+        self.appState = AppState()
     }
 }

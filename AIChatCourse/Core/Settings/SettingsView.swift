@@ -10,7 +10,6 @@ import SwiftUI
 struct SettingsView: View {
     
     @Environment(DependencyContainer.self) private var container
-    @Environment(AppState.self) private var appState
     @Environment(\.dismiss) private var dismiss
     
     @State var viewModel: SettingsViewModel
@@ -163,7 +162,6 @@ struct SettingsView: View {
     
     func dismissScreen() async {
         dismiss()
-        appState.updateViewState(showTabBarView: false)
     }
 }
 
