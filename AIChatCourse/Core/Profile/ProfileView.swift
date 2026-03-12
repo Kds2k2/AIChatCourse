@@ -24,7 +24,7 @@ struct ProfileView: View {
                     settingsButton
                 }
             }
-            .navigationDestinationForCoreModule(path: $viewModel.path)
+            .navigationDestinationForTabBarModule(path: $viewModel.path)
         }
         .showCustomAlert(alert: $viewModel.showAlert)
         .screenAppearAnalytics(name: "ProfileView")

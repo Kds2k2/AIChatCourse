@@ -35,7 +35,7 @@ class ExploreViewModel {
     private(set) var isLoadingPopular: Bool = true
     private(set) var showPushNotificationButton: Bool = false
     
-    var path: [NavigationPathOption] = []
+    var path: [TabBarPathOption] = []
     var showPushNotificationModal: Bool = false
     var showAppleProvider: Bool = false
     var showDevSettings: Bool = false

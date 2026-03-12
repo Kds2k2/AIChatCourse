@@ -8,7 +8,9 @@
 import SwiftUI
 
 struct OnboardingIntroView: View {
-    @Environment(ABTestManager.self) private var abTestManager
+    @Environment(DependencyContainer.self) private var container
+    @State var viewModel: OnboardingIntroViewModel
+    @Binding var path: [OnboardingPathOption]
     
     var body: some View {
         VStack {
@@ -31,17 +33,12 @@ struct OnboardingIntroView: View {
             .frame(maxHeight: .infinity)
             .padding(24)
 
-            NavigationLink {
-                if abTestManager.activeTests.onboardingCommunityTest {
-                    OnboardingCommunityView()
-                } else {
-                    OnboardingColorView()
+            Text("Continue")
+                .callToActionButton()
+                .accessibilityIdentifier("ContinueButton")
+                .anyButton(.press) {
+                    viewModel.onContinuePressed(path: $path)
                 }
-            } label: {
-                Text("Continue")
-                    .callToActionButton()
-            }
-            .accessibilityIdentifier("ContinueButton")
         }
         .font(.title3)
         .padding(24)
@@ -51,16 +48,20 @@ struct OnboardingIntroView: View {
 }
 
 #Preview("Original") {
-    NavigationStack {
-        OnboardingIntroView()
+    let container = DevPreview.shared.container
+    
+    return NavigationStack {
+        OnboardingIntroView(viewModel: OnboardingIntroViewModel(interactor: CoreInteractor(container: container)), path: .constant([]))
     }
     .previewEnvironment()
 }
 
 #Preview("Onboarding Community Test") {
-    NavigationStack {
-        OnboardingIntroView()
+    let container = DevPreview.shared.container
+    container.register(ABTestManager.self, service: ABTestManager(service: MockABTestService(onboardingCommunityTest: true)))
+    
+    return NavigationStack {
+        OnboardingIntroView(viewModel: OnboardingIntroViewModel(interactor: CoreInteractor(container: container)), path: .constant([]))
     }
-    .environment(ABTestManager(service: MockABTestService(onboardingCommunityTest: true)))
     .previewEnvironment()
 }

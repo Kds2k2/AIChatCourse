@@ -28,7 +28,7 @@ class ChatsViewModel {
     private(set) var isLoadingChats: Bool = true
     private(set) var recentAvatars: [AvatarModel] = []
     
-    var path: [NavigationPathOption] = []
+    var path: [TabBarPathOption] = []
     
     var currentUserId: String? {
         interactor.auth?.uid

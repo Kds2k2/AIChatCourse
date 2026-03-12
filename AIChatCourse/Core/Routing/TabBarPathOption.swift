@@ -8,18 +8,18 @@
 import SwiftUI
 import Foundation
 
-enum NavigationPathOption: Hashable {
+enum TabBarPathOption: Hashable {
     case chat(avatarId: String, chat: ChatModel?)
     case category(category: CharacterOption, imageName: String)
 }
 
-struct NavigationDestinationForCoreModuleViewModifier: ViewModifier {
+struct NavigationDestinationForTabBarModuleViewModifier: ViewModifier {
     @Environment(DependencyContainer.self) private var container
-    let path: Binding<[NavigationPathOption]>
+    let path: Binding<[TabBarPathOption]>
     
     func body(content: Content) -> some View {
         content
-            .navigationDestination(for: NavigationPathOption.self) { newValue in
+            .navigationDestination(for: TabBarPathOption.self) { newValue in
                 switch newValue {
                 case .chat(avatarId: let avatarId, chat: let chat):
                     ChatView(
@@ -43,7 +43,7 @@ struct NavigationDestinationForCoreModuleViewModifier: ViewModifier {
 }
 
 extension View {
-    func navigationDestinationForCoreModule(path: Binding<[NavigationPathOption]>) -> some View {
-        modifier(NavigationDestinationForCoreModuleViewModifier(path: path))
+    func navigationDestinationForTabBarModule(path: Binding<[TabBarPathOption]>) -> some View {
+        modifier(NavigationDestinationForTabBarModuleViewModifier(path: path))
     }
 }

@@ -43,7 +43,7 @@ struct ExploreView: View {
             }
             .navigationTitle("Explore")
             .screenAppearAnalytics(name: "ExploreView")
-            .navigationDestinationForCoreModule(path: $viewModel.path)
+            .navigationDestinationForTabBarModule(path: $viewModel.path)
             .toolbar(content: {
                 ToolbarItem(placement: .topBarLeading) {
                     if viewModel.showDevSettingsButton {

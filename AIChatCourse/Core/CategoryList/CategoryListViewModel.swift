@@ -44,7 +44,7 @@ class CategoryListViewModel {
         isLoading = false
     }
     
-    func onAvatarPressed(avatar: AvatarModel, path: Binding<[NavigationPathOption]>) {
+    func onAvatarPressed(avatar: AvatarModel, path: Binding<[TabBarPathOption]>) {
         path.wrappedValue.append(.chat(avatarId: avatar.avatarId, chat: nil))
         interactor.trackEvent(event: Event.onAvatarPressed(avatar: avatar))
     }

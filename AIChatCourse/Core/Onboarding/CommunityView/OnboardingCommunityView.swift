@@ -8,7 +8,9 @@
 import SwiftUI
 
 struct OnboardingCommunityView: View {
-    @Environment(AuthManager.self) private var authManager
+    @Environment(DependencyContainer.self) private var container
+    @State var viewModel: OnboardingCommunityViewModel
+    @Binding var path: [OnboardingPathOption]
     
     var body: some View {
         VStack {
@@ -32,13 +34,12 @@ struct OnboardingCommunityView: View {
             }
             .frame(maxHeight: .infinity)
 
-            NavigationLink {
-                OnboardingColorView()
-            } label: {
-                Text("Continue")
-                    .callToActionButton()
-            }
-            .accessibilityIdentifier("OnboardingCommunityContinueButton")
+            Text("Continue")
+                .callToActionButton()
+                .accessibilityIdentifier("OnboardingCommunityContinueButton")
+                .anyButton(.press) {
+                    viewModel.onContinuePressed(path: $path)
+                }
         }
         .font(.title3)
         .padding(24)
@@ -49,7 +50,7 @@ struct OnboardingCommunityView: View {
 
 #Preview {
     NavigationStack {
-        OnboardingCommunityView()
+        OnboardingCommunityView(viewModel: .init(interactor: CoreInteractor(container: DevPreview.shared.container)), path: .constant([]))
     }
     .previewEnvironment()
 }

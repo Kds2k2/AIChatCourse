@@ -21,12 +21,17 @@ class WelcomeViewModel {
     
     private(set) var imageName: String = Constants.randomImage
     
+    var path: [OnboardingPathOption] = []
     var showCreateAccountMenu: AnyAppAlert?
     var showAppleProvider: Bool = false
     var showEmailProvider: Bool = false
     
     init(interactor: WelcomeInteractor) {
         self.interactor = interactor
+    }
+    
+    func onGetStartedPressed() {
+        path.append(.intro)
     }
     
     func onSignInPressed() {
