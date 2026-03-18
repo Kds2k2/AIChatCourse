@@ -17,6 +17,8 @@
 	</array>
 	<key>FirebaseAutomaticScreenReportingEnabled</key>
 	<false/>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
 	<key>MIXPANEL_PROJECT_TOKEN</key>
 	<string>$(MIXPANEL_PROJECT_TOKEN)</string>
 	<key>REVENUECAT_API_KEY</key>

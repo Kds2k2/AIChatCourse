@@ -11,6 +11,8 @@
 		262536612F37CD870008B70C /* Mixpanel in Frameworks */ = {isa = PBXBuildFile; productRef = 262536602F37CD870008B70C /* Mixpanel */; };
 		262536632F37D23B0008B70C /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = 262536622F37D23B0008B70C /* FirebaseCrashlytics */; };
 		2671E6182F47966E00178008 /* FirebaseRemoteConfig in Frameworks */ = {isa = PBXBuildFile; productRef = 2671E6172F47966E00178008 /* FirebaseRemoteConfig */; };
+		2699EEB52F68738D00F8D928 /* MLXVLM in Frameworks */ = {isa = PBXBuildFile; productRef = 2699EEB42F68738D00F8D928 /* MLXVLM */; };
+		2699EEB72F68739500F8D928 /* MLXLMCommon in Frameworks */ = {isa = PBXBuildFile; productRef = 2699EEB62F68739500F8D928 /* MLXLMCommon */; };
 		26A3265C2F49F69E0047D76B /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26A3265B2F49F69E0047D76B /* StoreKit.framework */; };
 		26A38EC42F48767000598FF2 /* FirebaseInstallations in Frameworks */ = {isa = PBXBuildFile; productRef = 26A38EC32F48767000598FF2 /* FirebaseInstallations */; };
 		26A528452F2FD1F90065FCFF /* SignInAppleAsync in Frameworks */ = {isa = PBXBuildFile; productRef = 26A528442F2FD1F90065FCFF /* SignInAppleAsync */; };
@@ -123,8 +125,10 @@
 				26A92EB42F145E7D007A738A /* SwiftfulFirestore in Frameworks */,
 				26CF26702F4B981900C04FEF /* RevenueCat in Frameworks */,
 				26F02C102F36396100270AC3 /* FirebaseAnalytics in Frameworks */,
+				2699EEB72F68739500F8D928 /* MLXLMCommon in Frameworks */,
 				26A38EC42F48767000598FF2 /* FirebaseInstallations in Frameworks */,
 				260C87972F0705DC0078F742 /* SDWebImageSwiftUI in Frameworks */,
+				2699EEB52F68738D00F8D928 /* MLXVLM in Frameworks */,
 				26A528452F2FD1F90065FCFF /* SignInAppleAsync in Frameworks */,
 				26C599762F0FAF2200D7A1DE /* FirebaseAuth in Frameworks */,
 				26CF26722F4B981900C04FEF /* RevenueCatUI in Frameworks */,
@@ -251,6 +255,8 @@
 				26A38EC32F48767000598FF2 /* FirebaseInstallations */,
 				26CF266F2F4B981900C04FEF /* RevenueCat */,
 				26CF26712F4B981900C04FEF /* RevenueCatUI */,
+				2699EEB42F68738D00F8D928 /* MLXVLM */,
+				2699EEB62F68739500F8D928 /* MLXLMCommon */,
 			);
 			productName = AIChatCourse;
 			productReference = 26CA90F22F032E9500E21190 /* AIChatCourse.app */;
@@ -295,6 +301,7 @@
 				26A528432F2FD1F90065FCFF /* XCRemoteSwiftPackageReference "SignInAppleAsync" */,
 				2625365F2F37CD870008B70C /* XCRemoteSwiftPackageReference "mixpanel-swift" */,
 				26CF266E2F4B981900C04FEF /* XCRemoteSwiftPackageReference "purchases-ios" */,
+				2699EE732F68342A00F8D928 /* XCRemoteSwiftPackageReference "mlx-swift-lm" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 26CA90F32F032E9500E21190 /* Products */;
@@ -742,6 +749,7 @@
 				INFOPLIST_KEY_NSUserTrackingUsageDescription = "Your data will be used to deliver personolized ads and experience";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphoneos*]" = YES;
@@ -803,11 +811,12 @@
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AIChatCourse/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "AI Chat";
+				INFOPLIST_KEY_CFBundleDisplayName = "AI Chat - Dev";
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_NSUserTrackingUsageDescription = "Your data will be used to deliver personolized ads and experience";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphoneos*]" = YES;
@@ -935,11 +944,12 @@
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AIChatCourse/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "AI Chat - Mock";
+				INFOPLIST_KEY_CFBundleDisplayName = "AI Chat - Dev";
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_NSUserTrackingUsageDescription = "Your data will be used to deliver personolized ads and experience";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphoneos*]" = YES;
@@ -1034,6 +1044,14 @@
 				minimumVersion = 5.2.0;
 			};
 		};
+		2699EE732F68342A00F8D928 /* XCRemoteSwiftPackageReference "mlx-swift-lm" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ml-explore/mlx-swift-lm";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 		26A528432F2FD1F90065FCFF /* XCRemoteSwiftPackageReference "SignInAppleAsync" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SwiftfulThinking/SignInAppleAsync";
@@ -1088,6 +1106,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 26C599742F0FAF2200D7A1DE /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseRemoteConfig;
+		};
+		2699EEB42F68738D00F8D928 /* MLXVLM */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2699EE732F68342A00F8D928 /* XCRemoteSwiftPackageReference "mlx-swift-lm" */;
+			productName = MLXVLM;
+		};
+		2699EEB62F68739500F8D928 /* MLXLMCommon */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2699EE732F68342A00F8D928 /* XCRemoteSwiftPackageReference "mlx-swift-lm" */;
+			productName = MLXLMCommon;
 		};
 		26A38EC32F48767000598FF2 /* FirebaseInstallations */ = {
 			isa = XCSwiftPackageProductDependency;

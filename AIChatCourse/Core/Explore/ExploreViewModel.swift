@@ -154,6 +154,11 @@ class ExploreViewModel {
         path.append(.category(category: category, imageName: imageName))
         interactor.trackEvent(event: Event.categoryPressed(categoty: category))
     }
+    
+    func onLocalChatsEntryPressed() {
+        //path.append(.localChat)
+        interactor.trackEvent(event: Event.localChatsPressed)
+    }
 
     func onDevSettingsPressed() {
         showDevSettings = true
@@ -186,6 +191,7 @@ class ExploreViewModel {
         case loadPopularAvatarsStart, loadPopularAvatarsSuccess, loadPopularAvatarsFail(error: Error)
         case avatarPressed(avatar: AvatarModel), categoryPressed(categoty: CharacterOption)
         case tryAgainButtonPressed, devSettingsButtonPressed
+        case localChatsPressed
         case pushNotificationStart, pushNotificationEnable(isAuthorized: Bool), pushNotificationCancel
         case deepLinkStart(url: URL), deepLinkEmpty(url: URL), deepLinkCategory(category: CharacterOption), deepLinkUnknown(url: URL)
         
@@ -203,6 +209,7 @@ class ExploreViewModel {
             case .categoryPressed:                           return "\(Event.screenName)_Category_Pressed"
             case .tryAgainButtonPressed:                     return "\(Event.screenName)_TryAgainButton_Pressed"
             case .devSettingsButtonPressed:                  return "\(Event.screenName)_DevSettingsButton_Pressed"
+            case .localChatsPressed:                         return "\(Event.screenName)_LocalChats_Pressed"
             case .pushNotificationStart:                     return "\(Event.screenName)_PushNotification_Start"
             case .pushNotificationEnable:                    return "\(Event.screenName)_PushNotification_Enable"
             case .pushNotificationCancel:                    return "\(Event.screenName)_PushNotification_Cancel"

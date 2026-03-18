@@ -30,6 +30,8 @@ struct ExploreView: View {
                     categorySection
                 }
                 
+                localChatsEntryView
+                
                 if !viewModel.featuredAvatars.isEmpty {
                     featuredSection
                 }
@@ -87,6 +89,24 @@ struct ExploreView: View {
     }
     
     // MARK: - Views
+    private var localChatsEntryView: some View {
+        HStack {
+            Text("NEW")
+                .badgeButton()
+            
+            Text("Try local AI models")
+                .font(.headline)
+            
+            Spacer()
+            
+            Image(systemName: "arrow.right")
+                .font(.headline)
+        }
+        .anyButton(.press) {
+            viewModel.onLocalChatsEntryPressed()
+        }
+    }
+    
     private var devSettingsButton: some View {
         Text("DEV 👨‍💻")
             .anyButton(.press) {
